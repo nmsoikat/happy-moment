@@ -8,10 +8,18 @@ export default function Home() {
   return (
     <>
       <Topbar />
-      <div className="container home-container">
-        <Sidebar />
-        <Feed />
-        <Rightbar />
+      <div className="container">
+        <div className="row">
+          <div className="col-md-3">
+            <Sidebar />
+          </div>
+          <div className="col-md-6">
+            <Feed />
+          </div>
+          <div className="col-md-3">
+            <Rightbar/>
+          </div>
+        </div>
       </div>
     </>
   )

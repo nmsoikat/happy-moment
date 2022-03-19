@@ -22,17 +22,19 @@ export default function Share() {
 
     if (file) {
       const data = new FormData()
-      const fileName = Date.now() + file.name;
+      let removeSpaceFileName = file.name.toLocaleLowerCase().split(" ").join("-");
+      const fileName = user._id + '_' + Date.now() + '_' + removeSpaceFileName;
 
       // store like array in array;
       data.append("file", file)
-      data.append("name", fileName)
+      // data.append("name", fileName)
 
       newPost.photo = fileName;
       // console.log([...data]);
       // console.log(newPost);
+
       try {
-        await axios.post("/upload", data);
+        await axios.post(`/upload/${fileName}`, data);
       } catch (err) {
         console.log(err);
       }

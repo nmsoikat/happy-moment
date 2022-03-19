@@ -41,25 +41,65 @@ app.use(morgan('common'));
 
 
 // MULTER | FILE UPLOAD
-// destination
+const DESTINATION_PATH = "api/public/images/";
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "api/public/images/");
+    cb(null, DESTINATION_PATH);
   },
   filename: async (req, file, cb) => {
-    // console.log('before:', req.body);
-    const body = await req.body
-    // console.log(file);
-    // console.log('fileName:', body);
-    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
-      cb(null, body.name)
-    }
+
+      const fileName = req.params.fileName
+
+
+      cb(null, fileName);
   }
 })
 
-const upload = multer({ storage });
+const upload = multer({
+  // dest: DESTINATION_PATH,
+  storage: storage,
+  limits: {
+    fileSize: 10000000,
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === "file") {
+      if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true)
+      } else {
+        cb(new Error("Only .jpg, .png or .jpeg format allowed!"));
+      }
 
-app.post('/api/v1/upload', upload.single("file"), (req, res) => {
+    } else if (file.fieldname === "doc") {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true)
+      } else {
+        cb(new Error("Only .pdf format allowed!"))
+      }
+    }
+  }
+});
+
+// -------------------------
+// destination
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "api/public/images/");
+//   },
+//   filename: async (req, file, cb) => {
+//     // console.log('before:', req.body);
+//     const body = await req.body
+//     // console.log(file);
+//     // console.log('fileName:', body);
+//     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+//       cb(null, body.name)
+//     }
+//   }
+// })
+
+// const upload = multer({ storage });
+
+app.post('/api/v1/upload/:fileName', upload.single("file"), (req, res) => {
   try {
     return res.status(200).json("File uploaded successfully.");
   } catch (err) {

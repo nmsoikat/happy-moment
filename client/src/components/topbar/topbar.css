@@ -9,8 +9,8 @@
 /* ------------------------------- */
 .search-bar {
 	padding: 15px 5px;
-	background-color: #fff;
 	border-radius: 30px;
+	background-color: #fff;
 	display: flex;
 	align-items: center;
 }

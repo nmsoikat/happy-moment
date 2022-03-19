@@ -1,12 +1,11 @@
 .sidebar {
-	flex: 3;
 	height: calc(100vh - 50px);
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   position: sticky;
   top: 50px;
 }
 
-::-webkit-scrollbar{
+/* ::-webkit-scrollbar{
   width: 5px;
 }
 ::-webkit-scrollbar-track{
@@ -14,49 +13,49 @@
 }
 ::-webkit-scrollbar-thumb{
   background-color: #999;
-}
+} */
 
-.sidebar-wrapper {
-	padding: 20px;
+.sidebar-list{
+	border-radius: 30px;
 }
 
 .sidebar-list-item {
 	display: flex;
 	align-items: center;
-	margin-bottom: 20px;
+}
+
+.sidebar-list-item.logout,
+.sidebar-list-item a {
+  display: block;
+  text-decoration: none;
+  color: #e38802;
+  width: 100%;
+  padding: 15px 10px;
+}
+
+.sidebar-list-item a.active,
+.sidebar-list-item.logout:hover,
+.sidebar-list-item a:hover {
+  color: #e38802;
+  background-color: #f4f4f4;
+  cursor: pointer;
 }
 
 .sidebar-list-item-icon {
 	margin-right: 15px;
 }
 
-.sidebar-btn {
-	width: 150px;
-	padding: 10px;
-	border: none;
-	border-radius: 5px;
-	font-weight: 500;
+.date-time-wrap{
+  border-radius: 15px;
+  margin-top: 30px;
 }
 
-.sidebar-hr{
-  margin: 20px 0;
-}
-
-
-.sidebar-friend-item{
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.sidebar-friend-img{
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 10px;
-}
-
-.sidebar-friend-name{
-
+.date-time-wrap .time,
+.date-time-wrap .date{
+  padding: 15px 10px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 50px;
+  text-shadow: 2px 2px 2px #ffa803;
 }

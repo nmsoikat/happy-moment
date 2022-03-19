@@ -19,14 +19,16 @@ export default function Rightbar({ user }) {
 
   useEffect(() => {
     setFollowed(currentUser.followings.includes(user?._id))
-    console.log(currentUser.followings);
+    console.log('followings:', currentUser.followings);
   }, [currentUser, user?._id])
 
   useEffect(() => {
       const getFriends = async () => {
         try {
-          const friendList = await axios.get('/users/friends/' + user?._id)
-          setFriends(friendList.data)
+          if(user?._id){
+            const friendList = await axios.get('/users/friends/' + user?._id)
+            setFriends(friendList.data)
+          }
         } catch (err) {
           console.log(err);
         }
@@ -54,19 +56,13 @@ export default function Rightbar({ user }) {
   const HomeRightbar = () => {
     return (
       <>
-        <div className="birthday-container">
+        <div className="birthday-container shadow-sm overflow-hidden bg-white">
           <img className="birthday-img" src="/assets/gift.png" alt="" />
           <span className="birthday-text">
             <b>Pola Foster</b> and  <b>3 other friends</b> have birthday today.
           </span>
         </div>
-        <img className="rightbar-ad" src="/assets/ad.png" alt="" />
-        <h4 className="rightbar-title">Online Friends</h4>
-        <ul className="rightbar-friend-list">
-          {user?.map(u => (
-            <OnlineFriend key={u.id} user={u} />
-          ))}
-        </ul>
+        {/* <img className="rightbar-ad" src="/assets/ad.png" alt="" /> */}
       </>
     )
   }

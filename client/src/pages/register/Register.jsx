@@ -36,9 +36,9 @@ export default function Register() {
     <div className="login">
       <div className="login-wrapper">
         <div className="login-left">
-          <h3 className="login-logo">Social APP</h3>
+          <h3 className="login-logo">Happy Moment</h3>
           <div className="span login-desc">
-            Connect with friends and the world around you on Social APP.
+          Be happy for this moment.
           </div>
         </div>
         <form className="login-right" onSubmit={submitHandler}>
@@ -49,7 +49,7 @@ export default function Register() {
             <input placeholder="Password" type="password" minLength="6" ref={password} className="login-input" required />
             <input placeholder="Password Confirm" type="password" ref={confirmPassword} className="login-input" required />
             <button className='login-btn' type='submit'>Sign Up</button>
-            <button className='register-btn'><Link to="/login" style={{ textDecoration: 'none', color: 'white' }}>Log Into Account</Link></button>
+            <button type='button' className='register-btn'><Link to="/login" style={{ textDecoration: 'none', color: 'white', display:'block' }}>Log Into Account</Link></button>
           </div>
         </form>
       </div>

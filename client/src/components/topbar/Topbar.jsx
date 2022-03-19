@@ -13,16 +13,16 @@ export default function Topbar() {
       <div className="container">
         <div className="row">
           <div className="col-md-3">
-            <div class="search-bar shadow-sm overflow-hidden bg-white">
+            <div className="search-bar shadow-sm overflow-hidden bg-white">
               <Search className='search-icon' />
               <input type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
             </div>
           </div>
           <div className="col-md-6">
             <ul className='tab-wrap shadow-sm overflow-hidden bg-white'>
-              <li><NavLink className={(navData) => { return navData.isActive && 'active' }} to="/"  >Feed</NavLink></li>
-              <li><NavLink className={(navData) => { return navData.isActive && 'active' }} to="/trending">Trending</NavLink></li>
-              <li><NavLink className={(navData) => { return navData.isActive && 'active' }} to="/people">People</NavLink></li>
+              <li><NavLink className={(navData) => { return navData.isActive ? 'active' : '' }} to="/"  >Feed</NavLink></li>
+              <li><NavLink className={(navData) => { return navData.isActive ? 'active' : '' }} to="/trending">Trending</NavLink></li>
+              <li><NavLink className={(navData) => { return navData.isActive ? 'active' : '' }} to="/people">People</NavLink></li>
             </ul>
           </div>
           <div className="col-md-3">
