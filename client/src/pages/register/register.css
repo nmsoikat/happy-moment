@@ -1,0 +1,94 @@
+.login {
+	width: 100vw;
+	height: 100vh;
+	background-color: #f0f2f5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.login-wrapper {
+	width: 70%;
+	height: 70%;
+	display: flex;
+}
+
+.login-left,
+.login-right {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.login-logo {
+	font-size: 50px;
+	font-weight: 800;
+	color: #1775ee;
+	margin-bottom: 10px;
+}
+
+.login-desc {
+	font-size: 24px;
+}
+
+.login-box {
+	height: 450px;
+	padding: 30px;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+  border-radius: 10px;
+	-webkit-box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
+	box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
+}
+
+.register-title{
+	text-align: center;
+	font-size: 30px;
+	color: #333;
+}
+
+.login-input {
+	height: 50px;
+	border-radius: 10px;
+	border: 1px solid gray;
+	font-size: 18px;
+	padding-left: 20px;
+}
+
+.login-input:focus {
+	outline: none;
+}
+
+.login-btn {
+	height: 50px;
+	border-radius: 10px;
+	border: none;
+	color: #fff;
+	background-color: #1775ee;
+	font-weight: 500;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.password-forgot {
+	text-align: center;
+	color: #1775ee;
+	cursor: pointer;
+}
+
+.register-btn {
+	height: 40px;
+	border-radius: 10px;
+	border: none;
+	color: #fff;
+	background-color: #42b72a;
+	font-weight: 500;
+	font-size: 20px;
+	cursor: pointer;
+	align-self: center;
+	padding-left: 10px;
+	padding-right: 10px;
+}
