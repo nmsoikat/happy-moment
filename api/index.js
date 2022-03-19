@@ -41,7 +41,7 @@ app.use(morgan('common'));
 
 
 // MULTER | FILE UPLOAD
-const DESTINATION_PATH = "api/public/images/";
+const DESTINATION_PATH = "api/public/images/post";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
