@@ -62,11 +62,11 @@ const UserSchema = mongoose.Schema({
     type: String,
     maxLength: 50,
   },
-  city: {
+  livesIn: {
     type: String,
     maxLength: 50
   },
-  form:{
+  from:{
     type: String,
     maxLength: 50
   },

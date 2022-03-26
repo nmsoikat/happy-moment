@@ -10,7 +10,7 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
     return next(new AppError("File upload failed", 400))
   }
 
-  //only logged in user or admin
+  //only logged in user
   if (req.body.userId !== req.params.id) {
     return next(new AppError("You can update only your account!", 400))
   }
@@ -20,11 +20,13 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
     user = await User.findByIdAndUpdate(req.params.id, {
       $set: { coverPicture: req.file.filename }
     });
-  } else{
+  } else {
     user = await User.findByIdAndUpdate(req.params.id, {
       $set: { profilePicture: req.file.filename }
     });
   }
+
+  //$set if there is field create new one
 
   if (!user) {
     return next(new AppError("Update failed", 400))
@@ -42,16 +44,50 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
 
 // UPDATE USER
 exports.userUpdateById = catchAsync(async (req, res, next) => {
-  //only logged in user or admin
-  if (req.body.userId !== req.params.id || !req.body.isAdmin) {
+  //only logged in user
+  if (req.body.userId !== req.params.id) {
     return next(new AppError("You can update only your account!", 400))
   }
 
-  const user = await User.findByIdAndUpdate(req.params.id, {
-    $set: req.body
-  });
+  const { firstName, lastName, desc, livesIn, from } = req.body;
 
-  res.status(200).json("Account has been updated");
+  const user = await User.findByIdAndUpdate(req.params.id,
+    { firstName, lastName, desc, livesIn, from },
+    { new: true } //return updated doc instead old doc
+  );
+
+  user.password = undefined;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: user
+    }
+  })
+})
+
+// UPDATE USERNAME
+exports.usernameUpdateById = catchAsync(async (req, res, next) => {
+  //only logged in user
+  if (req.body.userId !== req.params.id) {
+    return next(new AppError("You can update only your account!", 400))
+  }
+
+  const userExist = await User.findOne({ 'username': req.body.username })
+  if (userExist) {
+    return next(new AppError("Username already exist", 400))
+  }
+
+  const user = await User.findByIdAndUpdate(req.params.id, { username: req.body.username }, { new: true });
+
+  user.password = undefined;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: user
+    }
+  })
 })
 
 // DELETE USER
@@ -79,6 +115,160 @@ exports.userGetAll = async (req, res) => {
   } catch (err) {
     return res.status(500).json(err)
   }
+}
+
+// SEND FRIEND REQUEST
+exports.sendFriendRequest = async (req, res, next) => {
+  const targetUserId = req.params.id;
+  const currentUserId = req.body.userId;
+
+  //same user cannot be friend
+  if (currentUserId === targetUserId) {
+    return next(new AppError("You can not send friend request yourself", 400))
+  }
+
+  //find
+  const targetUser = await User.findById(targetUserId);
+  const currentUser = await User.findById(currentUserId)
+
+  //not exist user
+  if (!targetUser || !currentUser) {
+    return next(new AppError("User not exist", 400))
+  }
+
+  // check user already friend or requested
+  if (targetUser.friends.includes(currentUserId) || targetUser.friendsRequest.includes(currentUserId)) {
+    return next(new AppError("You already sent request or friend of this user", 400))
+  }
+
+  // send friend request
+  await targetUser.updateOne({ $push: { friendsRequest: currentUserId } })
+  await currentUser.updateOne({ $push: { friendsSentRequest: targetUserId } })
+
+  res.status(200).json({
+    status: 'success'
+  })
+}
+
+// CONFIRM FRIEND REQUEST
+exports.confirmFriendRequest = async (req, res, next) => {
+  const targetUserId = req.params.id;
+  const currentUserId = req.body.userId;
+
+  //same user cannot be friend
+  if (currentUserId === targetUserId) {
+    return next(new AppError("You can not confirm friend yourself", 400))
+  }
+
+  //find
+  const targetUser = await User.findById(targetUserId);
+  const currentUser = await User.findById(currentUserId)
+
+  //not exist user
+  if (!targetUser || !currentUser) {
+    return next(new AppError("User not exist", 400))
+  }
+
+  // check user not exist in pending list
+  if (!currentUser.friendsRequest.includes(targetUserId) && !targetUser.friendsSentRequest.includes(currentUserId)) {
+    return next(new AppError("user not exist in pending list", 400))
+  }
+
+
+  // check user already friend
+  if (currentUser.friends.includes(targetUserId)) {
+    return next(new AppError("You already friend of this user", 400))
+  }
+
+  // confirm friend
+  await currentUser.updateOne({ $push: { friends: targetUserId } })
+  await targetUser.updateOne({ $push: { friends: currentUserId } })
+
+  // remove from friend request pending list
+  await currentUser.updateOne({ $pull: { friendsRequest: targetUserId } })
+  await targetUser.updateOne({ $pull: { friendsSentRequest: currentUserId } })
+
+
+  res.status(200).json({
+    status: 'success'
+  })
+}
+
+// DELETE FRIEND REQUEST
+exports.deleteFriendRequest = async (req, res, next) => {
+  const targetUserId = req.params.id;
+  const currentUserId = req.body.userId;
+
+  //same user cannot be friend
+  if (currentUserId === targetUserId) {
+    return next(new AppError("You can not confirm friend yourself", 400))
+  }
+
+  //find
+  const targetUser = await User.findById(targetUserId);
+  const currentUser = await User.findById(currentUserId)
+
+  //not exist user
+  if (!targetUser || !currentUser) {
+    return next(new AppError("User not exist", 400))
+  }
+
+  // check user not exist in pending list
+  if (!currentUser.friendsRequest.includes(targetUserId) && !targetUser.friendsSentRequest.includes(currentUserId)) {
+    return next(new AppError("user not exist in pending list", 400))
+  }
+
+
+  // check user already friend
+  if (currentUser.friends.includes(targetUserId)) {
+    return next(new AppError("You already friend of this user", 400))
+  }
+
+  // confirm friend
+  await currentUser.updateOne({ $push: { friends: targetUserId } })
+  await targetUser.updateOne({ $push: { friends: currentUserId } })
+
+  // remove from friend request pending list
+  await currentUser.updateOne({ $pull: { friendsRequest: targetUserId } })
+  await targetUser.updateOne({ $pull: { friendsSentRequest: currentUserId } })
+
+
+  res.status(200).json({
+    status: 'success'
+  })
+}
+
+// CANCEL FRIEND REQUEST
+exports.cancelFriendRequest = async (req, res, next) => {
+  const targetUserId = req.params.id;
+  const currentUserId = req.body.userId;
+
+  //same user cannot be friend
+  if (currentUserId === targetUserId) {
+    return next(new AppError("You can not send friend request yourself", 400))
+  }
+
+  //find
+  const targetUser = await User.findById(targetUserId);
+  const currentUser = await User.findById(currentUserId)
+
+  //not exist user
+  if (!targetUser || !currentUser) {
+    return next(new AppError("User not exist", 400))
+  }
+
+  // check user already friend or requested
+  if (targetUser.friends.includes(currentUserId) || targetUser.friendsRequest.includes(currentUserId)) {
+    return next(new AppError("You already sent request or friend of this user", 400))
+  }
+
+  // send friend request
+  await targetUser.updateOne({ $push: { friendsRequest: currentUserId } })
+  await currentUser.updateOne({ $push: { friendsSentRequest: targetUserId } })
+
+  res.status(200).json({
+    status: 'success'
+  })
 }
 
 // FOLLOW 

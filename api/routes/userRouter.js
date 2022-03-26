@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { protect } = require('../controllers/authController');
-const { userUpdateById, userProfileImgUpdateById, userDeleteById, userGetAll, userFollow, userUnfollow, userGetFriendsAndFollower, userGetBySearch } = require('../controllers/userController');
+const {sendFriendRequest, userUpdateById, userProfileImgUpdateById,usernameUpdateById, userDeleteById, userGetAll, userFollow, userUnfollow, userGetFriendsAndFollower, userGetBySearch, confirmFriendRequest, deleteFriendRequest, cancelFriendRequest } = require('../controllers/userController');
 const { setDestination, uploadFile } = require('../middlewares/fileUploadMiddleware');
 
 
@@ -8,14 +8,26 @@ const { setDestination, uploadFile } = require('../middlewares/fileUploadMiddlew
 router.put('/profile-pic/:id', protect, setDestination('/images/person'), uploadFile, userProfileImgUpdateById)
 router.put('/profile-cover/:id', protect, setDestination('/images/personCover'), uploadFile, userProfileImgUpdateById)
 
+// UPDATE USERNAME
+router.put('/username/:id', protect, usernameUpdateById)
+
 // UPDATE USER
-router.put('/:id', protect, userUpdateById)
+router.patch('/:id', protect, userUpdateById)
 
 // DELETE USER
 router.delete('/:id', protect, userDeleteById)
 
 // GET A USER by Id and username
 router.get('/', userGetAll)
+
+// SEARCH FRIENDS
+router.get('/search', userGetBySearch)
+
+// SEND FRIEND REQUEST
+router.put('/:id/send-request', protect, sendFriendRequest)
+router.put('/:id/confirm-request', protect, confirmFriendRequest)
+router.put('/:id/delete-request', protect, deleteFriendRequest)
+router.put('/:id/cancel-request', protect, cancelFriendRequest)
 
 // FOLLOW 
 router.put('/:id/follow', userFollow)
@@ -26,7 +38,5 @@ router.put('/:id/unfollow', userUnfollow)
 // FRIENDS AND FOLLOWER
 router.get('/friends/:userId', userGetFriendsAndFollower)
 
-// SEARCH FRIENDS
-router.get('/search', userGetBySearch)
 
 module.exports = router;

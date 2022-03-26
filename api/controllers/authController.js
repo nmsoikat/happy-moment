@@ -134,7 +134,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError("The user belonging to this token dose no longer exist."))
   }
 
-
   // 4) Check if user change password after the token  was issued.
   // error password change after login.
   // if (freshUser.changePasswordAfter(decoded.iat)) {
@@ -142,6 +141,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // }
 
   //GRANT ACCESS TO PROTECTED ROUTE.
+  freshUser.password = undefined;
   req.user = freshUser;
   next();
 })
