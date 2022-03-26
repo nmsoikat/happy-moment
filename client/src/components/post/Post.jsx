@@ -54,7 +54,14 @@ export default function Post({ post }) {
       </div>
       <div className="post-center">
         <span className="post-text">{post?.desc}</span>
-        <img className='post-img' src={PF + 'post/'+post?.photo} alt="" />
+        {post?.photo ? (
+          <img className='post-img' src={PF + 'post/' + post?.photo} alt="" />
+        ) : (
+          <video src={'/assets/The-Breathtaking-Beauty-of-Nature-HD.mp4'} controls>
+            Your browser does not support the video tag.
+          </video>
+        )}
+
       </div>
       <div className="post-bottom">
         <div className="post-bottom-left">

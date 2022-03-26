@@ -66,38 +66,16 @@ const upload = multer({
     if (file.fieldname === "file") {
       if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
         cb(null, true)
-      } else {
-        cb(new Error("Only .jpg, .png or .jpeg format allowed!"));
-      }
+      } 
+      // else {
+      //   cb(new Error("Only .jpg, .png or .jpeg format allowed!"));
+      // }
 
-    } else if (file.fieldname === "doc") {
-      if (file.mimetype === 'application/pdf') {
-        cb(null, true)
-      } else {
-        cb(new Error("Only .pdf format allowed!"))
-      }
+      console.log(file);
+      return;
     }
   }
 });
-
-// -------------------------
-// destination
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "api/public/images/");
-//   },
-//   filename: async (req, file, cb) => {
-//     // console.log('before:', req.body);
-//     const body = await req.body
-//     // console.log(file);
-//     // console.log('fileName:', body);
-//     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
-//       cb(null, body.name)
-//     }
-//   }
-// })
-
-// const upload = multer({ storage });
 
 app.post('/api/v1/upload/:fileName', upload.single("file"), (req, res) => {
   try {

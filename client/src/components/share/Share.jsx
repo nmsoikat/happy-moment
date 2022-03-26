@@ -3,6 +3,7 @@ import { Cancel, EmojiEmotions, Label, LineAxisOutlined, PermMedia, Room } from 
 import { useContext, useRef, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
+import { ProgressBar } from 'react-bootstrap'
 
 export default function Share() {
   const { user } = useContext(AuthContext)
@@ -59,11 +60,23 @@ export default function Share() {
       {
         file && (
           <div className="share-img-container">
-            <img src={URL.createObjectURL(file)} alt="" className="share-img" />
-            <Cancel className='share-img-cancel' onClick={() => setFile(null)} />
+            {
+              (file.type === "video/mp4") ? (<div>
+                {file.name}
+                <Cancel className='share-img-cancel' onClick={() => setFile(null)} />
+              </div>) : (
+                <>
+                  <img src={URL.createObjectURL(file)} alt="" className="share-img" />
+                  <Cancel className='share-img-cancel' onClick={() => setFile(null)} />
+                </>
+              )
+            }
           </div>
         )
       }
+
+      {/* <ProgressBar now="90" label={`90%`} /> */}
+
       <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
         <div className="share-options">
           <label id="file" className="share-option">
@@ -71,18 +84,6 @@ export default function Share() {
             <span className='share-option-text'>Photo or Video</span>
             <input style={{ display: 'none' }} type="file" id="file" name='file' onChange={(e) => setFile(e.target.files[0])} />
           </label>
-          <div className="share-option">
-            <Label htmlColor='blue' className='share-option-icon' />
-            <span className='share-option-text'>Tag</span>
-          </div>
-          <div className="share-option">
-            <Room htmlColor='green' className='share-option-icon' />
-            <span className='share-option-text'>Location</span>
-          </div>
-          <div className="share-option">
-            <EmojiEmotions htmlColor='goldenrod' className='share-option-icon' />
-            <span className='share-option-text'>Feelings</span>
-          </div>
         </div>
         <button className="share-btn" type='submit'>Share</button>
       </form>
