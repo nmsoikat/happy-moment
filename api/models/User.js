@@ -1,11 +1,22 @@
 const mongoose = require('mongoose')
 
 const UserSchema = mongoose.Schema({
+  firstName:{
+    type:String,
+    min: 2,
+    max: 20,
+    required: true
+  },
+  lastName:{
+    type:String,
+    min: 2,
+    max: 20,
+    required: true
+  },
   username: {
     type: String,
-    required: true,
     min: 3,
-    max: 20,
+    max: 30,
     unique: true
   },
   email: {
@@ -35,6 +46,18 @@ const UserSchema = mongoose.Schema({
     type: Array,
     default: []
   },
+  friends:{
+    type: Array,
+    default: []
+  },
+  friendsRequest:{
+    type: Array,
+    default: []
+  },
+  friendsSentRequest:{
+    type: Array,
+    default: []
+  },  
   desc:{
     type: String,
     maxLength: 50,

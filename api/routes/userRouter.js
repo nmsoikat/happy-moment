@@ -1,11 +1,12 @@
 const router = require('express').Router();
+const { protect } = require('../controllers/authController');
 const { userUpdateById, userDeleteById, userGetAll, userFollow, userUnfollow, userGetFriendsAndFollower, userGetBySearch } = require('../controllers/userController');
 
 // UPDATE USER
-router.put('/:id', userUpdateById)
+router.put('/:id', protect, userUpdateById)
 
 // DELETE USER
-router.delete('/:id', userDeleteById)
+router.delete('/:id',protect, userDeleteById)
 
 // GET A USER by Id and username
 router.get('/', userGetAll)
