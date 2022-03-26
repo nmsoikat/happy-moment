@@ -7,6 +7,9 @@ const helmet = require('helmet');
 const multer = require('multer');
 const path = require('path');
 
+const AppError = require('./utils/appError');
+const AppErrorHandler = require('./middlewares/appErrorHandleMiddleware');
+
 // ROUTER
 const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
@@ -97,6 +100,12 @@ app.get('/api/v1', (req, res) => {
   res.send('API is running')
 })
 
+
+app.all('*', (req, res, next) => {
+  next(new AppError(`Page not found on ${req.originalUrl}`, 404));
+});
+
+app.use(AppErrorHandler);
 
 // LISTEN
 const PORT = process.env.PORT || 5000;
