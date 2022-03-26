@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { protect } = require('../controllers/authController');
 const { postCreateOne, postUpdateById, postDeleteById, postLikeById, postGetById, postGetForTimeline, postGetByUsername } = require('../controllers/postController');
 
 // create a post
@@ -18,13 +19,13 @@ router.put('/:id/like', postLikeById)
 
 
 // get a post
-router.get('/:id', postGetById)
+router.get('/:id', protect, postGetById)
 
 
 // get timelines posts
-router.get('/timeline/:userId', postGetForTimeline)
+router.get('/timeline/:userId', protect, postGetForTimeline)
 
 // get user's all posts
-router.get('/profile/:username', postGetByUsername)
+router.get('/profile/:username',protect, postGetByUsername)
 
 module.exports = router;

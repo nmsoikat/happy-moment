@@ -125,7 +125,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // 2) Verification Token // if some one manipulate the token
   // callback function call after complete the verification.
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-   console.log(decoded);
+  // console.log(decoded); //{ id: '623ebc728a89e87f9fbd8ceb', iat: 1648286515, exp: 1648372915 }
 
 
   // 3) Check if user still exist // user deleted after login
