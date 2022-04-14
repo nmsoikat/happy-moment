@@ -5,7 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
 import { ProgressBar } from 'react-bootstrap'
 
-export default function Share() {
+export default function Share({fetchPosts}) {
   const { user } = useContext(AuthContext)
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
@@ -15,6 +15,9 @@ export default function Share() {
 
   const submitHandler = async (e) => {
     e.preventDefault()
+    if(!file && !desc.current.value ){
+      return alert("Please add description or image.")
+    }
 
     const newPost = {
       userId: user._id,
@@ -37,23 +40,27 @@ export default function Share() {
       try {
         await axios.post(`/upload/${fileName}`, data);
       } catch (err) {
-        console.log(err);
+        return console.log(err);
       }
     }
 
     try {
       await axios.post("/posts", newPost);
-      window.location.reload();
+      fetchPosts();
+      
+      setFile(null)
+      desc.current.value = "";
 
     } catch (err) {
-      console.log(err);
+      return console.log(err);
     }
   }
-  return <div className='share'>
+  return <>
+  <div className='share'>
     <div className="share-wrapper">
       <div className="share-top">
         <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
-        <input placeholder={"What's on your mind " + user.username + "?"} className="share-input" ref={desc} />
+        <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
       </div>
 
       <hr className="share-hr" />
@@ -88,5 +95,7 @@ export default function Share() {
         <button className="share-btn" type='submit'>Share</button>
       </form>
     </div>
-  </div>;
+  </div>
+
+  </>;
 }

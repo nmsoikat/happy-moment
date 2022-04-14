@@ -27,22 +27,8 @@ export default function Topbar() {
           </div>
           <div className="col-md-3">
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
-              {/* <div className="topbar-icons">
-                <div className="topbar-icon-item">
-                  <Person />
-                  <span className="topbar-icon-badge">1</span>
-                </div>
-                <Link to="/messenger" style={{ color: '#fff' }} className="topbar-icon-item">
-                  <Chat />
-                  <span className="topbar-icon-badge">2</span>
-                </Link>
-                <div className="topbar-icon-item">
-                  <NotificationsActive />
-                  <span className="topbar-icon-badge">1</span>
-                </div>
-              </div> */}
               <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF + user.profilePicture : PF + '/person/noAvatar.png'} className='topbar-img' alt="" /></Link>
-              <div className='username'>{user.username}</div>
+              <div className='username'>{user.firstName}</div>
               <div className="topbar-icon-item">
                 <TagFaces />
                 <span className="topbar-icon-badge">0</span>

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const PostSchema = mongoose.Schema({
   userId: {
     type: String,
-    required: true,
+    required: [true, 'Post should have an author'],
   },
   desc: {
     type: String,

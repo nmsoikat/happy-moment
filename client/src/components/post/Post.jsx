@@ -14,7 +14,14 @@ export default function Post({ post }) {
 
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
-  const { user: currentUser } = useContext(AuthContext)
+  const { user: currentUser, token } = useContext(AuthContext)
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
 
   useEffect(() => {
     setIsLike(post.likes.includes(currentUser._id))
@@ -22,7 +29,7 @@ export default function Post({ post }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios.get(`/users?id=${post.userId}`)
+      const res = await axios.get(`/users?id=${post.userId}`, config)
       setUser(res.data)
     }
     fetchUser();
@@ -30,7 +37,7 @@ export default function Post({ post }) {
 
   const likeHandler = async () => {
     try {
-      await axios.put(`/posts/${post._id}/like`, { userId: currentUser._id })
+      await axios.put(`/posts/${post._id}/like`, { userId: currentUser._id }, config)
       setLike(isLike ? like - 1 : like + 1)
       setIsLike(!isLike);
     } catch (err) {
@@ -45,7 +52,7 @@ export default function Post({ post }) {
           <Link to={`/profile/${user.username}`}>
             <img className='post-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + '/person/noAvatar.png'} alt="" />
           </Link>
-          <span className="post-username">{user.username}</span>
+          <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: '#222', display:'inline-block' }}><span className="post-username">{user.firstName + ' ' + user.lastName}</span></Link>
           <span className="post-date">{format(post.createdAt)}</span>
         </div>
         <div className="post-top-right">
@@ -56,10 +63,10 @@ export default function Post({ post }) {
         <span className="post-text">{post?.desc}</span>
         {post?.photo ? (
           <img className='post-img' src={PF + 'post/' + post?.photo} alt="" />
-        ) : (
-          <video src={'/assets/The-Breathtaking-Beauty-of-Nature-HD.mp4'} controls>
-            Your browser does not support the video tag.
-          </video>
+        ) : (''
+          // <video src={'/assets/The-Breathtaking-Beauty-of-Nature-HD.mp4'} controls>
+          //   Your browser does not support the video tag.
+          // </video>
         )}
 
       </div>

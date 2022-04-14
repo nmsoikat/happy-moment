@@ -4,13 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon api/index.js"
+    "api": "nodemon api/index.js",
+    "client": "npm start --prefix client",
+    "socket": "nodemon socket/index.js",
+    "start:dev": "concurrently \"npm run api\" \"npm run client\" \"npm run socket\" "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "helmet": "^5.0.1",

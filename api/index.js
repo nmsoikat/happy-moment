@@ -6,13 +6,14 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const multer = require('multer');
 const path = require('path');
+const cors = require('cors')
 
 const AppError = require('./utils/appError');
 const AppErrorHandler = require('./middlewares/appErrorHandleMiddleware');
 
 // ROUTER
-const userRouter = require('./routes/userRouter');
 const authRouter = require('./routes/authRouter');
+const userRouter = require('./routes/userRouter');
 const postRouter = require('./routes/postRouter');
 const conversationRouter = require('./routes/conversationRouter');
 const messageRouter = require('./routes/messageRouter');
@@ -38,6 +39,7 @@ app.use('/images', express.static(path.join(__dirname, "/public/images")))
 
 
 // MIDDLEWARE
+app.use(cors()) 
 app.use(express.json()) // body parser
 app.use(helmet())
 app.use(morgan('common'));

@@ -3,19 +3,18 @@ const { protect } = require('../controllers/authController');
 const { postCreateOne, postUpdateById, postDeleteById, postLikeById, postGetById, postGetForTimeline, postGetByUsername } = require('../controllers/postController');
 
 // create a post
-router.post('/', postCreateOne)
-
+router.post('/', protect, postCreateOne)
 
 // update a post
-router.put('/:id', postUpdateById)
+router.put('/:id', protect, postUpdateById)
 
 
 // delete a post
-router.delete('/:id', postDeleteById)
+router.delete('/:id', protect, postDeleteById)
 
 
 // like //dislike a post
-router.put('/:id/like', postLikeById)
+router.put('/:id/like', protect, postLikeById)
 
 
 // get a post

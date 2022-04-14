@@ -36,9 +36,7 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      user: user
-    }
+    data: user
   })
 })
 
@@ -60,9 +58,7 @@ exports.userUpdateById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      user: user
-    }
+    data: user
   })
 })
 
@@ -84,9 +80,7 @@ exports.usernameUpdateById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      user: user
-    }
+    data: user
   })
 })
 

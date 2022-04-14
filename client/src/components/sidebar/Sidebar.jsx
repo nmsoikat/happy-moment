@@ -42,6 +42,7 @@ export default function Sidebar() {
   
   const logoutHandler = () => {
     localStorage.removeItem('currentUser')
+    localStorage.removeItem('token')
     window.location.assign('/login')
   }
 
