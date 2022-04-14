@@ -1,11 +1,12 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import './chatOnline.css'
+import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   const [currentUserFriends, setCurrentUserFriends] = useState([])
   const [onlineFriends, setOnlineFriends] = useState([])
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const PF = REACT_APP_PUBLIC_FOLDER;
 
   // get all friends of current users
   useEffect(() => {

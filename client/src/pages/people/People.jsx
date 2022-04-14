@@ -1,38 +1,51 @@
 import './people.css'
+import Person from '../../components/person/Person';
+import axios from 'axios'
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
-import Feed from '../../components/feed/Feed'
-import Rightbar from '../../components/rightbar/Rightbar'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import Rightbar from '../../components/rightbar/Rightbar';
 
 export default function Profile() {
   const PF = REACT_APP_PUBLIC_FOLDER;
-  const { username } = useParams()
+  const { user: currentUser, token } = useContext(AuthContext)
+  const [allUsers, setAllUsers] = useState([])
 
-  const [user, setUser] = useState({})
+  const fetchAllUsers = async (searchValue) => {
+
+    const res = searchValue ? await axios.get(`/users?searchUser=${searchValue}`) : await axios.get(`/users`)
+
+    setAllUsers(
+      res.data.sort((p1, p2) => {
+        return new Date(p2.createdAt) - new Date(p1.createdAt)
+      })
+    )
+  }
+
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const res = await axios(`/users?username=${username}`);
-      setUser(res.data)
-    }
-
-    fetchUser();
-  }, [username])
+    fetchAllUsers();
+  }, [])
 
   return (
     <>
-      <Topbar />
+      <Topbar fetchAllUsers={fetchAllUsers} />
       <div className="container">
         <div className="row">
           <div className="col-md-3">
-            <Sidebar />
+            <Sidebar/>
           </div>
-          <div className="col-md-9">
-            <Feed />
+          <div className="col-md-6">
+            {
+              allUsers.map(person => (
+                <Person key={person._id} person={person} />
+              ))
+            }
+          </div>
+          <div className="col-md-3">
+            <Rightbar />
           </div>
         </div>
       </div>

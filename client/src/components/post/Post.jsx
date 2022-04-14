@@ -5,6 +5,7 @@ import axios from 'axios';
 import { format } from 'timeago.js'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
+import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Post({ post }) {
 
@@ -12,7 +13,7 @@ export default function Post({ post }) {
   const [isLike, setIsLike] = useState(false)
   const [user, setUser] = useState({})
 
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const PF = REACT_APP_PUBLIC_FOLDER;
 
   const { user: currentUser, token } = useContext(AuthContext)
 
@@ -29,7 +30,7 @@ export default function Post({ post }) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios.get(`/users?id=${post.userId}`, config)
+      const res = await axios.get(`/users/single?id=${post.userId}`, config)
       setUser(res.data)
     }
     fetchUser();
@@ -45,7 +46,7 @@ export default function Post({ post }) {
     }
   }
 
-  return <div className='post'>
+  return <div className='post shadow-sm bg-white'>
     <div className="post-wrapper">
       <div className="post-top">
         <div className="post-top-left">
@@ -74,7 +75,7 @@ export default function Post({ post }) {
         <div className="post-bottom-left">
           <img className='post-like-icon' src={`${PF}/like.png`} alt="like" onClick={likeHandler} />
           <img className='post-like-icon' src={`${PF}/heart.png`} alt="heart" onClick={likeHandler} />
-          <span className="post-like-count">{like} people like it</span>
+          <span className="post-like-count">{like} people smile it</span>
         </div>
         <div className="post-bottom-right">
           <span className="post-comment-text">{post.comment} comments</span>

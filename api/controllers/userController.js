@@ -4,6 +4,38 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 
+// GET All User
+exports.usersGetAll = async (req, res) => {
+  try {
+    const searchText = req.query.searchUser
+    const query = searchText ? {
+      "$or": [
+        { firstName: { $regex: new RegExp(searchText, 'i') } },
+        { lastName: { $regex: new RegExp(searchText, 'i') } }
+      ]
+    } : {}
+
+    const users = await User.find(query).select('-password');
+    res.status(200).json(users);
+  } catch (err) {
+    return res.status(500).json(err)
+  }
+}
+
+// GET A USER by Id and username
+exports.userGetByIdOrUsername = async (req, res) => {
+  try {
+    const userId = req.query.id
+    const username = req.query.username
+    const user = userId ? await User.findById(userId) : await User.findOne({ username });
+    const { password, updatedAt, ...others } = user._doc;
+    res.status(200).json(others);
+  } catch (err) {
+    return res.status(500).json(err)
+  }
+}
+
+
 // UPDATE PROFILE PICTURE
 exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
   if (!req.file) {
@@ -95,19 +127,6 @@ exports.userDeleteById = async (req, res) => {
     }
   } else {
     return res.status(403).json('you can delete only your account!')
-  }
-}
-
-// GET A USER by Id and username
-exports.userGetAll = async (req, res) => {
-  try {
-    const userId = req.query.id
-    const username = req.query.username
-    const user = userId ? await User.findById(userId) : await User.findOne({ username });
-    const { password, updatedAt, ...others } = user._doc;
-    res.status(200).json(others);
-  } catch (err) {
-    return res.status(500).json(err)
   }
 }
 
@@ -324,11 +343,4 @@ exports.userGetFriendsAndFollower = async (req, res) => {
   } catch (err) {
     res.status(500).json(err)
   }
-}
-
-// SEARCH FRIENDS
-exports.userGetBySearch = async (req, res) => {
-  const regex = new RegExp(req.query.name, 'i');
-  const userFilter = await User.find({ username: regex }, { 'username': 1 })
-  res.status(200).json(userFilter);
 }

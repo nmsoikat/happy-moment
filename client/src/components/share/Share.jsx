@@ -4,10 +4,11 @@ import { useContext, useRef, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
 import { ProgressBar } from 'react-bootstrap'
+import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Share({fetchPosts}) {
   const { user } = useContext(AuthContext)
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const PF = REACT_APP_PUBLIC_FOLDER;
 
   const desc = useRef();
   const [file, setFile] = useState(null);
@@ -56,7 +57,7 @@ export default function Share({fetchPosts}) {
     }
   }
   return <>
-  <div className='share'>
+  <div className='share shadow-sm bg-white'>
     <div className="share-wrapper">
       <div className="share-top">
         <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />

@@ -10,6 +10,7 @@ import { Routes, Route } from "react-router-dom";
 import { useContext } from 'react';
 import { AuthContext } from './context/AuthContext';
 import Messenger from './pages/messenger/Messenger';
+import NotFound from './pages/notFound/NotFound';
 // import RequiredAuth from './RequiredAuth';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route path='/trending' element={user ? <Trending /> : <Login />} />
       <Route path='/videos' element={user ? <Videos /> : <Login />} />
       <Route path='/people/' element={user ? <People /> : <Login />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

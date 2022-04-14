@@ -4,11 +4,12 @@ import { Users } from '../../dummyData';
 import CloseFriend from '../closeFriend/CloseFriend';
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Sidebar() {
 
   const date = new Date();
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const PF = REACT_APP_PUBLIC_FOLDER;
   const [time, setTime] = useState('');
 
   const startTime = () => {

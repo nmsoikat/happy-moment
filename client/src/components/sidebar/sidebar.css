@@ -16,7 +16,7 @@
 } */
 
 .sidebar-list{
-	border-radius: 30px;
+	border-radius: 15px;
 }
 
 .sidebar-list-item {
@@ -36,8 +36,10 @@
 .sidebar-list-item a.active,
 .sidebar-list-item.logout:hover,
 .sidebar-list-item a:hover {
-  color: #e38802;
-  background-color: #f4f4f4;
+  /* color: #e38802;
+  background-color: #f4f4f4; */
+  color: #222;
+  background-color: #e8e8e8;
   cursor: pointer;
 }
 

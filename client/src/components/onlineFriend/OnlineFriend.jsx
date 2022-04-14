@@ -1,7 +1,8 @@
 import './onlineFriend.css';
+import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 function OnlineFriend({ user }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const PF = REACT_APP_PUBLIC_FOLDER;
 
   return <li className="rightbar-friend">
     <div className="rightbar-profile-img-container">

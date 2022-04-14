@@ -25,6 +25,7 @@
 .post-profile-img{
   width: 32px;
   height: 32px;
+  margin-right: 10px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -32,11 +33,11 @@
 .post-username{
   font-size: 15px;
   font-weight: 500;
-  margin: 0 10px;
 }
 
 .post-date{
   font-size: 12px;
+  margin-left: 10px;
 }
 
 .post-center{

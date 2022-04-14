@@ -1,0 +1,17 @@
+.person{
+  padding: 15px 5px;
+	border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.person-left {
+  display: flex;
+}
+
+.person-left .person-desc{
+  display: block;
+  font-size: 12px;
+}
