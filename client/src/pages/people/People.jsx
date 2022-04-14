@@ -15,7 +15,14 @@ export default function Profile() {
 
   const fetchAllUsers = async (searchValue) => {
 
-    const res = searchValue ? await axios.get(`/users?searchUser=${searchValue}`) : await axios.get(`/users`)
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      }
+    }
+
+    const res = searchValue ? await axios.get(`/users?searchUser=${searchValue}`, config) : await axios.get(`/users`, config)
 
     setAllUsers(
       res.data.sort((p1, p2) => {

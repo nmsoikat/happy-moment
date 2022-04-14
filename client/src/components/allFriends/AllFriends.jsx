@@ -5,17 +5,24 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
-function AllFriends({user}) {
+function AllFriends() {
   const PF = REACT_APP_PUBLIC_FOLDER;
-  const { user: currentUser, dispatch } = useContext(AuthContext);
+  const { user: currentUser, token } = useContext(AuthContext);
   const [friends, setFriends] = useState([]);
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
 
   useEffect(() => {
     const getFriends = async () => {
       try {
-        if(user?._id){
-          const friendList = await axios.get('/users/friends/' + user?._id)
-          setFriends(friendList.data)
+        if(currentUser?._id){
+          const {data} = await axios.get(`/users/friends/view-sent-req/${currentUser?._id}`, config)
+          setFriends(data)
         }
       } catch (err) {
         console.log(err);
@@ -23,7 +30,8 @@ function AllFriends({user}) {
     }
 
     getFriends();
-}, [user])
+}, [currentUser])
+
   return (
     <>
     <h4 className="profile-info-title">User Friends</h4>

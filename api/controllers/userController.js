@@ -6,6 +6,7 @@ const catchAsync = require('../utils/catchAsync');
 
 // GET All User
 exports.usersGetAll = async (req, res) => {
+  const loggedInUser = req.user;
   try {
     const searchText = req.query.searchUser
     const query = searchText ? {
@@ -16,7 +17,21 @@ exports.usersGetAll = async (req, res) => {
     } : {}
 
     const users = await User.find(query).select('-password');
-    res.status(200).json(users);
+
+    //filter //except (current user, friends, ...)
+    const filteredUsers = users.filter(user => {
+      const searchUId = user._id.toString();
+      if (searchUId === loggedInUser._id.toString() ||
+        loggedInUser.friends.map(fId => fId.toString()).includes(searchUId) ||
+        loggedInUser.friendsRequest.map(fId => fId.toString()).includes(searchUId) ||
+        loggedInUser.friendsSentRequest.map(fId => fId.toString()).includes(searchUId)) {
+        return false
+      } else {
+        return true
+      }
+    })
+
+    res.status(200).json(filteredUsers);
   } catch (err) {
     return res.status(500).json(err)
   }
@@ -322,25 +337,76 @@ exports.userUnfollow = async (req, res) => {
   }
 }
 
-// FRIENDS AND FOLLOWER
-exports.userGetFriendsAndFollower = async (req, res) => {
+// GET ALL FRIENDS
+exports.userGetFriends = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     const friends = await Promise.all(
-      user.followings.map((friendId) => {
-        return User.findById(friendId)
+      user.friends.map((friendId) => {
+        return User.findById(friendId).select('_id username profilePicture')
       })
     )
 
-    let friendList = [];
-    friends.map(friend => {
-      const { _id, username, profilePicture } = friend;
-      friendList.push({ _id, username, profilePicture })
-    })
-
-    res.status(200).json(friendList);
+    res.status(200).json(friends);
 
   } catch (err) {
     res.status(500).json(err)
   }
 }
+
+// GET ALL FRIENDS REQUESTED
+exports.userGetFriendsReq = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    const friendsRequest = await Promise.all(
+      user.friendsRequest.map((friendId) => {
+        return User.findById(friendId).select('_id username profilePicture')
+      })
+    )
+
+    res.status(200).json(friendsRequest);
+
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+// GET ALL SENT FRIEND REQUEST
+exports.userGetFriendsSentReq = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    const friendsSentRequest = await Promise.all(
+      user.friendsSentRequest.map((friendId) => {
+        return User.findById(friendId).select('_id username profilePicture')
+      })
+    )
+
+    res.status(200).json(friendsSentRequest);
+
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+// FRIENDS AND FOLLOWER//old
+// exports.userGetFriendsAndFollower = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.userId);
+//     const friends = await Promise.all(
+//       user.followings.map((friendId) => {
+//         return User.findById(friendId)
+//       })
+//     )
+
+//     let friendList = [];
+//     friends.map(friend => {
+//       const { _id, username, profilePicture } = friend;
+//       friendList.push({ _id, username, profilePicture })
+//     })
+
+//     res.status(200).json(friendList);
+
+//   } catch (err) {
+//     res.status(500).json(err)
+//   }
+// }

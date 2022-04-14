@@ -7,12 +7,18 @@ import { ProgressBar } from 'react-bootstrap'
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Share({fetchPosts}) {
-  const { user } = useContext(AuthContext)
+  const { user, token } = useContext(AuthContext)
   const PF = REACT_APP_PUBLIC_FOLDER;
 
   const desc = useRef();
   const [file, setFile] = useState(null);
 
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
 
   const submitHandler = async (e) => {
     e.preventDefault()
@@ -39,14 +45,14 @@ export default function Share({fetchPosts}) {
       // console.log(newPost);
 
       try {
-        await axios.post(`/upload/${fileName}`, data);
+        await axios.post(`/upload/${fileName}`, data, config);
       } catch (err) {
         return console.log(err);
       }
     }
 
     try {
-      await axios.post("/posts", newPost);
+      await axios.post("/posts", newPost, config);
       fetchPosts();
       
       setFile(null)
