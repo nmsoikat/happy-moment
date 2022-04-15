@@ -42,3 +42,40 @@
 }
 
 .tab-control .nav-item {cursor: pointer;}
+
+.friends-wrapper{
+  display: flex;
+  margin: -10px;
+}
+
+.friends-wrapper .friends-item{
+  margin: 5px;
+  padding: 5px;
+  border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+  align-items: center;
+}
+
+.friends-wrapper .friends-img{
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	border-radius: 5px;
+	margin-bottom: 5px;
+}
+
+.friends-wrapper .friends-name{
+  margin-top: 10px;
+}
+
+.friends-wrapper button{
+  margin-top: 10px;
+}
+
+.friend-list-hidden-text{
+  font-size: 50px;
+  color: rgb(220, 220, 220);
+  text-align: center;
+  margin-top: 100px;
+}

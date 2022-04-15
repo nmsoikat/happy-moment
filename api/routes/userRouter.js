@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { protect } = require('../controllers/authController');
-const {sendFriendRequest, userUpdateById, userProfileImgUpdateById,usernameUpdateById, userDeleteById, userGetByIdOrUsername, userFollow, userUnfollow, usersGetAll, userGetFriends, confirmFriendRequest, deleteFriendRequest, cancelFriendRequest, userGetFriendsSentReq, userGetFriendsReq } = require('../controllers/userController');
+const {sendFriendRequest, userUpdateById, userProfileImgUpdateById,usernameUpdateById, userDeleteById, userGetByIdOrUsername, userFollow, userUnfollow, usersGetAll, userGetFriends, confirmFriendRequest, deleteFriendRequest, cancelFriendRequest, userGetFriendsSentReq, userGetFriendsReq, unfriendUser } = require('../controllers/userController');
 const { setDestination, uploadFile } = require('../middlewares/fileUploadMiddleware');
 
 
@@ -24,10 +24,11 @@ router.patch('/:id', protect, userUpdateById)
 router.delete('/:id', protect, userDeleteById)
 
 // SEND FRIEND REQUEST
-router.put('/:id/send-request', protect, sendFriendRequest)
-router.put('/:id/confirm-request', protect, confirmFriendRequest)
-router.put('/:id/delete-request', protect, deleteFriendRequest)
-router.put('/:id/cancel-request', protect, cancelFriendRequest)
+router.put('/friends/:id/send-request', protect, sendFriendRequest)
+router.put('/friends/:id/confirm-request', protect, confirmFriendRequest)
+router.put('/friends/:id/delete-request', protect, deleteFriendRequest)
+router.put('/friends/:id/cancel-request', protect, cancelFriendRequest)
+router.put('/friends/:id/unfriend', protect, unfriendUser)
 
 // GET FRIENDS
 router.get('/friends/:userId', protect, userGetFriends)

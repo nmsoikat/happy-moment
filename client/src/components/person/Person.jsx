@@ -20,7 +20,7 @@ export default function Person({ person }) {
 
   const sendFriendRequest = async (e) => {
     const targetUserId = e.target.value;
-    const { data } = await axios.put(`/users/${targetUserId}/send-request`, { userId: currentUser._id }, config)
+    const { data } = await axios.put(`/users/friends/${targetUserId}/send-request`, { userId: currentUser._id }, config)
 
     if (data.status === 'success') {
       setReqSent(true)
