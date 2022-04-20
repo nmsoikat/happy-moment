@@ -1,15 +1,18 @@
 const router = require('express').Router();
-const { convCreateOne, convGetByUId, convGetByTwoUId } = require('../controllers/conversationController');
+const { convCreateOne, convGetByUId, convGetByTwoUId, searchMyFriends } = require('../controllers/conversationController');
+const { protect } = require('../controllers/authController');
 
-//new conversation
-router.post('/', convCreateOne)
-
+// get friends //search
+router.get('/friends', protect, searchMyFriends)
 
 //get conversation
-router.get('/:userId', convGetByUId)
+router.get('/:userId', protect, convGetByUId)
+
+//new conversation
+router.post('/', protect, convCreateOne)
 
 //get conversation by two user
-router.get('/find/:firstUserId/:secondUserId', convGetByTwoUId)
+router.get('/find/:firstUserId/:secondUserId', protect, convGetByTwoUId)
 
 
 module.exports = router;

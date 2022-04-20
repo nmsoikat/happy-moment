@@ -7,6 +7,7 @@ const { setDestination, uploadFile } = require('../middlewares/fileUploadMiddlew
 
 // GET A USER by Id and username
 router.get('/', protect, usersGetAll)
+
 // GET All Users
 router.get('/single', userGetByIdOrUsername)
 
@@ -23,7 +24,7 @@ router.patch('/:id', protect, userUpdateById)
 // DELETE USER
 router.delete('/:id', protect, userDeleteById)
 
-// SEND FRIEND REQUEST
+// FRIEND REQUEST
 router.put('/friends/:id/send-request', protect, sendFriendRequest)
 router.put('/friends/:id/confirm-request', protect, confirmFriendRequest)
 router.put('/friends/:id/delete-request', protect, deleteFriendRequest)

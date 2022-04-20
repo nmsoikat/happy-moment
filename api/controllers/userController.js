@@ -5,7 +5,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 
-// GET All User
+// GET All User // Search
 exports.usersGetAll = async (req, res) => {
   const loggedInUser = req.user;
   try {
@@ -50,7 +50,6 @@ exports.userGetByIdOrUsername = async (req, res) => {
     return res.status(500).json(err)
   }
 }
-
 
 // UPDATE PROFILE PICTURE
 exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
