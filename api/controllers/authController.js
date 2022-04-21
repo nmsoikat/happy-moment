@@ -6,7 +6,9 @@ const genUsername = require("unique-username-generator");
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 const { promisify } = require('util')
-const sendEmail = require('../utils/email')
+// const sendEmail = require('../utils/email_old')
+const Email = require('../utils/email')
+
 
 // generate jwt
 const signToken = (id) => {
@@ -81,6 +83,10 @@ exports.userRegister = catchAsync(async (req, res, next) => {
     password: hashedPassword
   })
 
+  //send welcome mail
+  const url = `${req.protocol}://${req.get('host')}/profile/${newUser.username}`
+  await new Email(newUser, url).sendWelcome()
+  
   // after create an new account auto login
   createSendToken(newUser, 201, res)
 })
@@ -160,17 +166,20 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send it to user's email
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
-  const textMessage = `Forgot your password? \n
-                      Submit a PATCH request with your new-password and password confirm to: \n
-                      ${resetUrl} \n
-                      If you did not forget your password please ignore this email!`
+  const resetUrl = `http://localhost:3000/reset-password/${resetToken}`
+  // const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
+  // const textMessage = `Forgot your password? \n
+  //                     Submit a PATCH request with your new-password and password confirm to: \n
+  //                     ${resetUrl} \n
+  //                     If you did not forget your password please ignore this email!`
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      textMessage
-    })
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Your password reset token (valid for only 10 minutes)',
+    //   textMessage
+    // })
+
+    await new Email(user, resetUrl).sendResetPassword();
 
     res.status(200).json({
       status: 'success',

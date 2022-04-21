@@ -21,6 +21,9 @@ const messageRouter = require('./routes/messageRouter');
 // APP
 const app = express();
 
+app.set('views', './views')
+app.set('view engine', 'pug')
+
 // CONNECTION
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,

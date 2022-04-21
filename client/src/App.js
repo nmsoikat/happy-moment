@@ -1,5 +1,7 @@
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
+import ForgotPassword from './pages/forgotPassword/ForgotPassword';
+import ResetPassword from './pages/resetPassword/ResetPassword';
 import Register from './pages/register/Register';
 import Profile from './pages/profile/Profile'
 import Trending from './pages/trending/Trending'
@@ -25,7 +27,9 @@ function App() {
       <Route path='/profile/:username' element={user ? <Profile /> : <Login />} />
       <Route path='/trending' element={user ? <Trending /> : <Login />} />
       <Route path='/videos' element={user ? <Videos /> : <Login />} />
-      <Route path='/people/' element={user ? <People /> : <Login />} />
+      <Route path='/people' element={user ? <People /> : <Login />} />
+      <Route path='/forgot-password' element={user ? <Home /> : <ForgotPassword />} />
+      <Route path='/reset-password/:token' element={user ? <Home /> : <ResetPassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
