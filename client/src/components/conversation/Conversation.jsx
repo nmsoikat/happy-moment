@@ -22,8 +22,8 @@ function Conversation({ conversation, currentUser }) {
   }, [currentUser, conversation])
   return (
     <div className="conversation">
-      <img className='conversation-img' src={`${(user?.profilePicture && PF + user?.profilePicture) || PF + '/person/noAvatar.png'}`} alt="" />
-      <span className="conversation-name">{user?.username}</span>
+      <img className='conversation-img' src={`${(user?.profilePicture && PF + user?.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
+      <span className="conversation-name">{user?.firstName + ' ' + user?.lastName}</span>
     </div>
   )
 }

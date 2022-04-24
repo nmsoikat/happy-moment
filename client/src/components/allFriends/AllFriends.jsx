@@ -11,15 +11,15 @@ function AllFriends({ friendsList, unfriendHandler }) {
       <h4 className="profile-info-title">User Friends List</h4>
       <div className="friends-wrapper">
         {
-          friendsList.map(friend => (
+          friendsList.length > 0 ? friendsList.map(friend => (
             <div key={friend._id} className='friends-item bg-white shadow-sm text-center'>
-              <img className='friends-img' src={`${(friend.profilePicture && PF + friend.profilePicture) || PF + '/person/noAvatar.png'}`} alt="" />
+              <img className='friends-img' src={`${(friend.profilePicture && PF + friend.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
               <Link to={`/profile/${friend.username}`} style={{ textDecoration: 'none' }}>
                 <span className="friends-name">{friend.firstName}</span>
               </Link>
               <button className="btn btn-sm btn-secondary w-100" value={friend._id} onClick={unfriendHandler}>Unfriend</button>
             </div>
-          ))
+          )) : <div className='friend-list-hidden-text'>Empty List</div>
         }
       </div>
     </>

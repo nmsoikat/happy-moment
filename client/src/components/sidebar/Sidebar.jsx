@@ -1,7 +1,5 @@
 import './sidebar.css'
-import { Logout, Bookmark, Chat, Event, Group, HelpOutline, PlayCircleFilledOutlined, RssFeed, School, WorkOutline } from '@mui/icons-material';
-import { Users } from '../../dummyData';
-import CloseFriend from '../closeFriend/CloseFriend';
+import { Logout, Chat, PlayCircleFilledOutlined, RssFeed } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'

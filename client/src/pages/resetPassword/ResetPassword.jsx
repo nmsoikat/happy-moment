@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate, Link, useParams } from 'react-router-dom'
@@ -22,7 +22,6 @@ const validationSchema = Yup.object().shape({
 
 export default function ResetPassword() {
   const { user, isFetching, error, dispatch, token } = useContext(AuthContext)
-  const [isMailSent, setIsMailSent] = useState(false);
   let { token:resetToken } = useParams();
   const navigate = useNavigate()
   const config = {

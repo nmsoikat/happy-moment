@@ -1,10 +1,6 @@
 import './rightbar.css';
-import OnlineFriend from '../onlineFriend/OnlineFriend';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { Add, Remove } from '@mui/icons-material';
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Rightbar({ user }) {
@@ -19,7 +15,6 @@ export default function Rightbar({ user }) {
 
   useEffect(() => {
     setFollowed(currentUser.followings?.includes(user?._id))
-    console.log('followings:', currentUser.followings);
   }, [currentUser, user?._id])
 
   // useEffect(() => {
@@ -98,7 +93,7 @@ export default function Rightbar({ user }) {
   //           friends.map(friend => (
   //             <Link key={friend._id} to={`/profile/${friend.username}`} style={{ textDecoration: 'none' }}>
   //               <div className="rightbar-following">
-  //                 <img className='rightbar-following-img' src={`${(friend.profilePicture && PF + friend.profilePicture) || PF + '/person/noAvatar.png'}`} alt="" />
+  //                 <img className='rightbar-following-img' src={`${(friend.profilePicture && PF + friend.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
   //                 <span className="rightbar-following-name">{friend.username}</span>
   //               </div>
   //             </Link>

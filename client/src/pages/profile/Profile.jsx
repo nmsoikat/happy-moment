@@ -154,7 +154,7 @@ export default function Profile() {
             <div className="profile-right-top">
               <div className="profile-cover">
                 <img className='profile-cover-img' src={(user.coverPicture && PF + user.coverPicture) || PF + '/person/noCover.png'} alt="" />
-                <img className='profile-user-img' src={(user.profilePicture && PF + user.profilePicture) || PF + '/person/noAvatar.png'} alt="" />
+                <img className='profile-user-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
               </div>
               <div className="profile-info">
                 <h4 className="profile-info-name">{user.firstName + " " + user.lastName}</h4>

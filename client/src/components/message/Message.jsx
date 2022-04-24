@@ -1,5 +1,5 @@
 import './message.css'
-import { format } from 'timeago.js'
+import moment from 'moment'
 
 function Message({ message, own, currentUser }) {
   return (
@@ -11,7 +11,7 @@ function Message({ message, own, currentUser }) {
         </p>
       </div>
 
-      <div className="message-bottom">{format(message.createdAt)}</div>
+      <div className="message-bottom">{moment(message.createdAt).fromNow()}</div>
     </div>
   )
 }

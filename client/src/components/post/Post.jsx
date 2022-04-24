@@ -2,7 +2,7 @@ import './post.css'
 import { MoreVert } from '@mui/icons-material';
 import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { format } from 'timeago.js'
+import moment from 'moment'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
@@ -51,10 +51,10 @@ export default function Post({ post }) {
       <div className="post-top">
         <div className="post-top-left">
           <Link to={`/profile/${user.username}`}>
-            <img className='post-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + '/person/noAvatar.png'} alt="" />
+            <img className='post-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
           </Link>
           <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: '#222', display:'inline-block' }}><span className="post-username">{user.firstName + ' ' + user.lastName}</span></Link>
-          <span className="post-date">{format(post.createdAt)}</span>
+          <span className="post-date">{moment(post.createdAt).fromNow()}</span>
         </div>
         <div className="post-top-right">
           <MoreVert className='post-option-icon' />

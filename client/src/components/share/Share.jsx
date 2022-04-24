@@ -1,9 +1,8 @@
 import './share.css'
-import { Cancel, EmojiEmotions, Label, LineAxisOutlined, PermMedia, Room } from '@mui/icons-material';
+import { Cancel, PermMedia } from '@mui/icons-material';
 import { useContext, useRef, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
-import { ProgressBar } from 'react-bootstrap'
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
 
 export default function Share({fetchPosts}) {

@@ -1,17 +1,25 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import './chatOnline.css'
 import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { AuthContext } from "../../context/AuthContext"
 
 function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   const [currentUserFriends, setCurrentUserFriends] = useState([])
   const [onlineFriends, setOnlineFriends] = useState([])
   const PF = REACT_APP_PUBLIC_FOLDER;
+  const { user: currentUser, token } = useContext(AuthContext)
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
 
   // get all friends of current users
   useEffect(() => {
     const getFriends = async () => {
-      const res = await axios.get("/users/friends/"+ currentUserId)
+      const res = await axios.get(`/users/friends/${currentUserId}`, config)
       setCurrentUserFriends(res.data)
     }
 
@@ -25,7 +33,7 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   
   const handleClick = async (onlineF) => {
     try {
-      const res = await axios.get(`/conversation/find/${currentUserId}/${onlineF._id}`);
+      const res = await axios.get(`/conversation/find/${currentUserId}/${onlineF._id}`, config);
       setCurrentChat(res.data);
 
     } catch (err) {
