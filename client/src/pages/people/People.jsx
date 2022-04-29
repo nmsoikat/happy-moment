@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import Rightbar from '../../components/rightbar/Rightbar';
 
 export default function Profile() {
@@ -22,7 +22,7 @@ export default function Profile() {
       }
     }
 
-    const res = searchValue ? await axios.get(`/users?searchUser=${searchValue}`, config) : await axios.get(`/users`, config)
+    const res = searchValue ? await axios.get(`${API_URL}/users?searchUser=${searchValue}`, config) : await axios.get(`${API_URL}/users`, config)
 
     setAllUsers(
       res.data.sort((p1, p2) => {

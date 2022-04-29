@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
+import {API_URL} from '../../Constant'
 
 const initialValues = {
   firstName: "",
@@ -32,7 +33,7 @@ export default function Register() {
 
   const onSubmit = async (values) => {
     try {
-      await axios.post('/auth/register', values)
+      await axios.post(`${API_URL}/auth/register`, values)
       navigate('/login')
     } catch (error) {
       console.log(error);

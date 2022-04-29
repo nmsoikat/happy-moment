@@ -101,14 +101,20 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/conversation', conversationRouter);
 app.use('/api/v1/message', messageRouter);
 
-app.get('/api/v1', (req, res) => {
-  res.send('API is running')
-})
 
 
-app.all('*', (req, res, next) => {
-  next(new AppError(`Page not found on ${req.originalUrl}`, 404));
-});
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static(path.join(__dirname, '../client/build')))
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  })
+} else{
+  app.get('/', (req, res) => {
+    res.send('API is running')
+  })
+}
+
 
 app.use(AppErrorHandler);
 

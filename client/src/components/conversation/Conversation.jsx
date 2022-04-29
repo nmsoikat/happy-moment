@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import './conversation.css'
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
 function Conversation({ conversation, currentUser }) {
   const [user, setUser] = useState(null)
@@ -11,7 +11,7 @@ function Conversation({ conversation, currentUser }) {
     const findId = conversation.members.find(mId => mId !== currentUser._id)
     const getUser = async () => {
       try {
-        const { data } = await axios(`/users/single?id=${findId}`);
+        const { data } = await axios(`${API_URL}/users/single?id=${findId}`);
         setUser(data)
       } catch (err) {
         console.log(err);

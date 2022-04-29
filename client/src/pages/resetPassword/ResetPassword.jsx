@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
 import axios from 'axios';
+import {API_URL} from '../../Constant'
 
 const initialValues = {
   password: "",
@@ -32,7 +33,7 @@ export default function ResetPassword() {
   }
 
   const onSubmit = async (values) => {
-    await axios.patch(`/auth/reset-password/${resetToken}`, { password: values.password }, config)
+    await axios.patch(`${API_URL}/auth/reset-password/${resetToken}`, { password: values.password }, config)
     navigate('/login')
   }
 

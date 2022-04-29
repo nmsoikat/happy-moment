@@ -6,7 +6,7 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER,API_URL } from '../../Constant'
 
 export default function Profile() {
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -16,7 +16,7 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios(`/users/single?username=${username}`);
+      const res = await axios(`${API_URL}/users/single?username=${username}`);
       setUser(res.data)
     }
 

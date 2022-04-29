@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
 import axios from 'axios';
+import {API_URL} from '../../Constant'
 
 const initialValues = {
   email: "",
@@ -27,7 +28,7 @@ export default function ForgotPassword() {
   }
 
   const onSubmit = async (values) => {
-    await axios.post('/auth/forgot-password', { email: values.email }, config)
+    await axios.post(`${API_URL}/auth/forgot-password`, { email: values.email }, config)
     setIsMailSent(true)
   }
 

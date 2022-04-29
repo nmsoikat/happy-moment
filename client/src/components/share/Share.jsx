@@ -3,7 +3,7 @@ import { Cancel, PermMedia } from '@mui/icons-material';
 import { useContext, useRef, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER,API_URL } from '../../Constant'
 
 export default function Share({fetchPosts}) {
   const { user, token } = useContext(AuthContext)
@@ -44,22 +44,28 @@ export default function Share({fetchPosts}) {
       // console.log(newPost);
 
       try {
-        await axios.post(`/upload/${fileName}`, data, config);
+        await axios.post(`${API_URL}/upload/${fileName}`, data, config);
       } catch (err) {
         return console.log(err);
       }
     }
 
     try {
-      await axios.post("/posts", newPost, config);
+      await axios.post(`${API_URL}/posts`, newPost, config);
       fetchPosts();
       
       setFile(null)
+      URL.revokeObjectURL();
       desc.current.value = "";
 
     } catch (err) {
       return console.log(err);
     }
+  }
+
+  const cancelBlobView = () => {
+    setFile(null)
+    URL.revokeObjectURL();
   }
   return <>
   <div className='share shadow-sm bg-white'>
@@ -68,7 +74,6 @@ export default function Share({fetchPosts}) {
         <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
         <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
       </div>
-
       <hr className="share-hr" />
       {
         file && (
@@ -76,11 +81,11 @@ export default function Share({fetchPosts}) {
             {
               (file.type === "video/mp4") ? (<div>
                 {file.name}
-                <Cancel className='share-img-cancel' onClick={() => setFile(null)} />
+                <Cancel className='share-img-cancel' onClick={() => cancelBlobView()} />
               </div>) : (
                 <>
                   <img src={URL.createObjectURL(file)} alt="" className="share-img" />
-                  <Cancel className='share-img-cancel' onClick={() => setFile(null)} />
+                  <Cancel className='share-img-cancel' onClick={() => cancelBlobView()} />
                 </>
               )
             }

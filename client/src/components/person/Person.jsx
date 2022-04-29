@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
 export default function Person({ person }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -19,7 +19,7 @@ export default function Person({ person }) {
 
   const sendFriendRequest = async (e) => {
     const targetUserId = e.target.value;
-    const { data } = await axios.put(`/users/friends/${targetUserId}/send-request`, { userId: currentUser._id }, config)
+    const { data } = await axios.put(`${API_URL}/users/friends/${targetUserId}/send-request`, { userId: currentUser._id }, config)
 
     if (data.status === 'success') {
       setReqSent(true)

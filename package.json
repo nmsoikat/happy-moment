@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "api": "nodemon index.js",
-    "client": "npm start --prefix ../client",
-    "socket": "nodemon ../socket/index.js",
-    "dev": "concurrently \"npm run api\" \"npm run client\" \"npm run socket\" "
+    "start": "nodemon api/index.js",
+    "api": "nodemon api/index.js",
+    "client": "npm start --prefix client",
+    "socket": "nodemon socket/index.js",
+    "dev": "concurrently \"npm run api\" \"npm run client\" \"npm run socket\" ",
+    "heroku-postbuild":"NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +29,7 @@
     "nodemon": "^2.0.15",
     "path": "^0.12.7",
     "pug": "^3.0.2",
-    "socket.io": "^4.4.1",
+    "socket.io": "^4.5.0",
     "unique-username-generator": "^1.0.1"
   }
 }
