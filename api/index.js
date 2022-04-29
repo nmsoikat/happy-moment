@@ -101,6 +101,9 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/conversation', conversationRouter);
 app.use('/api/v1/message', messageRouter);
 
+app.get('/api/v1', (req, res) => {
+  res.send('API is running')
+})
 
 
 if(process.env.NODE_ENV === 'production'){
@@ -111,10 +114,12 @@ if(process.env.NODE_ENV === 'production'){
   })
 } else{
   app.get('/', (req, res) => {
-    res.send('API is running')
+    res.send('API is running (Development)')
   })
 }
-
+app.get('/', (req, res) => {
+  res.send('API is running')
+})
 
 app.use(AppErrorHandler);
 
