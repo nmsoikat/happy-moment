@@ -44,14 +44,14 @@ export default function Share({fetchPosts}) {
       // console.log(newPost);
 
       try {
-        await axios.post(`${API_URL}/upload/${fileName}`, data, config);
+        await axios.post(`/upload/${fileName}`, data, config);
       } catch (err) {
         return console.log(err);
       }
     }
 
     try {
-      await axios.post(`${API_URL}/posts`, newPost, config);
+      await axios.post(`/posts`, newPost, config);
       fetchPosts();
       
       setFile(null)

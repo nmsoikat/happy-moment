@@ -21,7 +21,7 @@ export default function Rightbar({ user }) {
   //     const getFriends = async () => {
   //       try {
   //         if(user?._id){
-  //           const friendList = await axios.get('${API_URL}/users/friends/' + user?._id)
+  //           const friendList = await axios.get('/users/friends/' + user?._id)
   //           setFriends(friendList.data)
   //         }
   //       } catch (err) {
@@ -35,10 +35,10 @@ export default function Rightbar({ user }) {
   // const handleClick = async () => {
   //   try {
   //     if (followed) {
-  //       await axios.put(`${API_URL}/users/${user._id}/unfollow`, { userId: currentUser._id })
+  //       await axios.put(`/users/${user._id}/unfollow`, { userId: currentUser._id })
   //       dispatch({ type: 'UNFOLLOW', payload: user._id })
   //     } else {
-  //       await axios.put(`${API_URL}/users/${user._id}/follow`, { userId: currentUser._id })
+  //       await axios.put(`/users/${user._id}/follow`, { userId: currentUser._id })
   //       dispatch({ type: 'FOLLOW', payload: user._id })
   //     }
 
