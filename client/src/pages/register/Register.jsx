@@ -33,7 +33,7 @@ export default function Register() {
 
   const onSubmit = async (values) => {
     try {
-      await axios.post(`/auth/register`, values)
+      await axios.post(`/api/v1/auth/register`, values)
       navigate('/login')
     } catch (error) {
       console.log(error);

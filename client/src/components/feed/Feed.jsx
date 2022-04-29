@@ -20,8 +20,8 @@ export default function Feed({ username }) {
     }
 
     const res = username ?
-      await axios.get(`/posts/profile/${username}`, config) :
-      await axios.get(`/posts/timeline/${user._id}`, config)
+      await axios.get(`/api/v1/posts/profile/${username}`, config) :
+      await axios.get(`/api/v1/posts/timeline/${user._id}`, config)
 
     setPosts(
       res.data.sort((p1, p2) => {

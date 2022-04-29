@@ -27,7 +27,7 @@ function Messenger() {
   const fetchAllUsers = async (searchValue) => {
     if (!searchValue) { return; }
 
-    const res = await axios.get(`/conversation/friends?searchUser=${searchValue}`, config)
+    const res = await axios.get(`/api/v1/conversation/friends?searchUser=${searchValue}`, config)
 
     setAllFriendsOfCurrentUser(
       res.data.sort((p1, p2) => {
@@ -108,7 +108,7 @@ function Messenger() {
   const createNewConversation = async (targetId) => {
     const receiverId = targetId;
     const senderId = currentUser._id;
-    const { data } = await axios.post(`/conversation/`,{senderId, receiverId} ,config)
+    const { data } = await axios.post(`/api/v1/conversation/`,{senderId, receiverId} ,config)
     if(data){
       alert("Created A New Conversation")
     }
@@ -118,7 +118,7 @@ function Messenger() {
   useEffect(() => {
     const getConversation = async () => {
       try {
-        const { data } = await axios.get(`/conversation/${currentUser._id}`, config)
+        const { data } = await axios.get(`/api/v1/conversation/${currentUser._id}`, config)
         setConversations(data)
       } catch (err) {
         console.log(err);
@@ -132,7 +132,7 @@ function Messenger() {
   useEffect(() => {
     const getMessage = async () => {
       try {
-        const { data } = await axios.get(`/message/${currentChat?._id}`, config);
+        const { data } = await axios.get(`/api/v1/message/${currentChat?._id}`, config);
         setMessages(data)
       } catch (err) {
         console.log(err);
@@ -153,7 +153,7 @@ function Messenger() {
 
     try {
       //send to db
-      const { data } = await axios.post(`/message`, message, config);//return created data
+      const { data } = await axios.post(`/api/v1/message`, message, config);//return created data
 
       //only sender frontend dom update
       setMessages([...messages, data])

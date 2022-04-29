@@ -48,7 +48,7 @@ export default function Profile() {
 
     try {
       if (currentUser?._id) {
-        const { data } = await axios.get(`/users/friends/${currentUser?._id}`, config)
+        const { data } = await axios.get(`/api/v1/users/friends/${currentUser?._id}`, config)
         setFriendsList(data)
       }
     } catch (err) {
@@ -58,7 +58,7 @@ export default function Profile() {
   const unfriendHandler = async (e) => {
     const targetUserId = e.target.value;
     try {
-      const { data } = await axios.put(`/users/friends/${targetUserId}/unfriend`, {}, config)
+      const { data } = await axios.put(`/api/v1/users/friends/${targetUserId}/unfriend`, {}, config)
       if (data.status === "success") {
         gerFriends();
       }
@@ -75,7 +75,7 @@ export default function Profile() {
     }
     try {
       if (user?._id) {
-        const { data } = await axios.get(`/users/friends/view-friend-request/${user?._id}`, config)
+        const { data } = await axios.get(`/api/v1/users/friends/view-friend-request/${user?._id}`, config)
         setFriendsRequestList(data)
       }
     } catch (err) {
@@ -85,7 +85,7 @@ export default function Profile() {
   const confirmRequestHandler = async (e) => {
     const targetUserId = e.target.value;
     try {
-      const { data } = await axios.put(`/users/friends/${targetUserId}/confirm-request`, {}, config)
+      const { data } = await axios.put(`/api/v1/users/friends/${targetUserId}/confirm-request`, {}, config)
       if (data.status === "success") {
         gerFriendsRequest();
       }
@@ -97,7 +97,7 @@ export default function Profile() {
   const deleteRequestHandler = async (e) => {
     const targetUserId = e.target.value;
     try {
-      const { data } = await axios.put(`/users/friends/${targetUserId}/delete-request`, {}, config)
+      const { data } = await axios.put(`/api/v1/users/friends/${targetUserId}/delete-request`, {}, config)
       if (data.status === "success") {
         gerFriendsRequest();
       }
@@ -116,7 +116,7 @@ export default function Profile() {
 
     try {
       if (currentUser?._id) {
-        const { data } = await axios.get(`/users/friends/view-sent-req/${currentUser?._id}`, config)
+        const { data } = await axios.get(`/api/v1/users/friends/view-sent-req/${currentUser?._id}`, config)
         setFriendsSentRequestList(data)
       }
     } catch (err) {
@@ -128,7 +128,7 @@ export default function Profile() {
     // loading = true;
     const targetUserId = e.target.value;
     try {
-      const { data } = await axios.put(`/users/friends/${targetUserId}/cancel-request`, {}, config)
+      const { data } = await axios.put(`/api/v1/users/friends/${targetUserId}/cancel-request`, {}, config)
       if (data.status === "success") {
         // setLoading(false)
         // loading = false;
