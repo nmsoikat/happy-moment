@@ -33,7 +33,7 @@ export default function Profile() {
   // user profile by username
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios(`/users/single?username=${username}`);
+      const res = await axios(`/api/v1/users/single?username=${username}`);
       setUser(res.data)
     }
 
@@ -167,7 +167,7 @@ export default function Profile() {
                 <Col md={9}>
                   <Tab.Content className='tab-content-wrap'>
                     <Tab.Pane eventKey="post">
-                      <Feed username={username} />
+                      <Feed username={username} profile={true} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="friends">
                       {

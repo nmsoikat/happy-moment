@@ -22,9 +22,9 @@ router.get('/:id', protect, postGetById)
 
 
 // get timelines posts
-router.get('/timeline/:userId', protect, postGetForTimeline)
+router.get('/timeline/:userId/all', postGetForTimeline)
 
 // get user's all posts
-router.get('/profile/:username',protect, postGetByUsername)
+router.get('/profile/:username/all',protect, postGetByUsername)
 
 module.exports = router;

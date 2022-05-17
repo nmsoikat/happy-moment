@@ -29,6 +29,22 @@ exports.postUpdateById = async (req, res) => {
 
 }
 
+// update a postType
+exports.postTypeUpdateById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (post.userId === req.body.userId) {
+      await post.updateOne({ postType: req.body.postType });
+      res.status(200).json("The post type has been updated");
+    } else {
+      res.status(403).json('You can update only our post')
+    }
+  } catch (err) {
+    res.status(500).json(err)
+  }
+
+}
+
 
 // delete a post
 exports.postDeleteById = async (req, res) => {
@@ -76,12 +92,16 @@ exports.postGetById = async (req, res) => {
 
 // get timelines posts
 exports.postGetForTimeline = async (req, res) => {
+  const page = req.query.page * 1 || 1;
+  const limit = 1
+  const skip = (page - 1) * limit; // previous-page * limit
+
   try {
     const currentUser = await User.findById(req.params.userId);
-    const posts = await Post.find({ userId: currentUser._id });
+    const posts = await Post.find({ userId: currentUser._id, postType: {$ne: 'private'} }).skip(skip).limit(limit).sort('-createdAt');
     const friendsPosts = await Promise.all(
-      currentUser.followings.map((friendId) => {
-        return Post.find({ userId: friendId })
+      currentUser.friends.map((friendId) => {
+        return Post.find({ userId: friendId, postType: {$ne: 'private'} }).skip(skip).limit(limit).sort('-createdAt');
       })
     )
 
@@ -94,9 +114,16 @@ exports.postGetForTimeline = async (req, res) => {
 
 // get user's all posts
 exports.postGetByUsername = async (req, res) => {
+  const page = req.query.page * 1 || 1;
+  const limit = 1
+  const skip = (page - 1) * limit; // previous-page * limit
+
+  const loggedInUser = req.user;
   try {
     const user = await User.findOne({username: req.params.username})
-    const posts = await Post.find({userId: user._id})
+    const posts = loggedInUser._id.toString() === user._id.toString() ? 
+    await Post.find({userId: user._id}).skip(skip).limit(limit).sort('-createdAt') : 
+    await Post.find({userId: user._id, postType: {$ne: 'private'}}).skip(skip).limit(limit).sort('-createdAt');
 
     res.status(200).json(posts)
 

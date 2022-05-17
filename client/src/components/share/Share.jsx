@@ -3,9 +3,9 @@ import { Cancel, PermMedia } from '@mui/icons-material';
 import { useContext, useRef, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'
-import { REACT_APP_PUBLIC_FOLDER,API_URL } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
-export default function Share({fetchPosts}) {
+export default function Share() {
   const { user, token } = useContext(AuthContext)
   const PF = REACT_APP_PUBLIC_FOLDER;
 
@@ -52,8 +52,7 @@ export default function Share({fetchPosts}) {
 
     try {
       await axios.post(`/api/v1/posts`, newPost, config);
-      fetchPosts();
-      
+
       setFile(null)
       URL.revokeObjectURL();
       desc.current.value = "";

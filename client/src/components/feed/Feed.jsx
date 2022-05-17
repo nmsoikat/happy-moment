@@ -1,48 +1,182 @@
 import './feed.css'
-import Share from '../share/Share'
-import Post from '../post/Post';
+import '../share/share.css'
 import axios from 'axios'
-import { useState, useEffect, useContext } from 'react';
+import Post from '../post/Post';
+import { Cancel, PermMedia } from '@mui/icons-material';
+import { Spinner, Stack } from 'react-bootstrap';
 import { AuthContext } from '../../context/AuthContext';
-import {API_URL} from '../../Constant'
+import UseInfinityScroll from '../../UseInfinityScroll';
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
+import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 
-export default function Feed({ username }) {
+const Feed = (props) => {
+  const username = props.username;
+  const profile = props.profile || false;
 
-  const [posts, setPosts] = useState([])
+  //share post
+  const PF = REACT_APP_PUBLIC_FOLDER;
+  const desc = useRef();
+  const [file, setFile] = useState(null);
+
+  //feed
   const { user, token } = useContext(AuthContext)
+  const [pageNumber, setPageNumber] = useState(1)
+  const [query, setQuery] = useState('')
+  const [newPosts, setNewPosts] = useState([])
 
-  const fetchPosts = async () => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
+
+  const url = profile ?
+  `/api/v1/posts/profile/${username}/all` : `/api/v1/posts/timeline/${user._id}/all`
+  const params = {query, page: pageNumber}
+
+  let {loading, error, docs, hasMore} = UseInfinityScroll(url, params, config)
+
+  //set IntersectionObserver
+  const observer = useRef();
+
+  const lastDocElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect()
+    
+    // create IntersectionObserver
+    observer.current = new IntersectionObserver((entires) => {
+      // when element is visible callback will invoked
+      if (entires[0].isIntersecting && hasMore) {
+        setPageNumber(prev => prev + 1)
+      }
+    })
+
+    //OBSERVE the element
+    if (node) observer.current.observe(node)
+
+  }, [loading, hasMore])
+
+
+  // share post
+  const submitHandler = async (e) => {
+    e.preventDefault()
+    if(!file && !desc.current.value ){
+      return alert("Please add description or image.")
+    }
+
+    const newPost = {
+      userId: user._id,
+      desc: desc.current.value
+    }
+
+    if (file) {
+      const data = new FormData()
+      let removeSpaceFileName = file.name.toLocaleLowerCase().split(" ").join("-");
+      const fileName = user._id + '_' + Date.now() + '_' + removeSpaceFileName;
+
+      // store like array in array;
+      data.append("file", file)
+      // data.append("name", fileName)
+
+      newPost.photo = fileName;
+      // console.log([...data]);
+      // console.log(newPost);
+
+      try {
+        await axios.post(`/api/v1/upload/${fileName}`, data, config);
+      } catch (err) {
+        return console.log(err);
       }
     }
 
-    const res = username ?
-      await axios.get(`/api/v1/posts/profile/${username}`, config) :
-      await axios.get(`/api/v1/posts/timeline/${user._id}`, config)
+    try {
+      await axios.post(`/api/v1/posts`, newPost, config);
+      setNewPosts(prev => [{...newPost, likes:[]}, ...prev])
+      
+      desc.current.value = "";
+      if(file){
+        cancelBlobView()
+      }
+    } catch (err) {
+      console.log(err);
+    }
 
-    setPosts(
-      res.data.sort((p1, p2) => {
-        return new Date(p2.createdAt) - new Date(p1.createdAt)
-      })
-    )
+
   }
 
-  useEffect(() => {
-
-    fetchPosts();
-  }, [username, user._id])
-
-  return <div className='feed'>
-    <div className="feed-wrapper">
-      {username ? username === user.username && <Share fetchPosts={fetchPosts} /> : ''}
-      {
-        posts.map(p => (
-          <Post key={p._id} post={p} />
-        ))
-      }
+  const cancelBlobView = () => {
+    setFile(null)
+    URL.revokeObjectURL();
+  }
+  return <>
+    <div className='feed'>
+      <div className="feed-wrapper">
+        {username ? username === user.username && (
+            <div className='share shadow-sm bg-white'>
+            <div className="share-wrapper">
+              <div className="share-top">
+                <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
+                <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
+              </div>
+              <hr className="share-hr" />
+              {
+                file && (
+                  <div className="share-img-container">
+                    {
+                      (file.type === "video/mp4") ? (<div>
+                        {file.name}
+                        <Cancel className='share-img-cancel' onClick={() => cancelBlobView()} />
+                      </div>) : (
+                        <>
+                          <img src={URL.createObjectURL(file)} alt="" className="share-img" />
+                          <Cancel className='share-img-cancel' onClick={() => cancelBlobView()} />
+                        </>
+                      )
+                    }
+                  </div>
+                )
+              }
+                
+              <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
+                <div className="share-options">
+                  <label id="file" className="share-option">
+                    <PermMedia htmlColor='tomato' className='share-option-icon' />
+                    <span className='share-option-text'>Photo or Video</span>
+                    <input style={{ display: 'none' }} type="file" id="file" name='file' onChange={(e) => setFile(e.target.files[0])} />
+                  </label>
+                </div>
+                <button className="share-btn" type='submit'>Share</button>
+              </form>
+            </div>
+          </div>
+        ) : ''}
+        {
+          newPosts.map((p, index) => (
+            <Post key={index} post={p} myRef={lastDocElementRef}/>
+          ))
+        }
+        {
+          docs.map((p) => (
+            <Post key={p._id} post={p} myRef={lastDocElementRef} />
+          ))
+        }
+      </div>
     </div>
-  </div>;
+
+    {
+      loading && (
+        <Stack className="text-center my-3">
+          <Spinner className='mx-auto' animation="border" variant="primary" />
+        </Stack>
+
+      )
+    }
+
+    {error && "Error"}
+  </>;
 }
+
+
+export default Feed;

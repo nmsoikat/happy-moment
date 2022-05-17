@@ -21,9 +21,9 @@ export default function Sidebar() {
     setTime(h + ":" + m + ":" + s)
   }
   
-  useEffect(() => {
-    setTimeout(startTime, 1000);
-  }, [time])
+  // useEffect(() => {
+  //   setTimeout(startTime, 1000);
+  // }, [time])
 
   //todays date
   const getDate = () => {
@@ -73,14 +73,14 @@ export default function Sidebar() {
           </li>
         </ul>
 
-        <div className="date-time-wrap shadow-sm overflow-hidden bg-white" style={{ background: "url('/assets/date-time-bg.jpg') center", backgroundSize: "cover" }}>
+        {/* <div className="date-time-wrap shadow-sm overflow-hidden bg-white" style={{ background: "url('/assets/date-time-bg.jpg') center", backgroundSize: "cover" }}>
           <div className="time">
             {time}
           </div>
           <div className="date">
             {getDate()}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )

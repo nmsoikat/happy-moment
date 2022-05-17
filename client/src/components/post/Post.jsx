@@ -1,13 +1,13 @@
 import './post.css'
 import { MoreVert } from '@mui/icons-material';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, forwardRef } from 'react';
 import axios from 'axios';
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
-export default function Post({ post }) {
+const Post = forwardRef(({ post, myRef }) => {
 
   const [like, setLike] = useState(post.likes.length)
   const [isLike, setIsLike] = useState(false)
@@ -46,7 +46,7 @@ export default function Post({ post }) {
     }
   }
 
-  return <div className='post shadow-sm bg-white'>
+  return <div ref={myRef} className='post shadow-sm bg-white'>
     <div className="post-wrapper">
       <div className="post-top">
         <div className="post-top-left">
@@ -73,8 +73,8 @@ export default function Post({ post }) {
       </div>
       <div className="post-bottom">
         <div className="post-bottom-left">
-          <img className='post-like-icon' src={`${PF}/like.png`} alt="like" onClick={likeHandler} />
-          <img className='post-like-icon' src={`${PF}/heart.png`} alt="heart" onClick={likeHandler} />
+          <img className='post-like-icon' src={`${PF}like.png`} alt="like" onClick={likeHandler} />
+          <img className='post-like-icon' src={`${PF}heart.png`} alt="heart" onClick={likeHandler} />
           <span className="post-like-count">{like} people smile it</span>
         </div>
         <div className="post-bottom-right">
@@ -83,4 +83,6 @@ export default function Post({ post }) {
       </div>
     </div>
   </div>;
-}
+})
+
+export default Post

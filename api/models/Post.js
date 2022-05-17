@@ -18,6 +18,11 @@ const PostSchema = mongoose.Schema({
   likes: {
     type: Array,
     default: []
+  },
+  postType:{
+    type: String,
+    default: 'public',
+    enum: ['public', 'private', 'friends']
   }
 
 }, { timestamps: true })
