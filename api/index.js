@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors')
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const AppErrorHandler = require('./middlewares/appErrorHandleMiddleware');
@@ -15,6 +16,7 @@ const AppErrorHandler = require('./middlewares/appErrorHandleMiddleware');
 const authRouter = require('./routes/authRouter');
 const userRouter = require('./routes/userRouter');
 const postRouter = require('./routes/postRouter');
+const commentRouter = require('./routes/commentRouter');
 const conversationRouter = require('./routes/conversationRouter');
 const messageRouter = require('./routes/messageRouter');
 
@@ -44,9 +46,10 @@ app.use('/images', express.static(path.join(__dirname, "/public/images")))
 // MIDDLEWARE
 app.use(cors()) 
 app.use(express.json()) // body parser
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(helmet())
 app.use(morgan('common'));
-
 
 // MULTER | FILE UPLOAD
 const DESTINATION_PATH = "api/public/images/post";
@@ -98,6 +101,7 @@ app.post('/api/v1/upload/:fileName', upload.single("file"), (req, res) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/conversation', conversationRouter);
 app.use('/api/v1/message', messageRouter);
 

@@ -21,7 +21,7 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id)
 
-  // set HTTP Only Cookie // expire in 1d
+  // set HTTP Only Cookie // expire in 30d
   const cookieOptions = {
     expire: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true
@@ -119,14 +119,18 @@ exports.userLogin = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of it's there
   let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
     return next(new AppError('Your are not logged in!. Please login to get access.'));
   }
-
 
   // 2) Verification Token // if some one manipulate the token
   // callback function call after complete the verification.
@@ -218,3 +222,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //4) Login the user, send JWT
   createSendToken(user, 201, res)
 })
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};

@@ -3,7 +3,7 @@ import {API_URL} from "./Constant"
 export const loginCall = async (userCredential, dispatch) => {
   dispatch({ type: "LOGIN_START" })
   try {
-    const { data } = await axios.post(`/api/v1/auth/login`, userCredential);
+    const { data } = await axios.post(`${API_URL}/api/v1/auth/login`, userCredential);
     dispatch({ type: "LOGIN_SUCCESS", payload: data })
 
     localStorage.setItem('currentUser', JSON.stringify(data.data))

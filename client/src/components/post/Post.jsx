@@ -30,7 +30,7 @@ const Post = forwardRef(({ post, myRef }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios.get(`/api/v1/users/single?id=${post.userId}`, config)
+      const res = await axios.get(`${API_URL}/api/v1/users/single?id=${post.userId}`, config)
       setUser(res.data)
     }
     fetchUser();
@@ -38,7 +38,7 @@ const Post = forwardRef(({ post, myRef }) => {
 
   const likeHandler = async () => {
     try {
-      await axios.put(`/api/v1/posts/${post._id}/like`, { userId: currentUser._id }, config)
+      await axios.put(`${API_URL}/api/v1/posts/${post._id}/like`, { userId: currentUser._id }, config)
       setLike(isLike ? like - 1 : like + 1)
       setIsLike(!isLike);
     } catch (err) {
@@ -74,7 +74,7 @@ const Post = forwardRef(({ post, myRef }) => {
       <div className="post-bottom">
         <div className="post-bottom-left">
           <img className='post-like-icon' src={`${PF}like.png`} alt="like" onClick={likeHandler} />
-          <img className='post-like-icon' src={`${PF}heart.png`} alt="heart" onClick={likeHandler} />
+          {/* <img className='post-like-icon' src={`${PF}heart.png`} alt="heart" onClick={likeHandler} /> */}
           <span className="post-like-count">{like} people smile it</span>
         </div>
         <div className="post-bottom-right">

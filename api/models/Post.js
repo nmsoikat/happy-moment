@@ -19,6 +19,12 @@ const PostSchema = mongoose.Schema({
     type: Array,
     default: []
   },
+  comments:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment'
+    }
+  ],
   postType:{
     type: String,
     default: 'public',

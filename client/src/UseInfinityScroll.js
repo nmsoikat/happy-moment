@@ -18,29 +18,34 @@ const UseInfinityScroll = (url='', params, config) => {
     setError(false)
 
     let cancel;
-
-    axios({
-      method: "GET",
-      url,
+    axios.get(url, {
       params,
-      config,
+      headers:config.headers,
       cancelToken: new axios.CancelToken(c => cancel = c)
+    }).then(res => {
+      setDocs(prev => {
+        return [...new Set([...prev, ...res.data])]
+      })
+
+      setHasMore(res.data.length > 0)
+      setLoading(false)
     })
-      .then(res =>{
-        setDocs(prev => {
-          return [...new Set([...prev, ...res.data])]
-        })
+    .catch(e => {
 
-        setHasMore(res.data.length > 0)
-        setLoading(false)
-      })
-      .catch(e => {
+      //ignore if axios cancel error
+      if (axios.isCancel(e)) return;
 
-        //ignore if axios cancel error
-        if (axios.isCancel(e)) return;
+      setError(true)
+    })
 
-        setError(true)
-      })
+    // axios({
+    //   method: "GET",
+    //   url,
+    //   params,
+    //   headers:config,
+    //   cancelToken: new axios.CancelToken(c => cancel = c)
+    // })
+      
 
     // useEffect return function
     return () => cancel();

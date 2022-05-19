@@ -32,7 +32,7 @@ export default function Profile() {
             <Sidebar />
           </div>
           <div className="col-md-9">
-            <Feed />
+            <Feed videoPage={true} />
           </div>
         </div>
       </div>

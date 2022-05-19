@@ -6,7 +6,7 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { REACT_APP_PUBLIC_FOLDER,API_URL } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
 export default function Profile() {
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -32,7 +32,7 @@ export default function Profile() {
             <Sidebar />
           </div>
           <div className="col-md-9">
-            <Feed />
+            <Feed trendingPage={true}/>
           </div>
         </div>
       </div>

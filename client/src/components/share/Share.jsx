@@ -44,14 +44,14 @@ export default function Share() {
       // console.log(newPost);
 
       try {
-        await axios.post(`/api/v1/upload/${fileName}`, data, config);
+        await axios.post(`${API_URL}/api/v1/upload/${fileName}`, data, config);
       } catch (err) {
         return console.log(err);
       }
     }
 
     try {
-      await axios.post(`/api/v1/posts`, newPost, config);
+      await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
 
       setFile(null)
       URL.revokeObjectURL();

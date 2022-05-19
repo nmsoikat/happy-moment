@@ -12,6 +12,8 @@ import { useState, useEffect, useContext, useRef, useCallback } from 'react';
 const Feed = (props) => {
   const username = props.username;
   const profile = props.profile || false;
+  const videoPage = props.videoPage || false;
+  const trendingPage = props.trendingPage || false;
 
   //share post
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -32,11 +34,20 @@ const Feed = (props) => {
     }
   }
 
-  const url = profile ?
-  `/api/v1/posts/profile/${username}/all` : `/api/v1/posts/timeline/${user._id}/all`
-  const params = {query, page: pageNumber}
+  let url;
+  if(profile){
+    url = `${API_URL}/api/v1/posts/profile/${username}/all`
+  }else if(videoPage){
+    url = `${API_URL}/api/v1/posts/timeline-video/${user._id}/all`
+  }else if(trendingPage){
+    url = `${API_URL}/api/v1/posts/timeline/tending`
+  }else{
+    url = `${API_URL}/api/v1/posts/timeline/${user._id}/all`
+  }
 
-  let {loading, error, docs, hasMore} = UseInfinityScroll(url, params, config)
+  const params = { query, page: pageNumber }
+
+  let { loading, error, docs, hasMore } = UseInfinityScroll(url, params, config)
 
   //set IntersectionObserver
   const observer = useRef();
@@ -44,7 +55,7 @@ const Feed = (props) => {
   const lastDocElementRef = useCallback(node => {
     if (loading) return;
     if (observer.current) observer.current.disconnect()
-    
+
     // create IntersectionObserver
     observer.current = new IntersectionObserver((entires) => {
       // when element is visible callback will invoked
@@ -62,7 +73,7 @@ const Feed = (props) => {
   // share post
   const submitHandler = async (e) => {
     e.preventDefault()
-    if(!file && !desc.current.value ){
+    if (!file && !desc.current.value) {
       return alert("Please add description or image.")
     }
 
@@ -85,18 +96,18 @@ const Feed = (props) => {
       // console.log(newPost);
 
       try {
-        await axios.post(`/api/v1/upload/${fileName}`, data, config);
+        await axios.post(`${API_URL}/api/v1/upload/${fileName}`, data, config);
       } catch (err) {
         return console.log(err);
       }
     }
 
     try {
-      await axios.post(`/api/v1/posts`, newPost, config);
-      setNewPosts(prev => [{...newPost, likes:[]}, ...prev])
-      
+      await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
+      setNewPosts(prev => [{ ...newPost, likes: [] }, ...prev])
+
       desc.current.value = "";
-      if(file){
+      if (file) {
         cancelBlobView()
       }
     } catch (err) {
@@ -114,7 +125,7 @@ const Feed = (props) => {
     <div className='feed'>
       <div className="feed-wrapper">
         {username ? username === user.username && (
-            <div className='share shadow-sm bg-white'>
+          <div className='share shadow-sm bg-white'>
             <div className="share-wrapper">
               <div className="share-top">
                 <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
@@ -138,7 +149,7 @@ const Feed = (props) => {
                   </div>
                 )
               }
-                
+
               <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
                 <div className="share-options">
                   <label id="file" className="share-option">
@@ -154,7 +165,7 @@ const Feed = (props) => {
         ) : ''}
         {
           newPosts.map((p, index) => (
-            <Post key={index} post={p} myRef={lastDocElementRef}/>
+            <Post key={index} post={p} myRef={lastDocElementRef} />
           ))
         }
         {

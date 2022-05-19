@@ -22,7 +22,7 @@ export default function Profile() {
       }
     }
 
-    const res = searchValue ? await axios.get(`/api/v1/users?searchUser=${searchValue}`, config) : await axios.get(`/api/v1/users`, config)
+    const res = searchValue ? await axios.get(`${API_URL}/api/v1/users?searchUser=${searchValue}`, config) : await axios.get(`${API_URL}/api/v1/users`, config)
 
     setAllUsers(
       res.data.sort((p1, p2) => {

@@ -33,7 +33,7 @@ export default function ResetPassword() {
   }
 
   const onSubmit = async (values) => {
-    await axios.patch(`/api/v1/auth/reset-password/${resetToken}`, { password: values.password }, config)
+    await axios.patch(`${API_URL}/api/v1/auth/reset-password/${resetToken}`, { password: values.password }, config)
     navigate('/login')
   }
 
