@@ -27,9 +27,10 @@ exports.commentCreateOne = catchAsync(async (req, res, next) => {
   })
 
   // populate comment and send to user
-  const commentData = await Comment.findById(currentComment._id).populate({
+  const commentData = await Comment.findById(currentComment._id)
+  .populate({
     path: "userId",
-    select: "username profilePics",
+    select: "firstName lastName profilePicture",
   })
 
   return res.status(201).json(commentData)
@@ -38,11 +39,11 @@ exports.commentCreateOne = catchAsync(async (req, res, next) => {
 
 exports.commentReplyCreate = catchAsync(async (req, res, next) => {
   const { commentId } = req.params
-  const { body } = req.body
+  const { data } = req.body
 
   const reply = {
     userId: req.user._id,
-    body,
+    body:data
   }
 
   // find current comment
@@ -57,6 +58,8 @@ exports.commentReplyCreate = catchAsync(async (req, res, next) => {
   // send response
   res.status(201).json({
     ...reply,
+    firstName: req.user.firstName,
+    lastName: req.user.lastName,
     profilePicture: req.user.profilePicture,
   })
 

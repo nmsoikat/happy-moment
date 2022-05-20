@@ -103,8 +103,9 @@ const Feed = (props) => {
     }
 
     try {
-      await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
-      setNewPosts(prev => [{ ...newPost, likes: [] }, ...prev])
+      const postShared = await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
+
+      setNewPosts(prev => [postShared.data, ...prev])
 
       desc.current.value = "";
       if (file) {

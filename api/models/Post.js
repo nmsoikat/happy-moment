@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 
 const PostSchema = mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: [true, 'Post should have an author'],
   },
   desc: {
@@ -19,8 +20,7 @@ const PostSchema = mongoose.Schema({
     type: Array,
     default: []
   },
-  comments:[
-    {
+  comments:[{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Comment'
     }
