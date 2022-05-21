@@ -1,12 +1,11 @@
 import './post.css'
 import { MoreVert } from '@mui/icons-material';
-import { useContext, useEffect, useState, forwardRef, useRef } from 'react';
+import { useContext, useEffect, useState, forwardRef } from 'react';
 import axios from 'axios';
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
-import Comment from '../comment/Comment'
 
 const Post = forwardRef(({ post, myRef }) => {
 
@@ -14,14 +13,11 @@ const Post = forwardRef(({ post, myRef }) => {
   const [isLike, setIsLike] = useState(false)
   const [user, setUser] = useState({})
 
-  const [commentBody, setCommentBody] = useState('')
-  const [commentReplyBody, setCommentReplyBody] = useState('')
-
-  const [newComments, setNewComments] = useState([])
-  const [newReplyComments, setNewReplyComments] = useState([])
+  const [comments, setComments] = useState(post.comments)
+  const [newReply, setNewReply] = useState({})
 
   const [isCommentVisible, setIsCommentVisible] = useState(false)
-  const [isReplyBoxVisible, setIsReplyBoxVisible] = useState(false)
+  const [isReplyInputBoxVisible, setIsReplyInputBoxVisible] = useState({ visible: false, commentId: '' })
 
   const PF = REACT_APP_PUBLIC_FOLDER;
 
@@ -33,6 +29,28 @@ const Post = forwardRef(({ post, myRef }) => {
       Authorization: `Bearer ${token}`,
     }
   }
+
+  // useEffect(() => {
+  //   if(newComment.createdComment){
+  //     console.log(newComment);
+  //     setComments(prev => [...prev, newComment.createdComment.data])
+  //   }
+  //   console.log(comments);
+  // }, [newComment])
+
+  // Reply
+  useEffect(() => {
+    if (Object.keys(newReply).length > 0) {
+      const updatedComments = comments.map(comment => {
+        if (comment._id === newReply.commentId) {
+          comment.replies.push(newReply.reply.data)
+        }
+        return comment
+      })
+
+      setComments(updatedComments)
+    }
+  }, [newReply])
 
   useEffect(() => {
     setIsLike(post.likes.includes(currentUser._id))
@@ -58,34 +76,47 @@ const Post = forwardRef(({ post, myRef }) => {
 
   //Comment Handler
   const commentOnKeyUp = async (event, postId) => {
-    setCommentBody(event.target.value)
+    const commentBody = event.target.value;
 
     if (event.key === 'Enter') {
       if (!commentBody) return;
 
-      const newComment = await axios.post(`${API_URL}/api/v1/comments/create-comment/${postId}`, { data: commentBody }, config)
+      const createdComment = await axios.post(`${API_URL}/api/v1/comments/create-comment/${postId}`, { data: commentBody }, config)
 
-      setNewComments(prev => [newComment.data, ...prev])
-      setIsCommentVisible(true)
+      setComments(prev => [...prev, createdComment.data])
 
+      // setNewComment({postId, createdComment})
+
+      setIsCommentVisible(true) //comment area visible
       event.target.value = '';
     }
   }
 
   //Reply Handler
-  const commentReplyOnKeyUp = async (event, postId) => {
-    setCommentReplyBody(event.target.value)
+  const commentReplyOnKeyUp = async (event, commentId) => {
+
+    const commentReplyBody = event.target.value;
 
     if (event.key === 'Enter') {
       if (!commentReplyBody) return;
 
-      const newCommentReply = await axios.post(`${API_URL}/api/v1/comments/create-reply/${postId}`, { data: commentReplyBody }, config)
-
-      setNewReplyComments(prev => [...prev, newCommentReply.data])
+      const reply = await axios.post(`${API_URL}/api/v1/comments/create-reply/${commentId}`, { data: commentReplyBody }, config)
+      setNewReply({ commentId, reply })
 
       event.target.value = '';
-      setIsCommentVisible(true)
-      setIsReplyBoxVisible(false)
+      setIsCommentVisible(true) //comment area visible
+      setIsReplyInputBoxVisible({ visible: false, commentId: '' }) //replay input box hide
+    }
+  }
+
+  const replyInputBoxToggler = (commentId) => {
+    // console.log(isReplyInputBoxVisible.commentId, commentId);
+    if(!isReplyInputBoxVisible.commentId){
+      setIsReplyInputBoxVisible({ visible: true, commentId })
+    } else if(isReplyInputBoxVisible.commentId === commentId){
+      setIsReplyInputBoxVisible({ visible: !isReplyInputBoxVisible.visible, commentId })
+    } else {
+      setIsReplyInputBoxVisible({ visible: true, commentId })
     }
   }
 
@@ -123,83 +154,55 @@ const Post = forwardRef(({ post, myRef }) => {
           <span className="post-like-count">{like} people smile it</span>
         </div>
         <div className="post-bottom-right">
-          <span className="post-comment-text" onClick={() => setIsCommentVisible(!isCommentVisible)}>{post.comments?.length + newComments.length} comments</span>
+          <span className="post-comment-text" onClick={() => setIsCommentVisible(!isCommentVisible)}>{comments?.length} comments</span>
         </div>
       </div>
 
       <div className="comments-wrap shadow-sm p-2 mt-3 bg-body rounded">
-        {
-          isCommentVisible &&
-          newComments.map(comment => (
-            <div key={comment._id} className="comment-row">
-              <div className="comment-card">
-                <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                <div className="comment-body">
-                  <div className='comment'>
-                    <b>{comment.userId.firstName}</b>
-                    <p>{comment.body}</p>
-                  </div>
-                </div>
-              </div>
-              {
-                newReplyComments.length > 0 &&
-                newReplyComments.map((replyComment, index) => (
-                  <div key={index} className="comment-card reply">
-                    <img className='post-profile-img current-user-profile-img' src={(replyComment.profilePicture && PF + replyComment.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                    <div className="comment-body">
-                      <div className='comment'>
-                        <b>{replyComment.firstName}</b>
-                        <p>{replyComment.body}</p>
-                      </div>
-                    </div>
 
-                  </div>
-                ))
-              }
-              <div className="toggle-reply-input" onClick={() => setIsReplyBoxVisible(!isReplyBoxVisible)}>Reply</div>
-              <div className={`reply-input-box ${isReplyBoxVisible ? '' : 'visually-hidden'}`}>
-                <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                <input onKeyUp={(event) => commentReplyOnKeyUp(event, comment._id)} type="text" className="form-control rounded-pill" placeholder="Press Enter to Reply" name="reply" />
-              </div>
-            </div>
-          ))
-        }
         {
-          isCommentVisible &&
-          post.comments.reverse().map(comment => (
-            <div key={comment._id} className="comment-row">
-              <div className="comment-card">
-                <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                <div className="comment-body">
-                  <div className='comment'>
-                    <b>{comment.userId.firstName}</b>
-                    <p>{comment.body}</p>
-                  </div>
-                </div>
-              </div>
-              {
-                comment.replies.length > 0 &&
-                comment.replies.map(commentReply => (
-                  <div key={commentReply._id} className="comment-card reply">
-                    <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                    <div className="comment-body">
-                      <div className='comment'>
-                        <b>{commentReply.userId.firstName}</b>
-                        <p>{commentReply.body}</p>
-                      </div>
-
+          isCommentVisible && comments.length > 0 ?
+            comments.map(comment => (
+              <div key={comment._id} className="comment-row">
+                <div className="comment-card">
+                  <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                  <div className="comment-body">
+                    <div className='comment'>
+                      <b>{comment.userId.firstName}</b>
+                      <p>{comment.body}</p>
                     </div>
                   </div>
-                ))
-              }
+                </div>
 
-              <div className="toggle-reply-input" onClick={() => setIsReplyBoxVisible(!isReplyBoxVisible)}>Reply</div>
-              <div className={`reply-input-box ${isReplyBoxVisible ? '' : 'visually-hidden'}`}>
-                <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                <input onKeyUp={(event) => commentReplyOnKeyUp(event, comment._id)} type="text" className="form-control rounded-pill" placeholder="Press Enter to Reply" name="reply" />
+                {
+                  comment.replies.length > 0 &&
+                  comment.replies.map(commentReply => (
+                    <div key={commentReply._id} className="comment-card reply">
+                      <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <div className="comment-body">
+                        <div className='comment'>
+                          <b>{commentReply.userId.firstName}</b>
+                          <p>{commentReply.body}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                }
+
+                <div className="toggle-reply-input" onClick={(e) => replyInputBoxToggler(comment._id)}>Reply</div>
+                {
+                  (isReplyInputBoxVisible.visible && isReplyInputBoxVisible.commentId === comment._id) &&
+                  (
+                    <div className="reply-input-box">
+                      <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <input onKeyUp={(event) => commentReplyOnKeyUp(event, comment._id)} type="text" className="form-control rounded-pill" placeholder="Press Enter to Reply" name="reply" />
+                    </div>
+                  )
+                }
               </div>
-            </div>
-          ))
+            ))
+
+            : ''
         }
 
 
