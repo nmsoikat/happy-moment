@@ -17,7 +17,7 @@ exports.postCreateOne = async (req, res) => {
 exports.postUpdateById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId === req.body.userId) {
+    if (post.userId.toString() === req.body.userId) {
       await post.updateOne({ $set: req.body });
       res.status(200).json("The post has been updated");
     } else {
@@ -33,7 +33,7 @@ exports.postUpdateById = async (req, res) => {
 exports.postTypeUpdateById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId === req.body.userId) {
+    if (post.userId.toString() === req.body.userId) {
       await post.updateOne({ postType: req.body.postType });
       res.status(200).json("The post type has been updated");
     } else {
@@ -50,7 +50,8 @@ exports.postTypeUpdateById = async (req, res) => {
 exports.postDeleteById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId === req.body.userId) {
+
+    if (post.userId.toString() === req.user._id.toString()) {
       await post.deleteOne()
       res.status(200).json('post has been deleted');
     } else {

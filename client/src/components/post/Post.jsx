@@ -14,10 +14,12 @@ const Post = forwardRef(({ post, myRef }) => {
   const [user, setUser] = useState({})
 
   const [comments, setComments] = useState(post.comments)
+  const [postType, setPostType] = useState({ postType: post.postType, postId: post._id })
   const [newReply, setNewReply] = useState({})
 
   const [isCommentVisible, setIsCommentVisible] = useState(false)
   const [isReplyInputBoxVisible, setIsReplyInputBoxVisible] = useState({ visible: false, commentId: '' })
+  const [isPostTypeVisible, setIsPostTypeVisible] = useState({ visible: false, postId: '' })
 
   const PF = REACT_APP_PUBLIC_FOLDER;
 
@@ -111,13 +113,35 @@ const Post = forwardRef(({ post, myRef }) => {
 
   const replyInputBoxToggler = (commentId) => {
     // console.log(isReplyInputBoxVisible.commentId, commentId);
-    if(!isReplyInputBoxVisible.commentId){
+    if (!isReplyInputBoxVisible.commentId) {
       setIsReplyInputBoxVisible({ visible: true, commentId })
-    } else if(isReplyInputBoxVisible.commentId === commentId){
+    } else if (isReplyInputBoxVisible.commentId === commentId) {
       setIsReplyInputBoxVisible({ visible: !isReplyInputBoxVisible.visible, commentId })
     } else {
       setIsReplyInputBoxVisible({ visible: true, commentId })
     }
+  }
+
+  const togglePostTypeHandler = (postId) => {
+    if (!isPostTypeVisible.postId) {
+      setIsPostTypeVisible({ visible: true, postId })
+    } else if (isPostTypeVisible.postId === postId) {
+      setIsPostTypeVisible({ visible: !isPostTypeVisible.visible, postId })
+    } else {
+      setIsPostTypeVisible({ visible: true, postId })
+    }
+  }
+
+  const updatePostType = async (postType) => {
+    await axios.patch(`${API_URL}/api/v1/posts/type/${postType.postId}`, { postType: postType.postType, userId: currentUser._id }, config)
+
+    setPostType(postType)
+    setIsPostTypeVisible({ visible: false, postId: '' })
+  }
+
+  const deleteUserPostById = async (postId) => {
+    await axios.delete(`${API_URL}/api/v1/posts/${postId}`,config)
+    setIsPostTypeVisible({ visible: false, postId: '' })
   }
 
   return <div ref={myRef} className='post shadow-sm bg-white'>
@@ -130,9 +154,25 @@ const Post = forwardRef(({ post, myRef }) => {
           <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: '#222', display: 'inline-block' }}><span className="post-username">{user.firstName + ' ' + user.lastName}</span></Link>
           <span className="post-date">{moment(post.createdAt).fromNow()}</span>
         </div>
-        <div className="post-top-right">
-          <MoreVert className='post-option-icon' />
-        </div>
+        {
+          currentUser._id === post.userId &&
+          (
+            <div className="post-top-right" onClick={() => togglePostTypeHandler(post._id)}>
+              <MoreVert className='post-option-icon' />
+              {
+                (isPostTypeVisible.visible && isPostTypeVisible.postId === post._id) &&
+                (
+                  <div className='dropdown shadow'>
+                    <label className={`d-block ${postType.postType === 'public' && 'selected'}`} onClick={() => updatePostType({ postType: 'public', postId: post._id })}>Public</label>
+                    <label className={`d-block ${postType.postType === 'private' && 'selected'}`} onClick={() => updatePostType({ postType: 'private', postId: post._id })}>Private</label>
+                    <label className={`d-block text-danger`} onClick={() => deleteUserPostById(post._id)}>Delete</label>
+                  </div>
+
+                )
+              }
+            </div>
+          )
+        }
       </div>
 
       <div className="post-center">

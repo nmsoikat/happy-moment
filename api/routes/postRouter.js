@@ -1,12 +1,16 @@
 const router = require('express').Router();
 const { protect } = require('../controllers/authController');
-const { postCreateOne, postUpdateById, postDeleteById, postLikeById, postGetById, postGetForTimeline, postGetByUsername, postGetForTimelineOnlyVideos, postGetForTimelineTrending } = require('../controllers/postController');
+const { postCreateOne, postUpdateById, postDeleteById, postLikeById, postGetById, postGetForTimeline, postGetByUsername, postGetForTimelineOnlyVideos, postGetForTimelineTrending, postTypeUpdateById } = require('../controllers/postController');
 
 // create a post
 router.post('/', protect, postCreateOne)
 
+
 // update a post
 router.put('/:id', protect, postUpdateById)
+
+// update a post
+router.patch('/type/:id', protect, postTypeUpdateById)
 
 
 // delete a post
@@ -25,6 +29,7 @@ router.get('/:id', protect, postGetById)
 router.get('/timeline/:userId/all',protect, postGetForTimeline)
 router.get('/timeline-video/:userId/all',protect, postGetForTimelineOnlyVideos)
 router.get('/timeline/tending',protect, postGetForTimelineTrending)
+
 
 // get user's all posts
 router.get('/profile/:username/all',protect, postGetByUsername)

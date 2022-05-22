@@ -136,3 +136,34 @@
 }
 
 
+
+.post-top-right{
+  position: relative;
+  z-index: 9;
+  cursor: pointer;
+}
+
+.post-top-right .dropdown{
+  position: absolute;
+  right: 10px;
+  top: 25px;
+  width: 108px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.post-top-right .dropdown label{
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+  padding: 2px 0;
+}
+
+.post-top-right .dropdown label:hover,
+.post-top-right .dropdown label.selected{
+  font-weight: bold;
+}
+
+.post-top-right .dropdown label:last-child{
+  border-bottom: none;
+}

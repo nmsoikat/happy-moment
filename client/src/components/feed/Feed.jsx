@@ -19,6 +19,7 @@ const Feed = (props) => {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const desc = useRef();
   const [file, setFile] = useState(null);
+  const [postType, setPostType] = useState('public');
 
   //feed
   const { user, token } = useContext(AuthContext)
@@ -35,13 +36,13 @@ const Feed = (props) => {
   }
 
   let url;
-  if(profile){
+  if (profile) {
     url = `${API_URL}/api/v1/posts/profile/${username}/all`
-  }else if(videoPage){
+  } else if (videoPage) {
     url = `${API_URL}/api/v1/posts/timeline-video/${user._id}/all`
-  }else if(trendingPage){
+  } else if (trendingPage) {
     url = `${API_URL}/api/v1/posts/timeline/tending`
-  }else{
+  } else {
     url = `${API_URL}/api/v1/posts/timeline/${user._id}/all`
   }
 
@@ -73,13 +74,15 @@ const Feed = (props) => {
   // share post
   const submitHandler = async (e) => {
     e.preventDefault()
+
     if (!file && !desc.current.value) {
       return alert("Please add description or image.")
     }
 
     const newPost = {
       userId: user._id,
-      desc: desc.current.value
+      desc: desc.current.value,
+      postType,
     }
 
     if (file) {
@@ -118,10 +121,15 @@ const Feed = (props) => {
 
   }
 
+  // const setPostTypeHandler = (e) => {
+  //   setPostType(e.target.value)
+  // }
+
   const cancelBlobView = () => {
     setFile(null)
     URL.revokeObjectURL();
   }
+
   return <>
     <div className='feed'>
       <div className="feed-wrapper">
@@ -155,18 +163,25 @@ const Feed = (props) => {
                 <div className="share-options">
                   <label id="file" className="share-option">
                     <PermMedia htmlColor='tomato' className='share-option-icon' />
-                    <span className='share-option-text'>Photo or Video</span>
+                    {/* <span className='share-option-text'>Photo or Video</span> */}
+                    <span className='share-option-text'>Photo</span>
                     <input style={{ display: 'none' }} type="file" id="file" name='file' onChange={(e) => setFile(e.target.files[0])} />
                   </label>
                 </div>
-                <button className="share-btn" type='submit'>Share</button>
+                <div className='post-setting'>
+                  <select style={{ width: '100px', display: 'inline-block', marginRight: '5px' }} name="postType" onChange={(e) => setPostType(e.target.value)} className="form-select form-select-sm">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                  </select>
+                  <button className="share-btn btn-sm" type='submit'>Share</button>
+                </div>
               </form>
             </div>
           </div>
         ) : ''}
         {
           newPosts.map((p, index) => (
-            <Post key={index} post={p} myRef={lastDocElementRef} />
+            <Post key={p._id} post={p} myRef={lastDocElementRef} />
           ))
         }
         {
