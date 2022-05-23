@@ -30,7 +30,7 @@ export default function Person({ person }) {
     <div className='person shadow-sm bg-white'>
       <div className="person-left">
         <Link to={`/profile/${person.username}`}>
-          <img className='post-profile-img' src={(person.profilePicture && PF + person.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+          <img className='post-profile-img' src={(person.profilePicture && PF + 'person/' + person.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
         </Link>
         <div className="person-left-info">
           <Link to={`/profile/${person.username}`} style={{ textDecoration: 'none', color: '#222', display: 'inline-block' }}><span className="post-username">{person.firstName + ' ' + person.lastName}</span></Link>

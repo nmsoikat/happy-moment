@@ -6,13 +6,17 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { REACT_APP_PUBLIC_FOLDER,API_URL } from '../../Constant'
-import { Col, Nav, Row, Tab } from 'react-bootstrap'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
+import { Button, Col, Modal, Nav, Row, Spinner, Tab } from 'react-bootstrap'
 import About from '../../components/about/About'
 import AllFriends from '../../components/allFriends/AllFriends'
 import AllFriendsRequest from '../../components/allFriendsRequest/AllFriendsRequest'
 import AllFriendsSentRequest from '../../components/allFriendsSentRequest/AllFriendsSentRequest'
 import { AuthContext } from '../../context/AuthContext';
+import CropEasy from '../../components/crop/CropEasy'
+import { DialogContent, DialogContentText, TextField } from '@mui/material'
+import { Box } from '@mui/system'
+import EditIcon from '@mui/icons-material/Edit';
 
 export default function Profile() {
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -23,12 +27,52 @@ export default function Profile() {
   const [friendsRequestList, setFriendsRequestList] = useState([]);
   const [friendsSentRequestList, setFriendsSentRequestList] = useState([]);
 
+
+  const [file, setFile] = useState(null);
+  const [photoURL, setPhotoURL] = useState(PF + (currentUser.profilePicture && 'person/' + currentUser.profilePicture || 'person/noAvatar.png'));
+  const [openCrop, setOpenCrop] = useState(false);
+
+  const [show, setShow] = useState(false);
+  const handleShow = () => setShow(true);
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     }
   }
+
+  const handleChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFile(file);
+      setPhotoURL(URL.createObjectURL(file));
+      setOpenCrop(true);
+      handleShow()
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (file) {
+        const data = new FormData()
+        let removeSpaceFileName = file.name.toLocaleLowerCase().split(" ").join("-");
+        const fileName = user._id + '_' + Date.now() + '_' + removeSpaceFileName;
+
+        // store like array in array;
+        data.append("file", file)
+        // data.append("name", fileName)
+        // data.profilePicture = fileName
+        // data.userId = currentUser._id
+
+        await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  };
 
   // user profile by username
   useEffect(() => {
@@ -67,7 +111,7 @@ export default function Profile() {
     }
   }
 
-  
+
   // ----------------------- Friend Request Handle --------------
   const gerFriendsRequest = async () => {
     if (user.username !== currentUser.username) {
@@ -140,7 +184,9 @@ export default function Profile() {
     }
   }
 
-
+  useEffect(() => {
+    console.log(currentUser);
+  },[])
   return (
     <>
       <Topbar />
@@ -152,12 +198,31 @@ export default function Profile() {
           <div className="col-md-9">
             <div className="profile-right-top">
               <div className="profile-cover">
-                <img className='profile-cover-img' src={(user.coverPicture && PF + user.coverPicture) || PF + '/person/noCover.png'} alt="" />
-                <img className='profile-user-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                <img className='profile-cover-img' src={(user.coverPicture && PF + user.coverPicture) || PF + 'person/noCover.png'} alt="" />
+                {/* <div className='profile-user-img-wrap'>
+                  <Button className="btn btn-sm" onClick={handleShow}>
+                    <EditIcon />
+                  </Button>
+                  <img className='profile-user-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                </div> */}
+                <div className='profile-user-img-wrap'>
+                  <label htmlFor="profilePhoto">
+                    <input
+                      accept="image/*"
+                      id="profilePhoto"
+                      type="file"
+                      name="file"
+                      style={{ display: 'none' }}
+                      onChange={handleChange}
+                    />
+                    <img className='profile-user-img' src={(photoURL && photoURL) || PF + 'person/noAvatar.png'} alt="" />
+                    {/* <img className='profile-user-img' src={PF + 'person/' + user.profilePicture} alt="" /> */}
+                  </label>
+                </div>
               </div>
               <div className="profile-info">
-                <h4 className="profile-info-name">{user.firstName + " " + user.lastName}</h4>
-                <p className="profile-info-desc">{user.desc}</p>
+                <h4 className="profile-info-name">{user ? user.firstName + " " + user.lastName : '...'}</h4>
+                <p className="profile-info-desc">{user ? user.desc : '...'}</p>
               </div>
             </div>
 
@@ -218,6 +283,8 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {openCrop && <CropEasy {...{ handleSubmit, photoURL, setPhotoURL, setFile, setOpenCrop, show }} />}
     </>
   );
 }

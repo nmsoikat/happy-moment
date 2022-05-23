@@ -1,10 +1,11 @@
 const Post = require('../models/Post')
 const User = require('../models/User')
+const fs = require("fs")
 
 // create a post
 exports.postCreateOne = async (req, res) => {
   try {
-    const newPost = new Post({...req.body, comments: []})
+    const newPost = new Post({ ...req.body, comments: [] })
     const savePost = await newPost.save();
     res.status(200).json(savePost)
   } catch (err) {
@@ -53,6 +54,15 @@ exports.postDeleteById = async (req, res) => {
 
     if (post.userId.toString() === req.user._id.toString()) {
       await post.deleteOne()
+      
+      fs.unlink(`api/public/images/post/${post.photo}`, (err) => {
+        if(err){
+          console.log(err);
+        }else{
+          console.log('file deleted success');
+        }
+      })
+
       res.status(200).json('post has been deleted');
     } else {
       res.status(403).json('You can delete only our post')
@@ -84,20 +94,20 @@ exports.postLikeById = async (req, res) => {
 exports.postGetById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
-    .populate({
-      path: "comments",
-      populate: {
-        path: "userId",
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .populate({
-      path: 'comments',
-      populate: {
-        path: 'replies.userId',
-        select: "firstName lastName profilePicture"
-      }
-    })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'replies.userId',
+          select: "firstName lastName profilePicture"
+        }
+      })
 
     res.status(200).json(post);
   } catch (err) {
@@ -117,41 +127,41 @@ exports.postGetForTimeline = async (req, res) => {
 
     // get 3 post for current user
     const posts = await Post.find({ userId: currentUser._id, postType: { $ne: 'private' } })
-    .populate({
-      path: "comments",
-      populate: {
-        path: "userId",
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .populate({
-      path: 'comments',
-      populate: {
-        path: 'replies.userId',
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .skip((page - 1) * 3).limit(3).sort('-createdAt');
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'replies.userId',
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .skip((page - 1) * 3).limit(3).sort('-createdAt');
 
     // get 1 post of each friends
     const friendsPosts = await Promise.all(
       currentUser.friends.map((friendId) => {
         return Post.find({ userId: friendId, postType: { $ne: 'private' } })
-        .populate({
-          path: "comments",
-          populate: {
-            path: "userId",
-            select: "firstName lastName profilePicture"
-          }
-        })
-        .populate({
-          path: 'comments',
-          populate: {
-            path: 'replies.userId',
-            select: "firstName lastName profilePicture"
-          }
-        })
-        .skip(skip).limit(limit).sort('-createdAt');
+          .populate({
+            path: "comments",
+            populate: {
+              path: "userId",
+              select: "firstName lastName profilePicture"
+            }
+          })
+          .populate({
+            path: 'comments',
+            populate: {
+              path: 'replies.userId',
+              select: "firstName lastName profilePicture"
+            }
+          })
+          .skip(skip).limit(limit).sort('-createdAt');
       })
     )
 
@@ -172,41 +182,41 @@ exports.postGetForTimelineOnlyVideos = async (req, res) => {
     const currentUser = await User.findById(req.params.userId);
     // get 3 post for current user
     const posts = await Post.find({ userId: currentUser._id, postType: { $ne: 'private' }, video: { $ne: null } })
-    .populate({
-      path: "comments",
-      populate: {
-        path: "userId",
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .populate({
-      path: 'comments',
-      populate: {
-        path: 'replies.userId',
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .skip((page - 1) * 3).limit(3).sort('-createdAt');
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'replies.userId',
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .skip((page - 1) * 3).limit(3).sort('-createdAt');
 
     // get 1 post of each friends
     const friendsPosts = await Promise.all(
       currentUser.friends.map((friendId) => {
         return Post.find({ userId: friendId, postType: { $ne: 'private' }, videos: { $ne: '' } })
-        .populate({
-          path: "comments",
-          populate: {
-            path: "userId",
-            select: "firstName lastName profilePicture"
-          }
-        })
-        .populate({
-          path: 'comments',
-          populate: {
-            path: 'replies.userId',
-            select: "firstName lastName profilePicture"
-          }
-        })
-        .skip(skip).limit(limit).sort('-createdAt');
+          .populate({
+            path: "comments",
+            populate: {
+              path: "userId",
+              select: "firstName lastName profilePicture"
+            }
+          })
+          .populate({
+            path: 'comments',
+            populate: {
+              path: 'replies.userId',
+              select: "firstName lastName profilePicture"
+            }
+          })
+          .skip(skip).limit(limit).sort('-createdAt');
       })
     )
 
@@ -226,22 +236,22 @@ exports.postGetForTimelineTrending = async (req, res) => {
   try {
     // const currentUser = await User.findById(req.params.userId);
     // get 3 post for current user
-    const posts = await Post.find({likes:{$size: 1}})
-    .populate({
-      path: "comments",
-      populate: {
-        path: "userId",
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .populate({
-      path: 'comments',
-      populate: {
-        path: 'replies.userId',
-        select: "firstName lastName profilePicture"
-      }
-    })
-    .skip(skip).limit(limit).sort('-createdAt');
+    const posts = await Post.find({ likes: { $size: 1 } })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "userId",
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'replies.userId',
+          select: "firstName lastName profilePicture"
+        }
+      })
+      .skip(skip).limit(limit).sort('-createdAt');
 
     // get 1 post of each friends
     // const friendsPosts = await Promise.all(
@@ -271,37 +281,37 @@ exports.postGetByUsername = async (req, res) => {
     const user = await User.findOne({ username: req.params.username })
     const posts = loggedInUser._id.toString() === user._id.toString() ?
       await Post.find({ userId: user._id }).skip(skip).limit(limit)
-      .populate({
-        path: "comments",
-        populate: {
-          path: "userId",
-          select: "firstName lastName profilePicture"
-        }
-      })
-      .populate({
-        path: 'comments',
-        populate: {
-          path: 'replies.userId',
-          select: "firstName lastName profilePicture"
-        }
-      })
-      .sort('-createdAt') :
+        .populate({
+          path: "comments",
+          populate: {
+            path: "userId",
+            select: "firstName lastName profilePicture"
+          }
+        })
+        .populate({
+          path: 'comments',
+          populate: {
+            path: 'replies.userId',
+            select: "firstName lastName profilePicture"
+          }
+        })
+        .sort('-createdAt') :
       await Post.find({ userId: user._id, postType: { $ne: 'private' } })
-      .populate({
-        path: "comments",
-        populate: {
-          path: "userId",
-          select: "firstName lastName profilePicture"
-        }
-      })
-      .populate({
-        path: 'comments',
-        populate: {
-          path: 'replies.userId',
-          select: "firstName lastName profilePicture"
-        }
-      })
-      .skip(skip).limit(limit).sort('-createdAt');
+        .populate({
+          path: "comments",
+          populate: {
+            path: "userId",
+            select: "firstName lastName profilePicture"
+          }
+        })
+        .populate({
+          path: 'comments',
+          populate: {
+            path: 'replies.userId',
+            select: "firstName lastName profilePicture"
+          }
+        })
+        .skip(skip).limit(limit).sort('-createdAt');
 
     res.status(200).json(posts)
 

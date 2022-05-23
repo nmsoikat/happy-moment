@@ -58,7 +58,7 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
   }
 
   //only logged in user
-  if (req.body.userId !== req.params.id) {
+  if (req.user._id.toString() !== req.params.id) {
     return next(new AppError("You can update only your account!", 400))
   }
 

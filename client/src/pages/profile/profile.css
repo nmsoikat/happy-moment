@@ -1,31 +1,39 @@
-.profile-right-top {
-}
+.profile-right-top {}
 
 .profile-cover {
-	height: 320px;
-	position: relative;
+  height: 320px;
+  position: relative;
 }
 
 .profile-cover-img {
-	width: 100%;
-	height: 250px;
-	object-fit: cover;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.profile-user-img-wrap {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
 }
 
 .profile-user-img {
-	width: 150px;
-	height: 150px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-	object-fit: cover;
-  position: absolute;
+  object-fit: cover;
+  /* position: absolute;
   left: 0;
   right: 0;
-  margin: auto;
+  margin: auto; */
   border: 3px solid #fff;
   bottom: 0;
+  cursor: pointer;
 }
 
-.profile-info{
+.profile-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,49 +41,79 @@
   margin: 15px 0px;
 }
 
-.profile-info-name{
+.profile-info-name {
   font-size: 24px;
 }
 
-.profile-info-desc{
+.profile-info-desc {
   font-weight: 300;
 }
 
-.tab-control .nav-item {cursor: pointer;}
+.tab-control .nav-item {
+  cursor: pointer;
+}
 
-.friends-wrapper{
+.friends-wrapper {
   display: flex;
   margin: -10px;
 }
 
-.friends-wrapper .friends-item{
+.friends-wrapper .friends-item {
   margin: 5px;
   padding: 5px;
   border-radius: 10px;
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-.friends-wrapper .friends-img{
-	width: 100px;
-	height: 100px;
-	object-fit: cover;
-	border-radius: 5px;
-	margin-bottom: 5px;
+.friends-wrapper .friends-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
 
-.friends-wrapper .friends-name{
+.friends-wrapper .friends-name {
   margin-top: 10px;
 }
 
-.friends-wrapper button{
+.friends-wrapper button {
   margin-top: 10px;
 }
 
-.friend-list-hidden-text{
+.friend-list-hidden-text {
   font-size: 50px;
   color: rgb(220, 220, 220);
   text-align: center;
   margin-top: 100px;
+}
+
+
+
+.custom-modal-wrap {
+  width: 800px;
+  height: 650px;
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: #fff;
+  visibility: hidden;
+  opacity: 0;
+  display: block;
+}
+
+.custom-modal-wrap.show {
+  top: 50%;
+  visibility: visible;
+  opacity: 1;
+}
+
+.custom-modal-body {
+  position: relative;
+  width: 100%;
+  height: 450px;
 }

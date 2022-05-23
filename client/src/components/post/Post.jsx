@@ -8,10 +8,11 @@ import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
 const Post = forwardRef(({ post, myRef }) => {
-
   const [like, setLike] = useState(post.likes.length)
   const [isLike, setIsLike] = useState(false)
   const [user, setUser] = useState({})
+
+  const [deletedPost, setDeletedPost] = useState({postId: post._id, deleted:false});
 
   const [comments, setComments] = useState(post.comments)
   const [postType, setPostType] = useState({ postType: post.postType, postId: post._id })
@@ -142,14 +143,15 @@ const Post = forwardRef(({ post, myRef }) => {
   const deleteUserPostById = async (postId) => {
     await axios.delete(`${API_URL}/api/v1/posts/${postId}`,config)
     setIsPostTypeVisible({ visible: false, postId: '' })
+    setDeletedPost({postId, deleted: true})
   }
 
-  return <div ref={myRef} className='post shadow-sm bg-white'>
+  return <div ref={myRef} className={`post shadow-sm bg-white ${(deletedPost.postId === post._id && deletedPost.deleted) && 'd-none'}`}>
     <div className="post-wrapper">
       <div className="post-top">
         <div className="post-top-left">
           <Link to={`/profile/${user.username}`}>
-            <img className='post-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+            <img className='post-profile-img' src={(user.profilePicture && PF + 'person/' +  user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
           </Link>
           <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: '#222', display: 'inline-block' }}><span className="post-username">{user.firstName + ' ' + user.lastName}</span></Link>
           <span className="post-date">{moment(post.createdAt).fromNow()}</span>
@@ -205,7 +207,7 @@ const Post = forwardRef(({ post, myRef }) => {
             comments.map(comment => (
               <div key={comment._id} className="comment-row">
                 <div className="comment-card">
-                  <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                  <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + 'person/' +comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                   <div className="comment-body">
                     <div className='comment'>
                       <b>{comment.userId.firstName}</b>
@@ -218,7 +220,7 @@ const Post = forwardRef(({ post, myRef }) => {
                   comment.replies.length > 0 &&
                   comment.replies.map(commentReply => (
                     <div key={commentReply._id} className="comment-card reply">
-                      <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + 'person/' +commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                       <div className="comment-body">
                         <div className='comment'>
                           <b>{commentReply.userId.firstName}</b>
@@ -234,7 +236,7 @@ const Post = forwardRef(({ post, myRef }) => {
                   (isReplyInputBoxVisible.visible && isReplyInputBoxVisible.commentId === comment._id) &&
                   (
                     <div className="reply-input-box">
-                      <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + 'person/' +user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                       <input onKeyUp={(event) => commentReplyOnKeyUp(event, comment._id)} type="text" className="form-control rounded-pill" placeholder="Press Enter to Reply" name="reply" />
                     </div>
                   )
@@ -247,7 +249,7 @@ const Post = forwardRef(({ post, myRef }) => {
 
 
         <div className="comment-input-box">
-          <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+          <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + 'person/' + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
           <input type="text" onKeyUp={(event) => commentOnKeyUp(event, post._id)} className="form-control rounded-pill" placeholder="Press enter to submit" />
         </div>
       </div>

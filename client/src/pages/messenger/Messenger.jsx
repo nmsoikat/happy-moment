@@ -192,7 +192,7 @@ function Messenger() {
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
               {allFriendsOfCurrentUser && allFriendsOfCurrentUser.map(friend => (
                 <div className='current-friend' onClick={() => createNewConversation(friend._id)}>
-                  <img className='post-profile-img' src={(friend.profilePicture && PF + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                  <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' +friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                   <div className="person-left-info">
                     <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
                   </div>
