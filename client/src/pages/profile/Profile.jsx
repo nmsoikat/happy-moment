@@ -65,7 +65,11 @@ export default function Profile() {
         // data.profilePicture = fileName
         // data.userId = currentUser._id
 
-        await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
+        const updatedData = await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
+
+        // currentUser.profilePicture = updatedData.profilePicture;
+
+        // localStorage.setItem('currentUser', JSON.stringify(currentUser))
       }
 
     } catch (error) {
@@ -77,8 +81,8 @@ export default function Profile() {
   // user profile by username
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
-      setUser(res.data)
+      const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
+      setUser(data)
     }
 
     fetchUser();
@@ -184,9 +188,6 @@ export default function Profile() {
     }
   }
 
-  useEffect(() => {
-    console.log(currentUser);
-  },[])
   return (
     <>
       <Topbar />

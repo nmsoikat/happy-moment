@@ -19,8 +19,8 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   // get all friends of current users
   useEffect(() => {
     const getFriends = async () => {
-      const res = await axios.get(`${API_URL}/api/v1/users/friends/${currentUserId}`, config)
-      setCurrentUserFriends(res.data)
+      const {data} = await axios.get(`${API_URL}/api/v1/users/friends/${currentUserId}`, config)
+      setCurrentUserFriends(data)
     }
 
     getFriends()
@@ -33,8 +33,9 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   
   const handleClick = async (onlineF) => {
     try {
-      const res = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUserId}/${onlineF._id}`, config);
-      setCurrentChat(res.data);
+      const {data} = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUserId}/${onlineF._id}`, config);
+      console.log(data);
+      setCurrentChat(data);
 
     } catch (err) {
       console.log(err);
@@ -46,10 +47,10 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
         onlineFriends?.map(onlineF => (
         <div key={onlineF._id} className="chat-online-friend" onClick={() => handleClick(onlineF)}>
           <div className="chat-online-img-container">
-            <img className='chat-online-img' src={onlineF?.profilePicture ? PF+onlineF.profilePicture : PF+ "person/noAvatar.png"} alt="" />
+            <img className='chat-online-img' src={onlineF?.profilePicture ? PF+'person/'+onlineF.profilePicture : PF+ "person/noAvatar.png"} alt="" />
             <div className="chat-online-badge"></div>
           </div>
-          <span className="chat-online-name">{onlineF.username}</span>
+          <span className="chat-online-name">{onlineF.firstName}</span>
         </div>
         ))
       }

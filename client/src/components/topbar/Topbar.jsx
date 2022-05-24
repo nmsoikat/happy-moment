@@ -32,7 +32,7 @@ export default function Topbar({fetchAllUsers}) {
           </div>
           <div className="col-md-3">
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
-              <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF + user.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
+              <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF +'person/' +user.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
               <Link to={`/profile/${user.username}`} style={{textDecoration:'none'}}><div className='username'>{user.firstName}</div></Link>
               <div className="topbar-icon-item">
                 <TagFaces />

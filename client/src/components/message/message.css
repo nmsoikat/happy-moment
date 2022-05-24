@@ -2,10 +2,12 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: 20px;
+	align-items: flex-start;
 }
 
 .message-top {
 	display: flex;
+	align-items: center;
 }
 
 .message-img {
@@ -17,17 +19,19 @@
 }
 
 .message-text {
-	padding: 10px;
-	border-radius: 20px;
+	padding: 8px 15px;
+	border-radius: 10px 10px 10px 0px;
 	background-color: #ffa803;
 	color: #fff;
 	max-width: 300px;
+	margin-bottom: 0px;
 }
 
 .message-bottom {
 	font-size: 12px;
 	margin-top: 5px;
 	color: #595959;
+	margin-left: 32px;
 }
 
 .message.own {
@@ -38,4 +42,5 @@
   color: #000;
 	background-color: #ffa80369;
 	margin-bottom: 0px;
+  border-radius: 10px 10px 0px 10px;
 }

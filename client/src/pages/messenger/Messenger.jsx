@@ -10,6 +10,11 @@ import { io } from "socket.io-client"
 import { Search, Person, Chat, NotificationsActive, TagFaces } from '@mui/icons-material';
 import { NavLink, Link, Navigate } from "react-router-dom";
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
+import SendIcon from '@mui/icons-material/Send';
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+
 
 function Messenger() {
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -17,12 +22,16 @@ function Messenger() {
 
   const [allFriendsOfCurrentUser, setAllFriendsOfCurrentUser] = useState([])
 
+  const [isLeftSideVisible, setIsLeftSideVisible] = useState(true)
+  const [isRightSideVisible, setIsRightSideVisible] = useState(true)
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     }
   }
+
 
   const fetchAllUsers = async (searchValue) => {
     if (!searchValue) { return; }
@@ -62,6 +71,9 @@ function Messenger() {
   // online users
   const [onlineUsers, setOnlineUsers] = useState(null)
 
+  // target user
+  const [targetId, setTargetId] = useState('')
+  const [targetUser, setTargetUser] = useState({})
 
   // ------------ Socket Start ------------
   const socket = useRef()
@@ -95,7 +107,7 @@ function Messenger() {
     // receive from server
     socket.current.on("getUsers", (users) => {
       setOnlineUsers(
-        currentUser.followings?.filter(fo => users.some(u => u.userId === fo))
+        currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
       )
     })
 
@@ -106,10 +118,11 @@ function Messenger() {
 
   //create new conversation
   const createNewConversation = async (targetId) => {
+    setTargetId(targetId)
     const receiverId = targetId;
     const senderId = currentUser._id;
-    const { data } = await axios.post(`${API_URL}/api/v1/conversation/`,{senderId, receiverId} ,config)
-    if(data){
+    const { data } = await axios.post(`${API_URL}/api/v1/conversation/`, { senderId, receiverId }, config)
+    if (data) {
       alert("Created A New Conversation")
     }
   }
@@ -158,13 +171,19 @@ function Messenger() {
       //only sender frontend dom update
       setMessages([...messages, data])
 
-      setNewMessage(""); //reset text box
+      /**
+       * onKeyUp
+       * if we use value attribute then it will be read only field
+       */
+      setNewMessage(""); //reset text box  
+      e.target.value = "" //direct reset
     } catch (error) {
       console.log(error);
     }
 
     //send to socket server 
     const receiverId = currentChat.members?.find(member => member !== currentUser._id);
+
     socket.current.emit("sendMessage", {
       senderId: currentUser._id,
       receiverId,
@@ -180,11 +199,40 @@ function Messenger() {
   }, [messages])
 
 
+  // Message Type Box
+  const messageTypeHandler = (event) => {
+    if (event.key === 'Enter') {
+      if (!newMessage) return;
+      newMessageHandler(event)
+    }
+    setNewMessage(event.target.value)
+  }
+
+  // Target User
+  useEffect(() => {
+    if (!targetId) return;
+
+    const findTargetUser = async () => {
+      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${targetId}`);
+      setTargetUser(data)
+    }
+    findTargetUser();
+
+  }, [targetId, currentChat])
+
+  const selectConversation = (c) => {
+    setCurrentChat(c)
+    setTargetId(c.members.find(mId => mId !== currentUser._id))
+  }
+
   return (
     <>
       <div className="container mt-3 h-100">
         <div className="row h-100">
-          <div className="col-md-3">
+          <div className={`col-md-3 left-expand-section-wrap ${!isLeftSideVisible && 'close'}`}>
+            <div className="left-side-expand-icon" onClick={() => setIsLeftSideVisible(!isLeftSideVisible)}>
+              {isLeftSideVisible ? <ExpandCircleDownIcon /> : <MenuIcon />}
+            </div>
             <div className="search-bar shadow-sm overflow-hidden bg-white">
               <Search className='search-icon' />
               <input onChange={searchHandler} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
@@ -192,7 +240,7 @@ function Messenger() {
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
               {allFriendsOfCurrentUser && allFriendsOfCurrentUser.map(friend => (
                 <div className='current-friend' onClick={() => createNewConversation(friend._id)}>
-                  <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' +friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                  <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                   <div className="person-left-info">
                     <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
                   </div>
@@ -200,7 +248,7 @@ function Messenger() {
               ))}
 
               {conversations.map((c, index) =>
-                <div key={index} onClick={() => setCurrentChat(c)}>
+                <div key={index} onClick={() => selectConversation(c)}>
                   <Conversation conversation={c} currentUser={currentUser} />
                 </div>
               )}
@@ -208,7 +256,7 @@ function Messenger() {
           </div>
 
 
-          <div className="col-md-6">
+          <div className={`col-md-6 ${(!isLeftSideVisible && !isRightSideVisible) ? 'chat-box-expand-both' : (!isLeftSideVisible || !isRightSideVisible) && 'chat-box-expand-one-side'}`}>
             <div className="chat-box">
               <div className="chat-box-wrapper">
                 {
@@ -218,14 +266,14 @@ function Messenger() {
                         {messages.map((m, index) =>
                         (
                           <div key={index} ref={newMessageRef}>
-                            <Message message={m} own={m.sender === currentUser._id} currentUser={currentUser} />
+                            <Message profilePicture={targetUser.profilePicture} message={m} own={m.sender === currentUser._id} currentUser={currentUser} />
                           </div>
                         )
                         )}
                       </div>
                       <div className="chat-box-bottom">
-                        <textarea cols="30" rows="10" className="chat-message-input form-control" placeholder="write something..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)}></textarea>
-                        <button className="ml-2 btn btn-sm btn-warning" onClick={newMessageHandler}>Send</button>
+                        <input className="chat-message-input form-control rounded-pill" placeholder="write something..." onKeyUp={(e) => messageTypeHandler(e)} />
+                        <button className="ml-2 btn btn-sm btn-warning send-message-btn" onClick={newMessageHandler}><span>Send</span> <SendIcon /></button>
                       </div>
                     </>) : (<p className="no-conversation-text">Open a conversation to start chat</p>)
                 }
@@ -234,9 +282,13 @@ function Messenger() {
           </div>
 
 
-          <div className="col-md-3">
+          <div className={`col-md-3 right-expand-section-wrap ${!isRightSideVisible && 'close'}`}>
+            <div className="right-side-expand-icon" onClick={() => setIsRightSideVisible(!isRightSideVisible)}>
+              {isRightSideVisible ? <ExpandCircleDownIcon /> : <MenuOpenIcon />}
+            </div>
+
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
-              <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
+              <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + 'person/' + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
               <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName}</div></Link>
               <div className="topbar-icon-item">
                 <TagFaces />

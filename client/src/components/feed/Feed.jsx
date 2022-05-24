@@ -137,7 +137,7 @@ const Feed = (props) => {
           <div className='share shadow-sm bg-white'>
             <div className="share-wrapper">
               <div className="share-top">
-                <img src={user.profilePicture ? PF + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
+                <img src={user.profilePicture ? PF +'person/'+ user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
                 <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
               </div>
               <hr className="share-hr" />
