@@ -25,6 +25,7 @@
 	border: none;
 	width: 70%;
 }
+
 .search-bar .search-input:focus {
 	outline: none;
 }
@@ -51,12 +52,16 @@
 	border-bottom: 3px solid transparent
 }
 
-.tab-wrap li {flex: 1;text-align: center; }
+.tab-wrap li {
+	flex: 1;
+	text-align: center;
+}
 
 .tab-wrap li a.active,
 .tab-wrap li a:hover {
 	border-bottom: 3px solid #ffa803;
 }
+
 .tab-wrap li a.active,
 .tab-wrap li a:hover {
 	color: #ffa803;
@@ -74,7 +79,7 @@
 	border-radius: 15px
 }
 
-.topbar-right .username{
+.topbar-right .username {
 	text-transform: capitalize;
 	font-weight: bold;
 	color: #ffa803
@@ -120,98 +125,11 @@
 	cursor: pointer;
 }
 
-
-/* .topbar-container {
-	height: 50px;
-	width: 100%;
-	background-color: #1877f2;
-	display: flex;
-	align-items: center;
-	position: sticky;
-	top: 0;
-	z-index: 9999;
-}
-
-.topbar-left {
-	flex: 3;
-}
-.topbar-left .logo {
-	font: 24px;
-	margin-left: 20px;
-	font-weight: bold;
-	color: #fff;
-	cursor: pointer;
-}
-
-.topbar-center {
-	flex: 5;
-}
-
-.topbar-center .search-bar {
-	width: 100%;
-	height: 30px;
-	background-color: #fff;
-	border-radius: 15px;
+.topbar-right-profile {
 	display: flex;
 	align-items: center;
 }
 
-.topbar-center .search-bar .search-icon {
-	font-size: 20px !important;
-	margin-left: 10px;
+.topbar-right-profile>a:first-child {
+	margin-right: 8px;
 }
-
-.topbar-center .search-bar .search-input {
-	border: none;
-	width: 70%;
-}
-.topbar-center .search-bar .search-input:focus {
-	outline: none;
-}
-
-.topbar-right {
-	flex: 4;
-	display: flex;
-	align-items: center;
-	justify-content: space-around;
-	color: #fff;
-}
-
-.topbar-right .topbar-link {
-	margin-right: 10px;
-	font-size: 14px;
-	cursor: pointer;
-}
-
-.topbar-right .topbar-icons {
-	display: flex;
-}
-
-.topbar-right .topbar-icon-item {
-	margin-right: 15px;
-	cursor: pointer;
-	position: relative;
-}
-
-.topbar-right .topbar-icon-badge {
-	width: 15px;
-	height: 15px;
-	background-color: red;
-	border-radius: 50%;
-	color: #fff;
-	position: absolute;
-	top: -5px;
-	right: -5px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 12px;
-}
-
-.topbar-right .topbar-img {
-	width: 32px;
-	height: 32px;
-	border-radius: 50%;
-	object-fit: cover;
-	cursor: pointer;
-} */

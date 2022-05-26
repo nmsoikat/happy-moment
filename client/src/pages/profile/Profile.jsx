@@ -18,7 +18,7 @@ import { DialogContent, DialogContentText, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 import EditIcon from '@mui/icons-material/Edit';
 
-export default function Profile() {
+export default function Profile({socket}) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams()
   const [user, setUser] = useState({})
@@ -190,7 +190,7 @@ export default function Profile() {
 
   return (
     <>
-      <Topbar />
+      <Topbar socket={socket} />
       <div className="container">
         <div className="row">
           <div className="col-md-3">

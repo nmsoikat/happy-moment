@@ -6,7 +6,7 @@ import ChatOnline from "../../components/chatOnline/ChatOnline"
 import { useContext, useEffect, useState, useRef } from "react"
 import { AuthContext } from "../../context/AuthContext"
 import axios from 'axios'
-import { io } from "socket.io-client"
+// import { io } from "socket.io-client"
 import { Search, Person, Chat, NotificationsActive, TagFaces } from '@mui/icons-material';
 import { NavLink, Link, Navigate } from "react-router-dom";
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
@@ -16,7 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 
 
-function Messenger() {
+function Messenger({socket}) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
 
@@ -76,13 +76,13 @@ function Messenger() {
   const [targetUser, setTargetUser] = useState({})
 
   // ------------ Socket Start ------------
-  const socket = useRef()
+  // const socket = useRef()
   useEffect(() => {
     //init
-    socket.current = io('ws://localhost:8900')
+    // socket?.current = io('ws://localhost:8900')
 
     //arrival message
-    socket.current.on("getMessage", ({ senderId, text }) => {
+    socket?.on("getMessage", ({ senderId, text }) => {
       setArrivalMessage({
         sender: senderId,
         text,
@@ -100,19 +100,19 @@ function Messenger() {
 
   }, [arrivalMessage, currentChat])
 
-  useEffect(() => {
-    // send client to socket-server
-    socket.current.emit("addUser", currentUser._id)
+  // useEffect(() => {
+  //   // send client to socket-server
+  //   socket?.emit("addUser", currentUser._id)
 
-    // receive from server
-    socket.current.on("getUsers", (users) => {
-      setOnlineUsers(
-        currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
-      )
-    })
+  //   // receive from server
+  //   socket?.on("getUsers", (users) => {
+  //     setOnlineUsers(
+  //       currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
+  //     )
+  //   })
 
 
-  }, [currentUser])
+  // }, [currentUser])
 
   // ------------ Socket End ------------
 
@@ -184,7 +184,7 @@ function Messenger() {
     //send to socket server 
     const receiverId = currentChat.members?.find(member => member !== currentUser._id);
 
-    socket.current.emit("sendMessage", {
+    socket?.emit("sendMessage", {
       senderId: currentUser._id,
       receiverId,
       text: newMessage
@@ -288,12 +288,14 @@ function Messenger() {
             </div>
 
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
+              <div className='topbar-right-profile'>
               <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + 'person/' + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
-              <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName}</div></Link>
-              <div className="topbar-icon-item">
+              <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName + ' ' + currentUser.lastName}</div></Link>
+              </div>
+              {/* <div className="topbar-icon-item">
                 <TagFaces />
                 <span className="topbar-icon-badge">0</span>
-              </div>
+              </div> */}
               <div className="topbar-icon-item">
                 <NotificationsActive />
                 <span className="topbar-icon-badge">0</span>

@@ -7,12 +7,12 @@ import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
-const Post = forwardRef(({ post, myRef }) => {
+const Post = forwardRef(({ post, myRef, socket }) => {
   const [like, setLike] = useState(post.likes.length)
   const [isLike, setIsLike] = useState(false)
   const [user, setUser] = useState({})
 
-  const [deletedPost, setDeletedPost] = useState({postId: post._id, deleted:false});
+  const [deletedPost, setDeletedPost] = useState({ postId: post._id, deleted: false });
 
   const [comments, setComments] = useState(post.comments)
   const [postType, setPostType] = useState({ postType: post.postType, postId: post._id })
@@ -32,6 +32,20 @@ const Post = forwardRef(({ post, myRef }) => {
       Authorization: `Bearer ${token}`,
     }
   }
+
+  useEffect(() => {
+    // send client to socket-server
+    socket?.emit("addUser", currentUser._id)
+    // receive from server
+    // socket?.on("getUsers", (users) => {
+    //   // setOnlineUsers(
+    //   //   currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
+    //   // )
+    //   console.log({users});
+    // })
+
+    socket?.emit('test', "hello")
+  }, [currentUser])
 
   // useEffect(() => {
   //   if(newComment.createdComment){
@@ -71,6 +85,15 @@ const Post = forwardRef(({ post, myRef }) => {
     try {
       await axios.put(`${API_URL}/api/v1/posts/${post._id}/like`, { userId: currentUser._id }, config)
       setLike(isLike ? like - 1 : like + 1)
+
+      if (!isLike && (currentUser._id !== post.userId)) {
+        socket?.emit("sendNotification", {
+          senderId: currentUser._id,
+          receiverId: post.userId,
+          type: 'like'
+        })
+      }
+
       setIsLike(!isLike);
     } catch (err) {
       console.log(err);
@@ -141,9 +164,9 @@ const Post = forwardRef(({ post, myRef }) => {
   }
 
   const deleteUserPostById = async (postId) => {
-    await axios.delete(`${API_URL}/api/v1/posts/${postId}`,config)
+    await axios.delete(`${API_URL}/api/v1/posts/${postId}`, config)
     setIsPostTypeVisible({ visible: false, postId: '' })
-    setDeletedPost({postId, deleted: true})
+    setDeletedPost({ postId, deleted: true })
   }
 
   return <div ref={myRef} className={`post shadow-sm bg-white ${(deletedPost.postId === post._id && deletedPost.deleted) && 'd-none'}`}>
@@ -151,7 +174,7 @@ const Post = forwardRef(({ post, myRef }) => {
       <div className="post-top">
         <div className="post-top-left">
           <Link to={`/profile/${user.username}`}>
-            <img className='post-profile-img' src={(user.profilePicture && PF + 'person/' +  user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+            <img className='post-profile-img' src={(user.profilePicture && PF + 'person/' + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
           </Link>
           <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none', color: '#222', display: 'inline-block' }}><span className="post-username">{user.firstName + ' ' + user.lastName}</span></Link>
           <span className="post-date">{moment(post.createdAt).fromNow()}</span>
@@ -178,15 +201,13 @@ const Post = forwardRef(({ post, myRef }) => {
       </div>
 
       <div className="post-center">
-        <span className="post-text">{post?.desc}</span>
-        {post?.photo ? (
-          <img className='post-img' src={PF + 'post/' + post?.photo} alt="" />
-        ) : (''
-          // <video src={'/assets/The-Breathtaking-Beauty-of-Nature-HD.mp4'} controls>
-          //   Your browser does not support the video tag.
-          // </video>
+        <p className="post-text">{post?.desc}</p>
+        {post?.photo && <img className='post-img' src={PF + 'post/' + post?.photo} alt="" />}
+        {post?.video && (
+          <video src={PF + 'post/' + post?.video} controls>
+            Your browser does not support the video tag.
+          </video>
         )}
-
       </div>
 
       <div className="post-bottom">
@@ -207,7 +228,7 @@ const Post = forwardRef(({ post, myRef }) => {
             comments.map(comment => (
               <div key={comment._id} className="comment-row">
                 <div className="comment-card">
-                  <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + 'person/' +comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                  <img className='post-profile-img current-user-profile-img' src={(comment.userId.profilePicture && PF + 'person/' + comment.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                   <div className="comment-body">
                     <div className='comment'>
                       <b>{comment.userId.firstName}</b>
@@ -220,7 +241,7 @@ const Post = forwardRef(({ post, myRef }) => {
                   comment.replies.length > 0 &&
                   comment.replies.map(commentReply => (
                     <div key={commentReply._id} className="comment-card reply">
-                      <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + 'person/' +commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <img className='post-profile-img current-user-profile-img' src={(commentReply.userId.profilePicture && PF + 'person/' + commentReply.userId.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                       <div className="comment-body">
                         <div className='comment'>
                           <b>{commentReply.userId.firstName}</b>
@@ -236,7 +257,7 @@ const Post = forwardRef(({ post, myRef }) => {
                   (isReplyInputBoxVisible.visible && isReplyInputBoxVisible.commentId === comment._id) &&
                   (
                     <div className="reply-input-box">
-                      <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + 'person/' +user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                      <img className='post-profile-img current-user-profile-img' src={(currentUser.profilePicture && PF + 'person/' + currentUser.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                       <input onKeyUp={(event) => commentReplyOnKeyUp(event, comment._id)} type="text" className="form-control rounded-pill" placeholder="Press Enter to Reply" name="reply" />
                     </div>
                   )
@@ -249,7 +270,7 @@ const Post = forwardRef(({ post, myRef }) => {
 
 
         <div className="comment-input-box">
-          <img className='post-profile-img current-user-profile-img' src={(user.profilePicture && PF + 'person/' + user.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+          <img className='post-profile-img current-user-profile-img' src={(currentUser.profilePicture && PF + 'person/' + currentUser.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
           <input type="text" onKeyUp={(event) => commentOnKeyUp(event, post._id)} className="form-control rounded-pill" placeholder="Press enter to submit" />
         </div>
       </div>

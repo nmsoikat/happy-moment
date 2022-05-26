@@ -1,17 +1,38 @@
 import './topbar.css'
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Search, Person, Chat, NotificationsActive, TagFaces } from '@mui/icons-material';
 import { NavLink, Link, Navigate } from "react-router-dom";
 import { AuthContext } from '../../context/AuthContext'
-import { REACT_APP_PUBLIC_FOLDER } from '../../Constant'
+import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
+import axios from 'axios';
 
-export default function Topbar({fetchAllUsers}) {
-  const { user } = useContext(AuthContext);
+export default function Topbar({ fetchAllUsers, socket }) {
+  const { user, token } = useContext(AuthContext);
   const PF = REACT_APP_PUBLIC_FOLDER;
+  const [sender, setSender] = useState();
+  const [notifications, setNotifications] = useState([]);
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    }
+  }
 
   const searchHandler = (e) => {
     fetchAllUsers(e.target.value)
   }
+
+  useEffect(() => {
+    socket?.on("getNotification", async ({ senderId, type }) => {
+      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${senderId}`, config)
+
+      setNotifications((prev) => [...prev, { senderName: data.firstName, type }])
+    })
+  }, [socket])
+
+  console.log({ notifications });
+
 
   return (
     <div className="topbar-wrapper py-3">
@@ -32,19 +53,22 @@ export default function Topbar({fetchAllUsers}) {
           </div>
           <div className="col-md-3">
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
-              <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF +'person/' +user.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
-              <Link to={`/profile/${user.username}`} style={{textDecoration:'none'}}><div className='username'>{user.firstName}</div></Link>
-              <div className="topbar-icon-item">
+              <div className='topbar-right-profile'>
+                <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF + 'person/' + user.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
+                <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none' }}><div className='username'>{user.firstName + ' ' + user.lastName}</div></Link>
+              </div>
+              {/* <div className="topbar-icon-item">
                 <TagFaces />
                 <span className="topbar-icon-badge">0</span>
-              </div>
+              </div> */}
               <div className="topbar-icon-item">
                 <NotificationsActive />
-                <span className="topbar-icon-badge">0</span>
+                {notifications.length > 0 &&
+                  <span className="topbar-icon-badge"> {notifications.length} </span>}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>)
+    </div >)
 }

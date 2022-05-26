@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
-export default function Profile() {
+export default function Profile({socket}) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams()
 
@@ -25,7 +25,7 @@ export default function Profile() {
 
   return (
     <>
-      <Topbar />
+      <Topbar socket={socket} />
       <div className="container">
         <div className="row">
           <div className="col-md-3">

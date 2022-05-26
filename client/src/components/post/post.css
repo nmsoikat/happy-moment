@@ -1,28 +1,28 @@
-.post{
+.post {
   width: 100%;
-	border-radius: 10px;
-	-webkit-box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
-	box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
+  box-shadow: 0px 0px 31px -7px rgba(0, 0, 0, 0.16);
   margin: 30px 0;
   background-color: #fff
 }
 
-.post-wrapper{
+.post-wrapper {
   padding: 10px;
 }
 
-.post-top{
+.post-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.post-top-left{
+.post-top-left {
   display: flex;
-  align-items: center; 
+  align-items: center;
 }
 
-.post-profile-img{
+.post-profile-img {
   width: 32px;
   height: 32px;
   margin-right: 10px;
@@ -30,29 +30,35 @@
   object-fit: cover;
 }
 
-.post-username{
+.post-username {
   font-size: 15px;
   font-weight: 500;
 }
 
-.post-date{
+.post-date {
   font-size: 12px;
   margin-left: 10px;
 }
 
-.post-center{
+.post-center {
   margin: 20px 0;
 }
 
-.post-img{
-  margin-top: 20px;
+.post-center video {
+  max-width: 100%;
+  display: block;
+  width: 100%;
+}
+
+.post-img {
+  /* margin-top: 20px; */
   width: 100%;
   max-height: 500px;
   /* object-fit: contain; */
   object-fit: cover;
 }
 
-.post-bottom{
+.post-bottom {
   display: flex;
   justify-content: space-between;
   border-top: 1px dotted rgb(222, 222, 222);
@@ -60,28 +66,28 @@
   padding: 5px 0;
 }
 
-.post-bottom-left{
+.post-bottom-left {
   display: flex;
   align-items: center;
 }
 
-.post-like-icon{
+.post-like-icon {
   height: 24px;
   width: 24px;
   margin-right: 10px;
   cursor: pointer;
 }
 
-.post-like-counter{
+.post-like-counter {
   font-size: 15px;
 }
 
-.post-comment-text{
+.post-comment-text {
   font-size: 15px;
   cursor: pointer;
 }
 
-.comment-input-box{
+.comment-input-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,12 +100,18 @@
   margin-bottom: 10px;
 }
 
-.comment-card {display: flex; padding: 5px;border-radius: 15px;margin-bottom: 10px;}
-.comment-card.reply{
+.comment-card {
+  display: flex;
+  padding: 5px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
+
+.comment-card.reply {
   margin-left: 50px;
 }
 
-.reply-input-box{
+.reply-input-box {
   display: flex;
   align-items: center;
   width: 50%;
@@ -113,18 +125,22 @@
   display: block;
 } */
 
-.comment-body {min-width: 200px;}
+.comment-body {
+  min-width: 200px;
+}
+
 .comment-body .comment {
   background-color: #f6f5f5;
   padding: 5px 10px;
   border-radius: 5px;
   margin-bottom: 5px;
 }
-.comment-body .comment > p{
+
+.comment-body .comment>p {
   margin-bottom: 0;
 }
 
-.toggle-reply-input{
+.toggle-reply-input {
   cursor: pointer;
   color: #333;
   width: 45px;
@@ -137,13 +153,13 @@
 
 
 
-.post-top-right{
+.post-top-right {
   position: relative;
   z-index: 9;
   cursor: pointer;
 }
 
-.post-top-right .dropdown{
+.post-top-right .dropdown {
   position: absolute;
   right: 10px;
   top: 25px;
@@ -153,17 +169,17 @@
   padding: 10px;
 }
 
-.post-top-right .dropdown label{
+.post-top-right .dropdown label {
   cursor: pointer;
   border-bottom: 1px solid #ddd;
   padding: 2px 0;
 }
 
 .post-top-right .dropdown label:hover,
-.post-top-right .dropdown label.selected{
+.post-top-right .dropdown label.selected {
   font-weight: bold;
 }
 
-.post-top-right .dropdown label:last-child{
+.post-top-right .dropdown label:last-child {
   border-bottom: none;
 }

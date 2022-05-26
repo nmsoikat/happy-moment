@@ -3,7 +3,7 @@ import '../share/share.css'
 import axios from 'axios'
 import Post from '../post/Post';
 import { Cancel, PermMedia } from '@mui/icons-material';
-import { Spinner, Stack } from 'react-bootstrap';
+import { ProgressBar, Spinner, Stack } from 'react-bootstrap';
 import { AuthContext } from '../../context/AuthContext';
 import UseInfinityScroll from '../../UseInfinityScroll';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
@@ -14,6 +14,7 @@ const Feed = (props) => {
   const profile = props.profile || false;
   const videoPage = props.videoPage || false;
   const trendingPage = props.trendingPage || false;
+  const socket = props.socket;
 
   //share post
   const PF = REACT_APP_PUBLIC_FOLDER;
@@ -26,12 +27,20 @@ const Feed = (props) => {
   const [pageNumber, setPageNumber] = useState(1)
   const [query, setQuery] = useState('')
   const [newPosts, setNewPosts] = useState([])
-
+  const [fileUploading, setFileUploading] = useState(0)
 
   const config = {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
+    },
+    onUploadProgress: (progressEvent) => {
+      const { loaded, total } = progressEvent;
+      let percent = Math.floor((loaded * 100) / total);
+      // console.log(`${loaded} kb of ${total}kb | ${percent}%`);
+      if (percent < 100) {
+        setFileUploading(percent)
+      }
     }
   }
 
@@ -93,8 +102,11 @@ const Feed = (props) => {
       // store like array in array;
       data.append("file", file)
       // data.append("name", fileName)
-
-      newPost.photo = fileName;
+      if (file.type.split('/')[0] === "video") {
+        newPost.video = fileName;
+      } else {
+        newPost.photo = fileName;
+      }
       // console.log([...data]);
       // console.log(newPost);
 
@@ -108,6 +120,12 @@ const Feed = (props) => {
     try {
       const postShared = await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
 
+      setFileUploading(100)
+      if(fileUploading === 100){
+        setTimeout(() => {
+          setFileUploading(0)
+        }, 500)
+      }
       setNewPosts(prev => [postShared.data, ...prev])
 
       desc.current.value = "";
@@ -127,6 +145,7 @@ const Feed = (props) => {
 
   const cancelBlobView = () => {
     setFile(null)
+    if (file.type.split('/')[0] === "video") return;
     URL.revokeObjectURL();
   }
 
@@ -137,7 +156,7 @@ const Feed = (props) => {
           <div className='share shadow-sm bg-white'>
             <div className="share-wrapper">
               <div className="share-top">
-                <img src={user.profilePicture ? PF +'person/'+ user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
+                <img src={user.profilePicture ? PF + 'person/' + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
                 <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
               </div>
               <hr className="share-hr" />
@@ -159,13 +178,15 @@ const Feed = (props) => {
                 )
               }
 
+              {fileUploading > 0 &&  <ProgressBar active now={fileUploading} label={`${fileUploading}%`} />}
+
               <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
                 <div className="share-options">
                   <label id="file" className="share-option">
                     <PermMedia htmlColor='tomato' className='share-option-icon' />
-                    {/* <span className='share-option-text'>Photo or Video</span> */}
-                    <span className='share-option-text'>Photo</span>
-                    <input style={{ display: 'none' }} type="file" id="file" name='file' onChange={(e) => setFile(e.target.files[0])} />
+                    <span className='share-option-text'>Photo or Video</span>
+                    {/* <span className='share-option-text'>Photo</span> */}
+                    <input style={{ display: 'none' }} type="file" id="file" name='file' accept='image/*,video/*' onChange={(e) => setFile(e.target.files[0])} />
                   </label>
                 </div>
                 <div className='post-setting'>
@@ -181,12 +202,12 @@ const Feed = (props) => {
         ) : ''}
         {
           newPosts.map((p, index) => (
-            <Post key={p._id} post={p} myRef={lastDocElementRef} />
+            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
           ))
         }
         {
           docs.map((p) => (
-            <Post key={p._id} post={p} myRef={lastDocElementRef} />
+            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
           ))
         }
       </div>

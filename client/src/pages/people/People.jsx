@@ -8,7 +8,7 @@ import Sidebar from '../../components/sidebar/Sidebar'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import Rightbar from '../../components/rightbar/Rightbar';
 
-export default function Profile() {
+export default function Profile({socket}) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
   const [allUsers, setAllUsers] = useState([])
@@ -38,7 +38,7 @@ export default function Profile() {
 
   return (
     <>
-      <Topbar fetchAllUsers={fetchAllUsers} />
+      <Topbar socket={socket} fetchAllUsers={fetchAllUsers} />
       <div className="container">
         <div className="row">
           <div className="col-md-3">

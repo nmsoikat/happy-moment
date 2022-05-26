@@ -5,21 +5,21 @@ const io = require('socket.io')(8900, {
 })
 
 // active users
-let users = []
+let onlineUsers = []
 
 // user added online
 const addUser = (userId, socketId) => {
-  !users.some(user => user.userId === userId) && users.push({ userId, socketId })
+  !onlineUsers.some(user => user.userId === userId) && onlineUsers.push({ userId, socketId })
 }
 
 // remove from online
 const removeUser = (socketId) => {
-  users = users.filter(user => user.socketId !== socketId)
+  onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
 }
 
 // get user
 const getUser = (userId) => {
-  return users.find(user => user.userId === userId)
+  return onlineUsers.find(user => user.userId === userId)
 }
 
 // every connection
@@ -30,11 +30,11 @@ io.on("connection", (socket) => {
 
   // CONNECTED
   //receive from client 
-  socket.on('addUser', userId => {
+  socket.on('addUser', (userId) => {
     addUser(userId, socket.id) // set userId and socketId
 
     //send to client
-    io.emit("getUsers", users) // online users
+    io.emit("getUsers", onlineUsers) // online users
   })
 
   // SEND AND GET MESSAGE
@@ -43,9 +43,24 @@ io.on("connection", (socket) => {
     
     //send to client //specific
     io.to(whoReceive?.socketId).emit("getMessage", { senderId, text })
+  })
+
+  socket.on("sendNotification", ({senderId, receiverId, type}) => {
+    const receiver = getUser(receiverId)
+
+    
+    if(receiver){ 
+      io.to(receiver.socketId).emit("getNotification", {
+        senderId,
+        type
+      })
+    }
 
   })
 
+  socket.on('test', (data) => {
+    console.log(data);
+  })
 
   // DISCONNECTED
   socket.on("disconnect", () => {
@@ -53,6 +68,6 @@ io.on("connection", (socket) => {
     removeUser(socket.id) // remove active user
 
     //send to client
-    io.emit('getUsers', users) // online users
+    io.emit('getUsers', onlineUsers) // online users
   })
 })

@@ -54,8 +54,14 @@ exports.postDeleteById = async (req, res) => {
 
     if (post.userId.toString() === req.user._id.toString()) {
       await post.deleteOne()
-      
-      fs.unlink(`api/public/images/post/${post.photo}`, (err) => {
+      let url = `api/public/images/post/`
+      if(post.photo){
+        url = url + post.photo
+      }else if(post.video){
+        url = url + post.video
+      }
+
+      fs.unlink(url, (err) => {
         if(err){
           console.log(err);
         }else{
@@ -172,7 +178,7 @@ exports.postGetForTimeline = async (req, res) => {
   }
 }
 
-// get timelines posts
+// get timelines posts only videos
 exports.postGetForTimelineOnlyVideos = async (req, res) => {
   const page = req.query.page * 1 || 1;
   const limit = 1
@@ -201,7 +207,7 @@ exports.postGetForTimelineOnlyVideos = async (req, res) => {
     // get 1 post of each friends
     const friendsPosts = await Promise.all(
       currentUser.friends.map((friendId) => {
-        return Post.find({ userId: friendId, postType: { $ne: 'private' }, videos: { $ne: '' } })
+        return Post.find({ userId: friendId, postType: { $ne: 'private' }, video: { $ne: null } })
           .populate({
             path: "comments",
             populate: {

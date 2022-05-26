@@ -44,7 +44,7 @@ app.use('/images', express.static(path.join(__dirname, "/public/images")))
 
 
 // MIDDLEWARE
-app.use(cors()) 
+app.use(cors())
 app.use(express.json()) // body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -60,10 +60,9 @@ const storage = multer.diskStorage({
   },
   filename: async (req, file, cb) => {
 
-      const fileName = req.params.fileName
+    const fileName = req.params.fileName
 
-
-      cb(null, fileName);
+    cb(null, fileName);
   }
 })
 
@@ -71,17 +70,16 @@ const upload = multer({
   // dest: DESTINATION_PATH,
   storage: storage,
   limits: {
-    fileSize: 10000000,
+    fileSize: 1024 * 1024 * 50,
   },
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "file") {
       if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
         cb(null, true)
-      } 
-      // else {
-      //   cb(new Error("Only .jpg, .png or .jpeg format allowed!"));
-      // }
-
+      }
+      if (file.mimetype.split('/')[0] === 'video') {
+        cb(null, true)
+      }
       console.log(file);
       return;
     }
@@ -110,13 +108,13 @@ app.get('/api/v1', (req, res) => {
 })
 
 
-if(process.env.NODE_ENV === 'production'){
+if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')))
 
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
   })
-} else{
+} else {
   app.get('/', (req, res) => {
     res.send('API is running (Development)')
   })

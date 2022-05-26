@@ -2,14 +2,14 @@ const crypto = require('crypto')
 const mongoose = require('mongoose')
 
 const UserSchema = mongoose.Schema({
-  firstName:{
-    type:String,
+  firstName: {
+    type: String,
     min: 2,
     max: 20,
     required: [true, 'Please provide first name.']
   },
-  lastName:{
-    type:String,
+  lastName: {
+    type: String,
     min: 2,
     max: 20,
     required: [true, 'Please provide last name.']
@@ -22,7 +22,7 @@ const UserSchema = mongoose.Schema({
   },
   email: {
     type: String,
-    max:50,
+    max: 50,
     unique: true,
     required: [true, 'Please provide email.'],
   },
@@ -47,19 +47,19 @@ const UserSchema = mongoose.Schema({
     type: Array,
     default: []
   },
-  friends:{
+  friends: {
     type: Array,
     default: []
   },
-  friendsRequest:{
+  friendsRequest: {
     type: Array,
     default: []
   },
-  friendsSentRequest:{
+  friendsSentRequest: {
     type: Array,
     default: []
-  },  
-  desc:{
+  },
+  desc: {
     type: String,
     maxLength: 50,
   },
@@ -67,27 +67,27 @@ const UserSchema = mongoose.Schema({
     type: String,
     maxLength: 50
   },
-  from:{
+  from: {
     type: String,
     maxLength: 50
   },
   relationship: {
     type: Number,
     default: 1,
-    enum: [1,2,3]
+    enum: [1, 2, 3]
   },
-  isAdmin:{
+  isAdmin: {
     type: Boolean,
     default: false
   },
   changePasswordAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  
-},{timestamps: true})
+
+}, { timestamps: true })
 
 //forgot password // reset token
-UserSchema.methods.createPasswordResetToken = function(){
+UserSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
 
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
@@ -97,8 +97,8 @@ UserSchema.methods.createPasswordResetToken = function(){
 }
 
 //when password has changed. 
-UserSchema.pre('save', async function(next) {
-  if(!this.isModified('password') || this.isNew) return next();
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
 
   this.changePasswordAt = Date.now() - 1000; // -1s for make sure token has been created after password change.
   next()
