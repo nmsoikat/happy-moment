@@ -242,7 +242,8 @@ exports.postGetForTimelineTrending = async (req, res) => {
   try {
     // const currentUser = await User.findById(req.params.userId);
     // get 3 post for current user
-    const posts = await Post.find({ likes: { $size: 1 } })
+    // const posts = await Post.find({ likes: { $size: 1 } })
+    const posts = await Post.find({postType: { $ne: 'private' }, "$expr":{$gte:[{$size:"$likes"},2]}})
       .populate({
         path: "comments",
         populate: {
