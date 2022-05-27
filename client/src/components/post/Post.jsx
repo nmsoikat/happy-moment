@@ -35,7 +35,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
 
   useEffect(() => {
     // send client to socket-server
-    socket?.emit("addUser", currentUser._id)
+    // socket?.emit("addUser", currentUser._id)
     // receive from server
     // socket?.on("getUsers", (users) => {
     //   // setOnlineUsers(
@@ -44,7 +44,6 @@ const Post = forwardRef(({ post, myRef, socket }) => {
     //   console.log({users});
     // })
 
-    socket?.emit('test', "hello")
   }, [currentUser])
 
   // useEffect(() => {

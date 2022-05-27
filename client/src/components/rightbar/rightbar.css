@@ -16,6 +16,18 @@
 	font-size: 15px;
 }
 
+.rightbar{
+	padding: 15px 5px;
+	border-radius: 15px;
+}
+
+.rightbar-title{
+	margin-bottom: 5px;
+	font-size: 18px;
+	font-weight: bold;
+	border-bottom: 1px dotted #ddd;
+}
+
 .rightbar-ad {
 	width: 100%;
 	border-radius: 10px;
@@ -26,6 +38,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+	flex-direction: column;
 }
 
 .rightbar-following {

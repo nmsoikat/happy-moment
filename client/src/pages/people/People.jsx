@@ -7,8 +7,9 @@ import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import Rightbar from '../../components/rightbar/Rightbar';
+import { Spinner, Stack } from 'react-bootstrap';
 
-export default function Profile({socket}) {
+export default function Profile({ socket, onlineFriends }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
   const [allUsers, setAllUsers] = useState([])
@@ -42,17 +43,22 @@ export default function Profile({socket}) {
       <div className="container">
         <div className="row">
           <div className="col-md-3">
-            <Sidebar/>
+            <Sidebar />
           </div>
           <div className="col-md-6">
             {
-              allUsers.map(person => (
-                <Person key={person._id} person={person} />
-              ))
+              allUsers.length > 0 ?
+                allUsers.map(person => (
+                  <Person key={person._id} person={person} />
+                ))
+                :
+                (<Stack className="text-center my-3">
+                  <Spinner className='mx-auto' animation="border" variant="primary" />
+                </Stack>)
             }
           </div>
           <div className="col-md-3">
-            <Rightbar />
+            <Rightbar onlineFriends={onlineFriends} />
           </div>
         </div>
       </div>

@@ -59,8 +59,7 @@
 }
 
 .chat-menu-wrapper,
-.chat-box-wrapper,
-.chat-online-wrapper {
+.chat-box-wrapper {
 	padding: 10px;
 	height: 90vh;
 }
@@ -76,6 +75,7 @@
 .conv-friends-wrapper {
 	min-height: 200px;
 	border-radius: 15px;
+	padding: 15px;
 }
 
 .current-friend {
@@ -160,4 +160,19 @@
 .chat-box-expand-one-side{
 	width: 70% !important;
 	width: calc(75% - 50px) !important;
+}
+
+.chat-online-wrapper{
+	padding: 15px;
+	border-radius: 15px;
+}
+
+.searchConvResultWrap{
+	position: absolute;
+	background-color: #fff;
+	padding: 15px;
+	z-index: 99;
+	width: 100%;
+	width: calc(100% - 40px);
+	height: auto;
 }

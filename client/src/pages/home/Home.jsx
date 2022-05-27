@@ -3,29 +3,23 @@ import Topbar from '../../components/topbar/Topbar'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Feed from '../../components/feed/Feed'
 import Rightbar from '../../components/rightbar/Rightbar'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 
-export default function Home({ socket }) {
+export default function Home({ socket, onlineFriends }) {
   const { user: currentUser, token } = useContext(AuthContext)
 
-  useEffect(() => {
-    // send client to socket-server
-    socket?.emit("addUser", currentUser._id)
-    // receive from server
-    // socket?.on("getUsers", (users) => {
-    //   // setOnlineUsers(
-    //   //   currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
-    //   // )
-    //   console.log({users});
-    // })
+  // useEffect(() => {
+  //   // socket?.emit("addUser", currentUser._id)
 
-    socket?.emit('test', "hello")
+  //   socket?.on("getUsers", (onlineUsers) => {
+  //     console.log({onlineUsers});
+  //     setOnlineFriends(
+  //       currentUser.friends?.filter(fId => onlineUsers.some(user => user.userId === fId))
+  //     )
+  //   })
 
-
-    return () => { socket.disconnect() }
-
-  }, [currentUser])
+  // }, [currentUser])
 
   return (
     <>
@@ -39,7 +33,7 @@ export default function Home({ socket }) {
             <Feed socket={socket} username={currentUser.username} />
           </div>
           <div className="col-md-3">
-            <Rightbar />
+            <Rightbar socket={socket} onlineFriends={onlineFriends} />
           </div>
         </div>
       </div>

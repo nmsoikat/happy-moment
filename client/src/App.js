@@ -20,24 +20,53 @@ import { io } from "socket.io-client"
 function App() {
   const { user } = useContext(AuthContext)
   const [socket, setSocket] = useState(null);
+  const [onlineFriends, setOnlineFriends] = useState([])
 
+  //socket init
   useEffect(() => {
-    //init
-    setSocket(io('ws://localhost:8900'))
+    if (user?._id) {
+      setSocket(io('ws://localhost:8900'))
+    }
+
   }, [])
 
+  //user added to socket
+  useEffect(() => {
+    socket?.on("connect", () => {
+
+      if (user?._id) {
+        socket?.emit("addUser", user._id)
+
+        socket?.on("getUsers", (onlineUsers) => {
+          //friends is array of id
+          setOnlineFriends(
+            user.friends?.filter(fId => onlineUsers.some(u => u.userId === fId))
+          )
+        })
+      }
+
+    })
+
+  }, [socket])
+
+  // useEffect(() => {
+
+  //   console.log({friends: user.friends});
+  //   console.log({onlineFriends});
+
+  // }, [onlineFriends])
   return (
     <Routes>
-      <Route path='/' element={user ? <Home socket={socket} /> : <Register />} />
-      <Route path='/login' element={user ? <Home  socket={socket}/> : <Login />} />
-      <Route path='/register' element={user ? <Home  socket={socket}/> : <Register />} />
-      <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} />} />
+      <Route path='/' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Register />} />
+      <Route path='/login' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Login />} />
+      <Route path='/register' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Register />} />
+      <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} onlineFriends={onlineFriends} />} />
       <Route path='/profile/:username' element={user ? <Profile socket={socket} /> : <Login />} />
       <Route path='/trending' element={user ? <Trending socket={socket} /> : <Login />} />
       <Route path='/videos' element={user ? <Videos socket={socket} /> : <Login />} />
-      <Route path='/people' element={user ? <People socket={socket} /> : <Login />} />
-      <Route path='/forgot-password' element={user ? <Home  socket={socket}/> : <ForgotPassword />} />
-      <Route path='/reset-password/:token' element={user ? <Home  socket={socket}/> : <ResetPassword />} />
+      <Route path='/people' element={user ? <People socket={socket} onlineFriends={onlineFriends} /> : <Login />} />
+      <Route path='/forgot-password' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <ForgotPassword />} />
+      <Route path='/reset-password/:token' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <ResetPassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

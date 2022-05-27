@@ -14,9 +14,10 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import { Spinner, Stack } from 'react-bootstrap';
 
 
-function Messenger({socket}) {
+function Messenger({ socket, onlineFriends }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
 
@@ -32,9 +33,8 @@ function Messenger({socket}) {
     }
   }
 
-
   const fetchAllUsers = async (searchValue) => {
-    if (!searchValue) { return; }
+    if (!searchValue) { setAllFriendsOfCurrentUser([]); return; }
 
     const res = await axios.get(`${API_URL}/api/v1/conversation/friends?searchUser=${searchValue}`, config)
 
@@ -44,6 +44,7 @@ function Messenger({socket}) {
       })
     )
   }
+
   const searchHandler = (e) => {
     // setSearchValue()
     fetchAllUsers(e.target.value)
@@ -54,6 +55,7 @@ function Messenger({socket}) {
 
   //find conversation and set according current-chat
   const [conversations, setConversations] = useState([])
+  const [newConvCreated, setNewConvCreated] = useState(false)
 
   //select user from left bar
   const [currentChat, setCurrentChat] = useState(null)
@@ -123,6 +125,7 @@ function Messenger({socket}) {
     const senderId = currentUser._id;
     const { data } = await axios.post(`${API_URL}/api/v1/conversation/`, { senderId, receiverId }, config)
     if (data) {
+      setNewConvCreated(true)
       alert("Created A New Conversation")
     }
   }
@@ -139,7 +142,7 @@ function Messenger({socket}) {
     }
 
     getConversation()
-  }, [currentUser._id])
+  }, [currentUser._id, newConvCreated])
 
   //GET MESSAGES
   useEffect(() => {
@@ -238,20 +241,34 @@ function Messenger({socket}) {
               <input onChange={searchHandler} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
             </div>
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
-              {allFriendsOfCurrentUser && allFriendsOfCurrentUser.map(friend => (
-                <div className='current-friend' onClick={() => createNewConversation(friend._id)}>
-                  <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
-                  <div className="person-left-info">
-                    <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
-                  </div>
+              {
+                allFriendsOfCurrentUser.length > 0 &&
+                <div className="searchConvResultWrap">
+                  {
+                    allFriendsOfCurrentUser.map(friend => (
+                      <div className='current-friend' onClick={() => createNewConversation(friend._id)}>
+                        <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                        <div className="person-left-info">
+                          <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
+                        </div>
+                      </div>
+                    ))
+                  }
                 </div>
-              ))}
+              }
 
-              {conversations.map((c, index) =>
-                <div key={index} onClick={() => selectConversation(c)}>
-                  <Conversation conversation={c} currentUser={currentUser} />
-                </div>
-              )}
+              {
+                conversations.length > 0 ?
+                  conversations.map((c, index) =>
+                    <div key={index} onClick={() => selectConversation(c)}>
+                      <Conversation onlineFriends={onlineFriends} conversation={c} />
+                    </div>
+                  )
+                  : (
+                    <Stack className="text-center my-3">
+                      <Spinner className='mx-auto' animation="border" variant="primary" />
+                    </Stack>
+                  )}
             </div>
           </div>
 
@@ -289,8 +306,8 @@ function Messenger({socket}) {
 
             <div className="topbar-right shadow-sm overflow-hidden bg-white">
               <div className='topbar-right-profile'>
-              <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + 'person/' + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
-              <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName + ' ' + currentUser.lastName}</div></Link>
+                <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + 'person/' + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
+                <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName + ' ' + currentUser.lastName}</div></Link>
               </div>
               {/* <div className="topbar-icon-item">
                 <TagFaces />
@@ -302,10 +319,9 @@ function Messenger({socket}) {
               </div>
             </div>
 
-            <div className="chat-online">
-              <div className="chat-online-wrapper">
-                <ChatOnline onlineUsers={onlineUsers} currentUserId={currentUser._id} setCurrentChat={setCurrentChat} />
-              </div>
+
+            <div className="chat-online-wrapper shadow-sm overflow-hidden bg-white mt-4">
+              <ChatOnline onlineFriends={onlineFriends} setCurrentChat={setCurrentChat} />
             </div>
           </div>
         </div>

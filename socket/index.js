@@ -24,18 +24,19 @@ const getUser = (userId) => {
 
 // every connection
 io.on("connection", (socket) => {
-  console.log("A user connected");
-  // emit: every user
-  // io.emit("welcome", "Hello from socket server")
-
   // CONNECTED
-  //receive from client 
+  console.log("A user connected");
+
   socket.on('addUser', (userId) => {
     addUser(userId, socket.id) // set userId and socketId
+
+    console.log(onlineUsers);
 
     //send to client
     io.emit("getUsers", onlineUsers) // online users
   })
+  
+  
 
   // SEND AND GET MESSAGE
   socket.on("sendMessage", ({ senderId, receiverId, text }) => { // receive from client
@@ -58,10 +59,6 @@ io.on("connection", (socket) => {
 
   })
 
-  socket.on('test', (data) => {
-    console.log(data);
-  })
-
   // DISCONNECTED
   socket.on("disconnect", () => {
     console.log("A user disconnected");
@@ -69,5 +66,6 @@ io.on("connection", (socket) => {
 
     //send to client
     io.emit('getUsers', onlineUsers) // online users
+    console.log(onlineUsers);
   })
 })

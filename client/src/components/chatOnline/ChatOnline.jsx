@@ -3,10 +3,12 @@ import { useContext, useEffect, useState } from 'react'
 import './chatOnline.css'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from "../../context/AuthContext"
+import { Spinner, Stack } from 'react-bootstrap'
 
-function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
-  const [currentUserFriends, setCurrentUserFriends] = useState([])
-  const [onlineFriends, setOnlineFriends] = useState([])
+function ChatOnline({ onlineFriends, setCurrentChat }) {
+  const [friends, setFriends] = useState([]);
+  const [getFriendsLoaded, setGetFriendsLoaded] = useState(false);
+
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
   const config = {
@@ -19,21 +21,43 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
   // get all friends of current users
   useEffect(() => {
     const getFriends = async () => {
-      const {data} = await axios.get(`${API_URL}/api/v1/users/friends/${currentUserId}`, config)
-      setCurrentUserFriends(data)
+      try {
+        if (currentUser?._id) {
+          const { data } = await axios.get(`${API_URL}/api/v1/users/friends/${currentUser?._id}`, config)
+          setFriends(data)
+          setGetFriendsLoaded(true);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
-    getFriends()
+    getFriends();
+  }, [currentUser])
 
-  }, [currentUserId])
 
-  useEffect(()=> {
-    setOnlineFriends(currentUserFriends.filter((f) => onlineUsers?.includes(f._id)))
-  }, [currentUserFriends, onlineUsers])
-  
+  useEffect(() => {
+    const activeFriends = friends?.map(friend => {
+
+      if (onlineFriends?.some(ofId => ofId === friend._id)) {
+        return {
+          ...friend,
+          active: true
+        }
+      } else {
+        return {
+          ...friend,
+          active: false
+        }
+      }
+
+    })
+    setFriends(activeFriends)
+  }, [getFriendsLoaded, onlineFriends])
+
   const handleClick = async (onlineF) => {
     try {
-      const {data} = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUserId}/${onlineF._id}`, config);
+      const { data } = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUser._id}/${onlineF._id}`, config);
       console.log(data);
       setCurrentChat(data);
 
@@ -41,18 +65,24 @@ function ChatOnline({onlineUsers, currentUserId, setCurrentChat}) {
       console.log(err);
     }
   }
+
   return (
     <div className='chat-online'>
       {
-        onlineFriends?.map(onlineF => (
-        <div key={onlineF._id} className="chat-online-friend" onClick={() => handleClick(onlineF)}>
-          <div className="chat-online-img-container">
-            <img className='chat-online-img' src={onlineF?.profilePicture ? PF+'person/'+onlineF.profilePicture : PF+ "person/noAvatar.png"} alt="" />
-            <div className="chat-online-badge"></div>
-          </div>
-          <span className="chat-online-name">{onlineF.firstName}</span>
-        </div>
-        ))
+        friends.length > 0 ?
+          friends?.map(onlineF => (
+            onlineF.active && <div key={onlineF._id} className="chat-online-friend" onClick={() => handleClick(onlineF)}>
+              <div className="chat-online-img-container">
+                <img className='chat-online-img' src={onlineF?.profilePicture ? PF + 'person/' + onlineF.profilePicture : PF + "person/noAvatar.png"} alt="" />
+                <div className="chat-online-badge"></div>
+              </div>
+              <span className="chat-online-name">{onlineF.firstName + ' ' + onlineF?.lastName}</span>
+            </div>
+          )) : (
+            <Stack className="text-center my-3">
+              <Spinner className='mx-auto' animation="border" variant="primary" />
+            </Stack>
+          )
       }
     </div>
   )
