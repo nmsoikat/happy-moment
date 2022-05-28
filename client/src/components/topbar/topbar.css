@@ -74,9 +74,9 @@
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
-	color: #fff;
 	padding: 8px 5px;
-	border-radius: 15px
+	border-radius: 15px;
+	position: relative;
 }
 
 .topbar-right .username {
@@ -132,4 +132,25 @@
 
 .topbar-right-profile>a:first-child {
 	margin-right: 8px;
+}
+
+.notifications-wrap {
+	padding: 15px;
+	border-radius: 15px;
+	position: absolute;
+	top: 62px;
+	width: 100%;
+	z-index: 99;
+}
+
+.no-notifications {
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	color: #ddd;
+}
+
+.notification-item{
+	margin-bottom: 10px;
+	border-bottom: 1px dotted #ddd;
 }

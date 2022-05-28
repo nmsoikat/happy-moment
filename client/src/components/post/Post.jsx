@@ -10,6 +10,8 @@ import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 const Post = forwardRef(({ post, myRef, socket }) => {
   const [like, setLike] = useState(post.likes.length)
   const [isLike, setIsLike] = useState(false)
+  const [isLikeClick, setIsLikeClick] = useState(false)
+  const [isAnyComment, setIsAnyComment] = useState(false)
   const [user, setUser] = useState({})
 
   const [deletedPost, setDeletedPost] = useState({ postId: post._id, deleted: false });
@@ -32,27 +34,6 @@ const Post = forwardRef(({ post, myRef, socket }) => {
       Authorization: `Bearer ${token}`,
     }
   }
-
-  useEffect(() => {
-    // send client to socket-server
-    // socket?.emit("addUser", currentUser._id)
-    // receive from server
-    // socket?.on("getUsers", (users) => {
-    //   // setOnlineUsers(
-    //   //   currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
-    //   // )
-    //   console.log({users});
-    // })
-
-  }, [currentUser])
-
-  // useEffect(() => {
-  //   if(newComment.createdComment){
-  //     console.log(newComment);
-  //     setComments(prev => [...prev, newComment.createdComment.data])
-  //   }
-  //   console.log(comments);
-  // }, [newComment])
 
   // Reply
   useEffect(() => {
@@ -81,23 +62,51 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   }, [post.userId])
 
   const likeHandler = async () => {
+
     try {
       await axios.put(`${API_URL}/api/v1/posts/${post._id}/like`, { userId: currentUser._id }, config)
+
       setLike(isLike ? like - 1 : like + 1)
-
-      if (!isLike && (currentUser._id !== post.userId)) {
-        socket?.emit("sendNotification", {
-          senderId: currentUser._id,
-          receiverId: post.userId,
-          type: 'like'
-        })
-      }
-
       setIsLike(!isLike);
+
+      setIsLikeClick(true) //for notification
     } catch (err) {
       console.log(err);
     }
   }
+
+  // set notification for like
+  useEffect(() => {
+    if (isLikeClick) {
+      if (isLike) {
+        socket?.emit("sendNotification", {
+          senderId: currentUser._id,
+          receiverId: post.userId,
+          postId: post._id,
+          senderName: currentUser.firstName + ' '+ currentUser.lastName,
+          type: 'like',
+        })
+      }
+      console.log('like');
+
+      setIsLikeClick(false)
+    }
+  }, [isLikeClick])
+
+  // set notification for comment
+  useEffect(() => {
+    if (isAnyComment) {
+      socket?.emit("sendNotification", {
+        senderId: currentUser._id,
+        receiverId: post.userId,
+        postId: post._id,
+        senderName: currentUser.firstName + ' '+ currentUser.lastName,
+        type: 'comment',
+      })
+
+      setIsAnyComment(false)
+    }
+  }, [isAnyComment])
 
   //Comment Handler
   const commentOnKeyUp = async (event, postId) => {
@@ -114,6 +123,8 @@ const Post = forwardRef(({ post, myRef, socket }) => {
 
       setIsCommentVisible(true) //comment area visible
       event.target.value = '';
+
+      setIsAnyComment(true) //for notification
     }
   }
 
@@ -131,6 +142,8 @@ const Post = forwardRef(({ post, myRef, socket }) => {
       event.target.value = '';
       setIsCommentVisible(true) //comment area visible
       setIsReplyInputBoxVisible({ visible: false, commentId: '' }) //replay input box hide
+
+      setIsAnyComment(true) //for notification
     }
   }
 

@@ -5,12 +5,13 @@ import { NavLink, Link, Navigate } from "react-router-dom";
 import { AuthContext } from '../../context/AuthContext'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import axios from 'axios';
+import { Button } from '@mui/material';
 
 export default function Topbar({ fetchAllUsers, socket }) {
   const { user, token } = useContext(AuthContext);
   const PF = REACT_APP_PUBLIC_FOLDER;
-  const [sender, setSender] = useState();
   const [notifications, setNotifications] = useState([]);
+  const [notificationToggle, setNotificationToggle] = useState(false);
 
   const config = {
     headers: {
@@ -24,10 +25,10 @@ export default function Topbar({ fetchAllUsers, socket }) {
   }
 
   useEffect(() => {
-    socket?.on("getNotification", async ({ senderId, type }) => {
-      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${senderId}`, config)
+    socket?.on("getNotification", async ({ senderId, postId, senderName, type }) => {
 
-      setNotifications((prev) => [...prev, { senderName: data.firstName, type }])
+      console.log('dd');
+      setNotifications((prev) => [...prev, { senderId, postId, senderName, type }])
     })
   }, [socket])
 
@@ -52,7 +53,7 @@ export default function Topbar({ fetchAllUsers, socket }) {
             </ul>
           </div>
           <div className="col-md-3">
-            <div className="topbar-right shadow-sm overflow-hidden bg-white">
+            <div className="topbar-right shadow-sm bg-white">
               <div className='topbar-right-profile'>
                 <Link to={`/profile/${user.username}`}><img src={user.profilePicture ? PF + 'person/' + user.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
                 <Link to={`/profile/${user.username}`} style={{ textDecoration: 'none' }}><div className='username'>{user.firstName + ' ' + user.lastName}</div></Link>
@@ -61,11 +62,33 @@ export default function Topbar({ fetchAllUsers, socket }) {
                 <TagFaces />
                 <span className="topbar-icon-badge">0</span>
               </div> */}
-              <div className="topbar-icon-item">
+              <div className="topbar-icon-item" onClick={() => setNotificationToggle(!notificationToggle)}>
                 <NotificationsActive />
                 {notifications.length > 0 &&
                   <span className="topbar-icon-badge"> {notifications.length} </span>}
               </div>
+
+              {
+                notificationToggle &&
+                <div className='notifications-wrap shadow bg-white'>
+                  {
+                    notifications.length > 0 ?
+                      notifications.map((item, index) => (
+                        <div key={index} className='notification-item'>
+                          <i>{item.senderName}</i> <b className='type'>{item.type}</b> <span>On your post</span>
+                        </div>
+                      ))
+
+
+                      : (
+                        <div className='no-notifications'>No New Notification</div>
+                      )
+                  }
+                  {
+                    notifications.length > 0 && <button className='btn btn-sm w-100 btn-info' onClick={() => setNotifications([])}>Clear Notifications</button>
+                  }
+                </div>
+              }
             </div>
           </div>
         </div>

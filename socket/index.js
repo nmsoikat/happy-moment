@@ -35,24 +35,26 @@ io.on("connection", (socket) => {
     //send to client
     io.emit("getUsers", onlineUsers) // online users
   })
-  
-  
+
+
 
   // SEND AND GET MESSAGE
   socket.on("sendMessage", ({ senderId, receiverId, text }) => { // receive from client
     const whoReceive = getUser(receiverId)
-    
+
     //send to client //specific
     io.to(whoReceive?.socketId).emit("getMessage", { senderId, text })
   })
 
-  socket.on("sendNotification", ({senderId, receiverId, type}) => {
+  socket.on("sendNotification", ({ senderId, receiverId, postId, senderName, type }) => {
     const receiver = getUser(receiverId)
 
-    
-    if(receiver){ 
+
+    if (receiver) {
       io.to(receiver.socketId).emit("getNotification", {
         senderId,
+        postId,
+        senderName,
         type
       })
     }
