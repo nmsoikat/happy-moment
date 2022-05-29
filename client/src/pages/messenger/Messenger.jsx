@@ -26,6 +26,11 @@ function Messenger({ socket, onlineFriends }) {
   const [isLeftSideVisible, setIsLeftSideVisible] = useState(true)
   const [isRightSideVisible, setIsRightSideVisible] = useState(true)
 
+  const [notifications, setNotifications] = useState([]);
+  const [notificationToggle, setNotificationToggle] = useState(false);
+  
+  const [selectedConversation, setSelectedConversation] = useState({});
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -78,12 +83,8 @@ function Messenger({ socket, onlineFriends }) {
   const [targetUser, setTargetUser] = useState({})
 
   // ------------ Socket Start ------------
-  // const socket = useRef()
+  //arrival message
   useEffect(() => {
-    //init
-    // socket?.current = io('ws://localhost:8900')
-
-    //arrival message
     socket?.on("getMessage", ({ senderId, text }) => {
       setArrivalMessage({
         sender: senderId,
@@ -92,7 +93,7 @@ function Messenger({ socket, onlineFriends }) {
       })
     })
 
-  }, [])
+  }, [socket])
 
   //if any arrival message update dom
   useEffect(() => {
@@ -101,21 +102,6 @@ function Messenger({ socket, onlineFriends }) {
       setMessages((prev) => [...prev, arrivalMessage])
 
   }, [arrivalMessage, currentChat])
-
-  // useEffect(() => {
-  //   // send client to socket-server
-  //   socket?.emit("addUser", currentUser._id)
-
-  //   // receive from server
-  //   socket?.on("getUsers", (users) => {
-  //     setOnlineUsers(
-  //       currentUser.friends?.filter(fo => users.some(u => u.userId === fo))
-  //     )
-  //   })
-
-
-  // }, [currentUser])
-
   // ------------ Socket End ------------
 
   //create new conversation
@@ -126,7 +112,6 @@ function Messenger({ socket, onlineFriends }) {
     const { data } = await axios.post(`${API_URL}/api/v1/conversation/`, { senderId, receiverId }, config)
     if (data) {
       setNewConvCreated(true)
-      alert("Created A New Conversation")
     }
   }
 
@@ -226,6 +211,8 @@ function Messenger({ socket, onlineFriends }) {
   const selectConversation = (c) => {
     setCurrentChat(c)
     setTargetId(c.members.find(mId => mId !== currentUser._id))
+
+    setSelectedConversation({conversationId: c._id, active: true})
   }
 
   return (
@@ -246,7 +233,7 @@ function Messenger({ socket, onlineFriends }) {
                 <div className="searchConvResultWrap">
                   {
                     allFriendsOfCurrentUser.map(friend => (
-                      <div className='current-friend' onClick={() => createNewConversation(friend._id)}>
+                      <div key={friend._id} className='current-friend' onClick={() => createNewConversation(friend._id)}>
                         <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
                         <div className="person-left-info">
                           <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
@@ -260,7 +247,7 @@ function Messenger({ socket, onlineFriends }) {
               {
                 conversations.length > 0 ?
                   conversations.map((c, index) =>
-                    <div key={index} onClick={() => selectConversation(c)}>
+                    <div className={`${(selectedConversation.conversationId === c._id && selectedConversation.active === true) ? 'selected' : ''}`} key={index} onClick={() => selectConversation(c)}>
                       <Conversation onlineFriends={onlineFriends} conversation={c} />
                     </div>
                   )
@@ -275,7 +262,7 @@ function Messenger({ socket, onlineFriends }) {
 
           <div className={`col-md-6 ${(!isLeftSideVisible && !isRightSideVisible) ? 'chat-box-expand-both' : (!isLeftSideVisible || !isRightSideVisible) && 'chat-box-expand-one-side'}`}>
             <div className="chat-box">
-              <div className="chat-box-wrapper">
+              <div className="chat-box-wrapper shadow-sm bg-white">
                 {
                   currentChat ?
                     (<>
@@ -313,15 +300,38 @@ function Messenger({ socket, onlineFriends }) {
                 <TagFaces />
                 <span className="topbar-icon-badge">0</span>
               </div> */}
-              <div className="topbar-icon-item">
+              <div className="topbar-icon-item" onClick={() => setNotificationToggle(!notificationToggle)}>
                 <NotificationsActive />
-                <span className="topbar-icon-badge">0</span>
+                {notifications.length > 0 &&
+                  <span className="topbar-icon-badge"> {notifications.length} </span>}
               </div>
+
+              {
+                notificationToggle &&
+                <div className='notifications-wrap shadow bg-white'>
+                  {
+                    notifications.length > 0 ?
+                      notifications.map((item, index) => (
+                        <div key={index} className='notification-item'>
+                          <i>{item.senderName}</i> <b className='type'>{item.type}</b> <span>On your post</span>
+                        </div>
+                      ))
+
+
+                      : (
+                        <div className='no-notifications'>No New Notification</div>
+                      )
+                  }
+                  {
+                    notifications.length > 0 && <button className='btn btn-sm w-100 btn-info' onClick={() => setNotifications([])}>Clear Notifications</button>
+                  }
+                </div>
+              }
             </div>
 
 
-            <div className="chat-online-wrapper shadow-sm overflow-hidden bg-white mt-4">
-              <ChatOnline onlineFriends={onlineFriends} setCurrentChat={setCurrentChat} />
+            <div className={`chat-online-wrapper shadow-sm overflow-hidden bg-white mt-4 ${!isRightSideVisible && 'close'}`}>
+              <ChatOnline onlineFriends={onlineFriends} createNewConversation={createNewConversation} />
             </div>
           </div>
         </div>

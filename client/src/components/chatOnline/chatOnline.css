@@ -6,8 +6,12 @@
 	align-items: center;
 	font-weight: 500;
 	cursor: pointer;
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
+.chat-online-friend:last-child{
+  margin-bottom: 0;
+}
+
 .chat-online-img-container {
   position: relative;
   margin-right: 10px;

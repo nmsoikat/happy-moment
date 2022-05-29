@@ -121,11 +121,9 @@ const Feed = (props) => {
       const postShared = await axios.post(`${API_URL}/api/v1/posts`, newPost, config);
 
       setFileUploading(100)
-      if(fileUploading === 100){
-        setTimeout(() => {
-          setFileUploading(0)
-        }, 500)
-      }
+      setTimeout(() => {
+        setFileUploading(0)
+      }, 500)
       setNewPosts(prev => [postShared.data, ...prev])
 
       desc.current.value = "";
@@ -178,7 +176,7 @@ const Feed = (props) => {
                 )
               }
 
-              {fileUploading > 0 &&  <ProgressBar active now={fileUploading} label={`${fileUploading}%`} />}
+              {fileUploading > 0 && <ProgressBar now={fileUploading} label={`${fileUploading}%`} />}
 
               <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
                 <div className="share-options">

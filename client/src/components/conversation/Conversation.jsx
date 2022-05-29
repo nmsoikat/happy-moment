@@ -18,7 +18,7 @@ function Conversation({ onlineFriends, conversation }) {
     }
   }
 
-
+//find conversation user
   useEffect(() => {
     const findId = conversation.members.find(mId => mId !== currentUser._id)
     setConversationUserId(findId)
@@ -36,6 +36,7 @@ function Conversation({ onlineFriends, conversation }) {
     getUser()
   }, [currentUser, conversation])
 
+  //conversation user active
   useEffect(() => {
     if (onlineFriends.some(oFId => oFId === conversationUserId)) {
       setUser(prev => ({ ...prev, active: true }))
@@ -45,16 +46,11 @@ function Conversation({ onlineFriends, conversation }) {
   return (
     <div key={user._id} className="chat-online-friend" >
       <div className="chat-online-img-container">
-        <img className='chat-online-img' src={user?.profilePicture ? PF + 'person/' + user.profilePicture : PF + "person/noAvatar.png"} alt="" />
+        <img className='chat-online-img' src={user.profilePicture ? PF + 'person/' + user.profilePicture : PF + "person/noAvatar.png"} alt="" />
         {user?.active && <div className="chat-online-badge"></div>}
       </div>
-      <span className="chat-online-name">{user?.firstName + ' ' + user?.lastName}</span>
+      <span className="chat-online-name">{(user.firstName && user.firstName) + ' ' + (user.lastName && user.lastName)}</span>
     </div>
-
-    // <div className="conversation">
-    //   <img className='conversation-img' src={`${(user?.profilePicture && PF + 'person/' + user?.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
-    //   <span className="conversation-name">{user?.firstName + ' ' + user?.lastName}</span>
-    // </div>
   )
 }
 

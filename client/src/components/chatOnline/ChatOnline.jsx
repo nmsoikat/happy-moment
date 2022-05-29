@@ -5,7 +5,7 @@ import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from "../../context/AuthContext"
 import { Spinner, Stack } from 'react-bootstrap'
 
-function ChatOnline({ onlineFriends, setCurrentChat }) {
+function ChatOnline({ onlineFriends }) {
   const [friends, setFriends] = useState([]);
   const [getFriendsLoaded, setGetFriendsLoaded] = useState(false);
 
@@ -59,7 +59,7 @@ function ChatOnline({ onlineFriends, setCurrentChat }) {
     try {
       const { data } = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUser._id}/${onlineF._id}`, config);
       console.log(data);
-      setCurrentChat(data);
+      // setCurrentChat(data);
 
     } catch (err) {
       console.log(err);

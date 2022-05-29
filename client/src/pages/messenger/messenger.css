@@ -60,8 +60,9 @@
 
 .chat-menu-wrapper,
 .chat-box-wrapper {
-	padding: 10px;
+	padding: 15px;
 	height: 90vh;
+	border-radius: 15px;
 }
 
 .no-conversation-text {
@@ -114,6 +115,7 @@
 	top: 8px;
 	display: none;
 	cursor: pointer;
+	z-index: 99;
 }
 
 .right-side-expand-icon svg,
@@ -123,12 +125,12 @@
 }
 
 .left-side-expand-icon {
-	right: -20px;
+	right: 0px;
 	transform: rotate(90deg);
 }
 
 .right-side-expand-icon {
-	left: -20px;
+	left: 0px;
 	transform: rotate(-90deg);
 }
 
@@ -139,6 +141,7 @@
 	width: 50px;
 }
 
+.chat-online-wrapper.close,
 .left-expand-section-wrap.close .search-bar,
 .left-expand-section-wrap.close .conv-friends-wrapper,
 .right-expand-section-wrap.close .topbar-right,
@@ -175,4 +178,10 @@
 	width: 100%;
 	width: calc(100% - 40px);
 	height: auto;
+}
+
+.conv-friends-wrapper .selected .chat-online-friend {
+	background: #f9d591;
+	padding: 5px;
+	border-radius: 10px;
 }
