@@ -17,7 +17,7 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Spinner, Stack } from 'react-bootstrap';
 
 
-function Messenger({ socket, onlineFriends }) {
+function Messenger({ socket, onlineFriends, stopSpinner }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
 
@@ -215,6 +215,7 @@ function Messenger({ socket, onlineFriends }) {
     setSelectedConversation({conversationId: c._id, active: true})
   }
 
+
   return (
     <>
       <div className="container mt-3 h-100">
@@ -252,6 +253,7 @@ function Messenger({ socket, onlineFriends }) {
                     </div>
                   )
                   : (
+                    !stopSpinner &&
                     <Stack className="text-center my-3">
                       <Spinner className='mx-auto' animation="border" variant="primary" />
                     </Stack>
@@ -296,10 +298,7 @@ function Messenger({ socket, onlineFriends }) {
                 <Link to={`/profile/${currentUser.username}`}><img src={currentUser.profilePicture ? PF + 'person/' + currentUser.profilePicture : PF + 'person/noAvatar.png'} className='topbar-img' alt="" /></Link>
                 <Link to={`/profile/${currentUser.username}`} style={{ textDecoration: 'none' }}><div className='username'>{currentUser.firstName + ' ' + currentUser.lastName}</div></Link>
               </div>
-              {/* <div className="topbar-icon-item">
-                <TagFaces />
-                <span className="topbar-icon-badge">0</span>
-              </div> */}
+
               <div className="topbar-icon-item" onClick={() => setNotificationToggle(!notificationToggle)}>
                 <NotificationsActive />
                 {notifications.length > 0 &&
@@ -331,7 +330,7 @@ function Messenger({ socket, onlineFriends }) {
 
 
             <div className={`chat-online-wrapper shadow-sm overflow-hidden bg-white mt-4 ${!isRightSideVisible && 'close'}`}>
-              <ChatOnline onlineFriends={onlineFriends} createNewConversation={createNewConversation} />
+              <ChatOnline stopSpinner={stopSpinner} onlineFriends={onlineFriends} selectConversation={selectConversation} />
             </div>
           </div>
         </div>

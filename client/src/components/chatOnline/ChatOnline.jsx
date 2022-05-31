@@ -5,12 +5,13 @@ import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from "../../context/AuthContext"
 import { Spinner, Stack } from 'react-bootstrap'
 
-function ChatOnline({ onlineFriends }) {
+function ChatOnline({ onlineFriends, selectConversation, stopSpinner }) {
+  const PF = REACT_APP_PUBLIC_FOLDER;
+  const { user: currentUser, token } = useContext(AuthContext)
+
   const [friends, setFriends] = useState([]);
   const [getFriendsLoaded, setGetFriendsLoaded] = useState(false);
 
-  const PF = REACT_APP_PUBLIC_FOLDER;
-  const { user: currentUser, token } = useContext(AuthContext)
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -58,9 +59,7 @@ function ChatOnline({ onlineFriends }) {
   const handleClick = async (onlineF) => {
     try {
       const { data } = await axios.get(`${API_URL}/api/v1/conversation/find/${currentUser._id}/${onlineF._id}`, config);
-      console.log(data);
-      // setCurrentChat(data);
-
+      selectConversation(data[0]);
     } catch (err) {
       console.log(err);
     }
@@ -79,6 +78,7 @@ function ChatOnline({ onlineFriends }) {
               <span className="chat-online-name">{onlineF.firstName + ' ' + onlineF?.lastName}</span>
             </div>
           )) : (
+            !stopSpinner &&
             <Stack className="text-center my-3">
               <Spinner className='mx-auto' animation="border" variant="primary" />
             </Stack>

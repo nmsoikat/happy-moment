@@ -21,6 +21,7 @@ function App() {
   const { user } = useContext(AuthContext)
   const [socket, setSocket] = useState(null);
   const [onlineFriends, setOnlineFriends] = useState([])
+  const [stopSpinner, setStopSpinner] = useState(false);
 
   //socket init
   useEffect(() => {
@@ -49,6 +50,10 @@ function App() {
 
   }, [socket])
 
+  setTimeout(() => {
+    setStopSpinner(true)
+  }, 5000)
+
   // useEffect(() => {
 
   //   console.log({friends: user.friends});
@@ -57,16 +62,16 @@ function App() {
   // }, [onlineFriends])
   return (
     <Routes>
-      <Route path='/' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Register />} />
-      <Route path='/login' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Login />} />
-      <Route path='/register' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <Register />} />
-      <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} onlineFriends={onlineFriends} />} />
-      <Route path='/profile/:username' element={user ? <Profile socket={socket} /> : <Login />} />
+      <Route path='/' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Register />} />
+      <Route path='/login' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Login />} />
+      <Route path='/register' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Register />} />
+      <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} />} />
+      <Route path='/profile/:username' element={user ? <Profile socket={socket} stopSpinner={stopSpinner} /> : <Login />} />
       <Route path='/trending' element={user ? <Trending socket={socket} /> : <Login />} />
       <Route path='/videos' element={user ? <Videos socket={socket} /> : <Login />} />
       <Route path='/people' element={user ? <People socket={socket} onlineFriends={onlineFriends} /> : <Login />} />
-      <Route path='/forgot-password' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <ForgotPassword />} />
-      <Route path='/reset-password/:token' element={user ? <Home socket={socket} onlineFriends={onlineFriends} /> : <ResetPassword />} />
+      <Route path='/forgot-password' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <ForgotPassword />} />
+      <Route path='/reset-password/:token' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <ResetPassword />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

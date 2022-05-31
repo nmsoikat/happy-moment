@@ -232,7 +232,7 @@ export default function Profile({socket}) {
                 <Col md={9}>
                   <Tab.Content className='tab-content-wrap'>
                     <Tab.Pane eventKey="post">
-                      <Feed username={username} profile={true} />
+                      <Feed username={username} profile={true} isCurrentUser={user.username === currentUser.username} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="friends">
                       {

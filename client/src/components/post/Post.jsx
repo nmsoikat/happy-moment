@@ -91,7 +91,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
 
       setIsLikeClick(false)
     }
-  }, [isLikeClick])
+  }, [socket, isLikeClick])
 
   // set notification for comment
   useEffect(() => {
@@ -106,7 +106,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
 
       setIsAnyComment(false)
     }
-  }, [isAnyComment])
+  }, [socket, isAnyComment])
 
   //Comment Handler
   const commentOnKeyUp = async (event, postId) => {
