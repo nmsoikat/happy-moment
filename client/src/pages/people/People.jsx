@@ -52,7 +52,7 @@ export default function Profile({ socket, onlineFriends, stopSpinner }) {
                   <Person key={person._id} person={person} />
                 ))
                 :
-                (<Stack className="text-center my-3">
+                (!stopSpinner && <Stack className="text-center my-3">
                   <Spinner className='mx-auto' animation="border" variant="primary" />
                 </Stack>)
             }

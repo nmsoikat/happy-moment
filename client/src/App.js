@@ -15,6 +15,8 @@ import Messenger from './pages/messenger/Messenger';
 import NotFound from './pages/notFound/NotFound';
 // import RequiredAuth from './RequiredAuth';
 import { io } from "socket.io-client"
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -22,7 +24,6 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [onlineFriends, setOnlineFriends] = useState([])
   const [stopSpinner, setStopSpinner] = useState(false);
-
   //socket init
   useEffect(() => {
     if (user?._id) {
@@ -61,19 +62,33 @@ function App() {
 
   // }, [onlineFriends])
   return (
-    <Routes>
-      <Route path='/' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Register />} />
-      <Route path='/login' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Login />} />
-      <Route path='/register' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <Register />} />
-      <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} />} />
-      <Route path='/profile/:username' element={user ? <Profile socket={socket} stopSpinner={stopSpinner} /> : <Login />} />
-      <Route path='/trending' element={user ? <Trending socket={socket} /> : <Login />} />
-      <Route path='/videos' element={user ? <Videos socket={socket} /> : <Login />} />
-      <Route path='/people' element={user ? <People socket={socket} onlineFriends={onlineFriends} /> : <Login />} />
-      <Route path='/forgot-password' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <ForgotPassword />} />
-      <Route path='/reset-password/:token' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner}/> : <ResetPassword />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path='/' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <Register />} />
+        <Route path='/login' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <Login />} />
+        <Route path='/register' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <Register />} />
+        <Route path='/messenger' element={!user ? <Register /> : <Messenger socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} />} />
+        <Route path='/profile/:username' element={user ? <Profile socket={socket} stopSpinner={stopSpinner} /> : <Login />} />
+        <Route path='/trending' element={user ? <Trending socket={socket} /> : <Login />} />
+        <Route path='/videos' element={user ? <Videos socket={socket} /> : <Login />} />
+        <Route path='/people' element={user ? <People socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <Login />} />
+        <Route path='/forgot-password' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ForgotPassword />} />
+        <Route path='/reset-password/:token' element={user ? <Home socket={socket} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ResetPassword />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </>
   );
 }
 

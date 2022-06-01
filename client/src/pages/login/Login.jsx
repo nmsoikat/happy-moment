@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
+import { toast } from 'react-toastify';
 
 const initialValues = {
   email: "",
@@ -23,11 +24,11 @@ export default function Login() {
 
   const onSubmit = (values) => {
     loginCall(
-        {
-          email: values.email,
-          password: values.password
-        }, dispatch
-      )
+      {
+        email: values.email,
+        password: values.password
+      }, dispatch
+    )
   }
 
 
@@ -76,14 +77,14 @@ export default function Login() {
                     component={TextError}
                   />
                 </div>
-        
+
                 <button className='login-btn w-100 mt-4' type='submit' disabled={isFetching}>
                   {isFetching ? <CircularProgress color="inherit" size="20px" /> : "Log In"}
                 </button>
 
                 <Link to="/forgot-password"><span className="password-forgot">Forgot Password?</span></Link>
                 <button className='register-btn mx-auto d-block'>
-                  <Link to="/register" style={{ textDecoration: 'none', color: 'white', display:'block' }}>
+                  <Link to="/register" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
                     {isFetching ? <CircularProgress color="inherit" size="20px" /> : "Create a New Account"}
                   </Link>
                 </button>

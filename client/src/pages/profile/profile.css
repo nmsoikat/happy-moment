@@ -117,3 +117,12 @@
   width: 100%;
   height: 450px;
 }
+
+.profile-cover label {
+  width: 100%;
+  height: auto;
+}
+
+.profile-cover label .profile-cover-img {
+  border-radius: 15px;
+}

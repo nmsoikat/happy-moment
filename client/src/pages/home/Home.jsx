@@ -6,7 +6,7 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 
-export default function Home({ socket, onlineFriends, stopSpinner }) {
+export default function Home({ ToastContainer, toast, socket, onlineFriends, stopSpinner }) {
   const { user: currentUser, token } = useContext(AuthContext)
 
   // useEffect(() => {

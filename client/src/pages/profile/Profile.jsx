@@ -5,7 +5,7 @@ import Feed from '../../components/feed/Feed'
 import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
 import { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { Button, Col, Modal, Nav, Row, Spinner, Tab } from 'react-bootstrap'
 import About from '../../components/about/About'
@@ -18,7 +18,9 @@ import { DialogContent, DialogContentText, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 import EditIcon from '@mui/icons-material/Edit';
 
-export default function Profile({socket}) {
+export default function Profile({ socket }) {
+  const navigation = useNavigate();
+
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams()
   const [user, setUser] = useState({})
@@ -30,9 +32,12 @@ export default function Profile({socket}) {
 
   const [file, setFile] = useState(null);
   const [photoURL, setPhotoURL] = useState(PF + (currentUser.profilePicture && 'person/' + currentUser.profilePicture || 'person/noAvatar.png'));
+  const [photoCoverURL, setPhotoCoverURL] = useState(PF + (currentUser.coverPicture && 'personCover/' + currentUser.coverPicture || 'person/noCover.png'));
   const [openCrop, setOpenCrop] = useState(false);
 
   const [show, setShow] = useState(false);
+  const [isCover, setIsCover] = useState(false);
+
   const handleShow = () => setShow(true);
 
   const config = {
@@ -42,13 +47,19 @@ export default function Profile({socket}) {
     }
   }
 
-  const handleChange = (e) => {
+  const handleChange = (e, cover=false) => {
     const file = e.target.files[0];
     if (file) {
       setFile(file);
-      setPhotoURL(URL.createObjectURL(file));
+      if(cover){
+        setPhotoCoverURL(URL.createObjectURL(file));
+      }else{
+        setPhotoURL(URL.createObjectURL(file));
+      }
       setOpenCrop(true);
       handleShow()
+
+      setIsCover(cover)
     }
   };
 
@@ -65,7 +76,11 @@ export default function Profile({socket}) {
         // data.profilePicture = fileName
         // data.userId = currentUser._id
 
-        const updatedData = await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
+        if(isCover){
+          await axios.put(`${API_URL}/api/v1/users/profile-cover/${currentUser._id}`, data, config)
+        }else{
+          await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
+        }
 
         // currentUser.profilePicture = updatedData.profilePicture;
 
@@ -83,6 +98,7 @@ export default function Profile({socket}) {
     const fetchUser = async () => {
       const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
       setUser(data)
+      setPhotoURL(PF + (data.profilePicture && 'person/' + data.profilePicture || 'person/noAvatar.png'))
     }
 
     fetchUser();
@@ -188,6 +204,11 @@ export default function Profile({socket}) {
     }
   }
 
+  const relocating = () => {
+    navigation('/')
+    navigation('/profile/' + user.username)
+  }
+
   return (
     <>
       <Topbar socket={socket} />
@@ -199,7 +220,21 @@ export default function Profile({socket}) {
           <div className="col-md-9">
             <div className="profile-right-top">
               <div className="profile-cover">
-                <img className='profile-cover-img' src={(user.coverPicture && PF + user.coverPicture) || PF + 'person/noCover.png'} alt="" />
+                <label htmlFor="profileCover">
+                  {currentUser.username === user.username &&
+                    <input
+                      accept="image/*"
+                      id="profileCover"
+                      type="file"
+                      name="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleChange(e, true)}
+                    />
+                  }
+                  <img className='profile-cover-img ' src={(user.coverPicture && PF + 'personCover/'+ user.coverPicture) || PF + 'person/noCover.png'} alt="" />
+                  {/* <img className='profile-user-img' src={PF + 'person/' + user.profilePicture} alt="" /> */}
+                </label>
+
                 {/* <div className='profile-user-img-wrap'>
                   <Button className="btn btn-sm" onClick={handleShow}>
                     <EditIcon />
@@ -208,14 +243,16 @@ export default function Profile({socket}) {
                 </div> */}
                 <div className='profile-user-img-wrap'>
                   <label htmlFor="profilePhoto">
-                    <input
-                      accept="image/*"
-                      id="profilePhoto"
-                      type="file"
-                      name="file"
-                      style={{ display: 'none' }}
-                      onChange={handleChange}
-                    />
+                    {currentUser.username === user.username &&
+                      <input
+                        accept="image/*"
+                        id="profilePhoto"
+                        type="file"
+                        name="file"
+                        style={{ display: 'none' }}
+                        onChange={handleChange}
+                      />
+                    }
                     <img className='profile-user-img' src={(photoURL && photoURL) || PF + 'person/noAvatar.png'} alt="" />
                     {/* <img className='profile-user-img' src={PF + 'person/' + user.profilePicture} alt="" /> */}
                   </label>
@@ -263,7 +300,7 @@ export default function Profile({socket}) {
                 <Col md={3}>
                   <Nav variant="pills" className="flex-column tab-control">
                     <Nav.Item>
-                      <Nav.Link eventKey="post">Posts</Nav.Link>
+                      <Nav.Link onClick={relocating} eventKey="post">Posts</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                       <Nav.Link onClick={gerFriends} eventKey="friends">Friends</Nav.Link>
@@ -285,7 +322,7 @@ export default function Profile({socket}) {
         </div>
       </div>
 
-      {openCrop && <CropEasy {...{ handleSubmit, photoURL, setPhotoURL, setFile, setOpenCrop, show }} />}
+      {openCrop && <CropEasy {...{isCover, photoCoverURL, setPhotoCoverURL, handleSubmit, photoURL, setPhotoURL, setFile, setOpenCrop, show }} />}
     </>
   );
 }

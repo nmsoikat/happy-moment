@@ -4,7 +4,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
-import {API_URL} from '../../Constant'
+import { API_URL } from '../../Constant'
+import { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+import { toast } from 'react-toastify';
 
 const initialValues = {
   firstName: "",
@@ -28,15 +31,22 @@ const validationSchema = Yup.object().shape({
 
 
 export default function Register() {
-
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
   const onSubmit = async (values) => {
     try {
+      setIsLoading(true)
       await axios.post(`${API_URL}/api/v1/auth/register`, values)
+      setIsLoading(false)
+
+      toast.success("Registration Success!")
+      
       navigate('/login')
     } catch (error) {
+      toast.error("Registration Failed!")
       console.log(error);
+      setIsLoading(false)
     }
   };
 
@@ -128,9 +138,12 @@ export default function Register() {
                   />
                 </div>
 
-                <button className='login-btn w-100 mt-4' type='submit'>Sign Up</button>
+                <button className='login-btn w-100 mt-4' type='submit'>
+                  {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Sign Up"}
+                </button>
                 <button type='button' className='register-btn mx-auto d-block'>
-                  <Link to="/login" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>Log Into Account
+                  <Link to="/login" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
+                    {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Log Into Account"}
                   </Link>
                 </button>
               </div>

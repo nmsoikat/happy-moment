@@ -1,5 +1,7 @@
 import axios from "axios"
 import {API_URL} from "./Constant"
+import { toast } from 'react-toastify';
+
 export const loginCall = async (userCredential, dispatch) => {
   dispatch({ type: "LOGIN_START" })
   try {
@@ -11,5 +13,5 @@ export const loginCall = async (userCredential, dispatch) => {
     window.location.assign('/')
   } catch (err) {
     dispatch({ type: "LOGIN_FAIL", payload: err })
-  }
+    toast.error("Login failed")  }
 }

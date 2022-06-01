@@ -84,8 +84,8 @@ exports.userRegister = catchAsync(async (req, res, next) => {
   })
 
   //send welcome mail
-  const url = `${req.protocol}://${req.get('host')}/profile/${newUser.username}`
-  await new Email(newUser, url).sendWelcome()
+  // const url = `${req.protocol}://${req.get('host')}/profile/${newUser.username}`
+  // await new Email(newUser, url).sendWelcome()
   
   // after create an new account auto login
   createSendToken(newUser, 201, res)
