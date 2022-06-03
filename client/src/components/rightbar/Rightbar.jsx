@@ -82,6 +82,7 @@ export default function Rightbar({ socket, onlineFriends, stopSpinner }) {
   //   }
   // }
 
+
   const HomeRightbar = () => {
     return (
       <>

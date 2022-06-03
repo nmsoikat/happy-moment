@@ -147,6 +147,13 @@ const Feed = (props) => {
     URL.revokeObjectURL();
   }
 
+  // Force Re-render for friend profile view
+  // const [, updateState] = useState();
+  // const forceUpdate = useCallback(() => updateState({}), []);
+  // useEffect(() => {
+  //   forceUpdate();
+  // }, [user.username])
+
   return <>
     <div className='feed'>
       <div className="feed-wrapper">

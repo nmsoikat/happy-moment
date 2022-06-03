@@ -13,7 +13,7 @@ function AllFriendsRequest({ friendsRequestList, confirmRequestHandler, deleteRe
         {
           friendsRequestList.length > 0 ? friendsRequestList.map(friend => (
             <div key={friend._id} className='friends-item bg-white shadow-sm text-center'>
-              <img className='friends-img' src={`${(friend.profilePicture && PF + friend.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
+              <img className='friends-img' src={`${(friend.profilePicture && PF + 'person/' +friend.profilePicture) || PF + 'person/noAvatar.png'}`} alt="" />
               <Link to={`/profile/${friend.username}`} style={{ textDecoration: 'none' }}>
                 <span className="friends-name">{friend.firstName}</span>
               </Link>

@@ -27,14 +27,11 @@ export default function Topbar({ fetchAllUsers, socket }) {
   useEffect(() => {
     socket?.on("getNotification", async ({ senderId, postId, senderName, type }) => {
 
-      console.log('dd');
       setNotifications((prev) => [...prev, { senderId, postId, senderName, type }])
     })
   }, [socket])
 
-  console.log({ notifications });
-
-
+  
   return (
     <div className="topbar-wrapper py-3">
       <div className="container">
