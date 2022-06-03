@@ -9,7 +9,7 @@ import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import Rightbar from '../../components/rightbar/Rightbar';
 import { Spinner, Stack } from 'react-bootstrap';
 
-export default function Profile({ socket, onlineFriends, stopSpinner }) {
+export default function Profile({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
   const [allUsers, setAllUsers] = useState([])
@@ -58,7 +58,7 @@ export default function Profile({ socket, onlineFriends, stopSpinner }) {
             }
           </div>
           <div className="col-md-3">
-            <Rightbar stopSpinner={stopSpinner} onlineFriends={onlineFriends} />
+            <Rightbar stopSpinner={stopSpinner} onlineFriends={onlineFriends} {...{ isFriendsUpdated, updateCurrentUser }} />
           </div>
         </div>
       </div>

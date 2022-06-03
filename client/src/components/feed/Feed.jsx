@@ -23,7 +23,9 @@ const Feed = (props) => {
   const [postType, setPostType] = useState('public');
 
   //feed
-  const { user, token } = useContext(AuthContext)
+  // const { user, token } = useContext(AuthContext)
+  const { token } = useContext(AuthContext)
+  const [user, setUser] = useState(useContext(AuthContext).user)
   const [pageNumber, setPageNumber] = useState(1)
   const [query, setQuery] = useState('')
   const [newPosts, setNewPosts] = useState([])
@@ -147,12 +149,15 @@ const Feed = (props) => {
     URL.revokeObjectURL();
   }
 
-  // Force Re-render for friend profile view
-  // const [, updateState] = useState();
-  // const forceUpdate = useCallback(() => updateState({}), []);
-  // useEffect(() => {
-  //   forceUpdate();
-  // }, [user.username])
+  //current user refresh if profile pic has changed
+  useEffect(() => {
+    const refreshUser = async () => {
+      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${user._id}`, config);
+      setUser(data)
+    }
+
+    refreshUser();
+  }, [])
 
   return <>
     <div className='feed'>

@@ -5,7 +5,7 @@ import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from "../../context/AuthContext"
 import { Spinner, Stack } from 'react-bootstrap'
 
-function ChatOnline({ onlineFriends, selectConversation, stopSpinner }) {
+function ChatOnline({ onlineFriends, selectConversation, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser, token } = useContext(AuthContext)
 
@@ -55,6 +55,17 @@ function ChatOnline({ onlineFriends, selectConversation, stopSpinner }) {
     })
     setFriends(activeFriends)
   }, [getFriendsLoaded, onlineFriends])
+
+  //confirm || unfriend //need to re filter for both side users online friends
+  useEffect(() => {
+    const refreshUser = async () => {
+      //user friend list updated //onlineFriend should filter
+      const { data: updateUser } = await axios.get(`${API_URL}/api/v1/users/single?id=${currentUser._id}`, config);
+      updateCurrentUser(updateUser)
+    }
+
+    refreshUser();
+  }, [isFriendsUpdated])
 
   const handleClick = async (onlineF) => {
     try {

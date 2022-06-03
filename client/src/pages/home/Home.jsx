@@ -6,7 +6,7 @@ import Rightbar from '../../components/rightbar/Rightbar'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 
-export default function Home({ ToastContainer, toast, socket, onlineFriends, stopSpinner }) {
+export default function Home({ToastContainer, toast, socket, onlineFriends, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
   const { user: currentUser, token } = useContext(AuthContext)
 
   // useEffect(() => {
@@ -33,7 +33,7 @@ export default function Home({ ToastContainer, toast, socket, onlineFriends, sto
             <Feed socket={socket} username={currentUser.username} />
           </div>
           <div className="col-md-3">
-            <Rightbar stopSpinner={stopSpinner} socket={socket} onlineFriends={onlineFriends} />
+            <Rightbar stopSpinner={stopSpinner} socket={socket} onlineFriends={onlineFriends}  {...{isFriendsUpdated, updateCurrentUser}} />
           </div>
         </div>
       </div>

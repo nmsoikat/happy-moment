@@ -4,7 +4,7 @@ import Sidebar from '../../components/sidebar/Sidebar'
 import Feed from '../../components/feed/Feed'
 import Rightbar from '../../components/rightbar/Rightbar'
 import axios from 'axios'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { Button, Col, Modal, Nav, Row, Spinner, Tab } from 'react-bootstrap'
@@ -17,14 +17,15 @@ import CropEasy from '../../components/crop/CropEasy'
 import { DialogContent, DialogContentText, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 import EditIcon from '@mui/icons-material/Edit';
+import { getUpdatedUser } from '../../apiCalls'
 
-export default function Profile({ socket }) {
+export default function Profile({ socket, setIsFriendsUpdated }) {
   const navigation = useNavigate();
 
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams()
   const [user, setUser] = useState({})
-  const { user: currentUser, token } = useContext(AuthContext);
+  const { user: currentUser, token, dispatch } = useContext(AuthContext);
   const [friendsList, setFriendsList] = useState([]);
   const [friendsRequestList, setFriendsRequestList] = useState([]);
   const [friendsSentRequestList, setFriendsSentRequestList] = useState([]);
@@ -47,13 +48,13 @@ export default function Profile({ socket }) {
     }
   }
 
-  const handleChange = (e, cover=false) => {
+  const handleChange = (e, cover = false) => {
     const file = e.target.files[0];
     if (file) {
       setFile(file);
-      if(cover){
+      if (cover) {
         setPhotoCoverURL(URL.createObjectURL(file));
-      }else{
+      } else {
         setPhotoURL(URL.createObjectURL(file));
       }
       setOpenCrop(true);
@@ -76,9 +77,9 @@ export default function Profile({ socket }) {
         // data.profilePicture = fileName
         // data.userId = currentUser._id
 
-        if(isCover){
+        if (isCover) {
           await axios.put(`${API_URL}/api/v1/users/profile-cover/${currentUser._id}`, data, config)
-        }else{
+        } else {
           await axios.put(`${API_URL}/api/v1/users/profile-pic/${currentUser._id}`, data, config)
         }
 
@@ -98,6 +99,7 @@ export default function Profile({ socket }) {
     const fetchUser = async () => {
       const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
       setUser(data)
+      setPhotoCoverURL(PF + (data.coverPicture && 'personCover/' + data.coverPicture || 'person/noCover.png'))
       setPhotoURL(PF + (data.profilePicture && 'person/' + data.profilePicture || 'person/noAvatar.png'))
     }
 
@@ -124,6 +126,7 @@ export default function Profile({ socket }) {
     try {
       const { data } = await axios.put(`${API_URL}/api/v1/users/friends/${targetUserId}/unfriend`, {}, config)
       if (data.status === "success") {
+        setIsFriendsUpdated(true)
         gerFriends();
       }
     } catch (err) {
@@ -151,6 +154,7 @@ export default function Profile({ socket }) {
     try {
       const { data } = await axios.put(`${API_URL}/api/v1/users/friends/${targetUserId}/confirm-request`, {}, config)
       if (data.status === "success") {
+        setIsFriendsUpdated(true)
         gerFriendsRequest();
       }
 
@@ -187,6 +191,7 @@ export default function Profile({ socket }) {
       console.log(err);
     }
   }
+
   const cancelRequestHandler = async (e) => {
     // setLoading(true)
     // loading = true;
@@ -204,9 +209,20 @@ export default function Profile({ socket }) {
     }
   }
 
-  const relocating = () => {
-    navigation('/')
-    navigation('/profile/' + user.username)
+  //Re render the feed for friend profile view
+  const [loadFeed, setLoadFeed] = useState()
+  useEffect(() => {
+    setLoadFeed(false)
+    setTimeout(() => {
+      setLoadFeed(true)
+    }, 100)
+  }, [user.username])
+
+  const feedRerender = () => {
+    setLoadFeed(false)
+    setTimeout(() => {
+      setLoadFeed(true)
+    }, 100)
   }
 
   return (
@@ -231,7 +247,7 @@ export default function Profile({ socket }) {
                       onChange={(e) => handleChange(e, true)}
                     />
                   }
-                  <img className='profile-cover-img ' src={(user.coverPicture && PF + 'personCover/'+ user.coverPicture) || PF + 'person/noCover.png'} alt="" />
+                  <img className='profile-cover-img  shadow-sm bg-white' src={(photoCoverURL && photoCoverURL) || PF + 'person/noCover.png'} alt="" />
                   {/* <img className='profile-user-img' src={PF + 'person/' + user.profilePicture} alt="" /> */}
                 </label>
 
@@ -253,7 +269,7 @@ export default function Profile({ socket }) {
                         onChange={handleChange}
                       />
                     }
-                    <img className='profile-user-img' src={(photoURL && photoURL) || PF + 'person/noAvatar.png'} alt="" />
+                    <img className='profile-user-img shadow-sm bg-white' src={(photoURL && photoURL) || PF + 'person/noAvatar.png'} alt="" />
                     {/* <img className='profile-user-img' src={PF + 'person/' + user.profilePicture} alt="" /> */}
                   </label>
                 </div>
@@ -269,38 +285,38 @@ export default function Profile({ socket }) {
                 <Col md={9}>
                   <Tab.Content className='tab-content-wrap'>
                     <Tab.Pane eventKey="post">
-                      <Feed username={username} profile={true} isCurrentUser={user.username === currentUser.username} />
+                      {loadFeed && <Feed username={username} profile={true} isCurrentUser={user.username === currentUser.username} />}
                     </Tab.Pane>
-                    <Tab.Pane eventKey="friends">
+                    <Tab.Pane eventKey="friends" className="tab-pane-wrap" >
                       {
                         user.username === currentUser.username ?
                           <AllFriends friendsList={friendsList} unfriendHandler={unfriendHandler} />
                           : <div className='friend-list-hidden-text'>Friend List is hidden</div>
                       }
                     </Tab.Pane>
-                    <Tab.Pane eventKey="friendRequests">
+                    <Tab.Pane eventKey="friendRequests" className="tab-pane-wrap" >
                       {
                         user.username === currentUser.username ?
                           <AllFriendsRequest friendsRequestList={friendsRequestList} confirmRequestHandler={confirmRequestHandler} deleteRequestHandler={deleteRequestHandler} />
                           : <div className='friend-list-hidden-text'>Friend List is hidden</div>
                       }
                     </Tab.Pane>
-                    <Tab.Pane eventKey="sentRequests">
+                    <Tab.Pane eventKey="sentRequests" className="tab-pane-wrap" >
                       {
                         user.username === currentUser.username ?
                           <AllFriendsSentRequest friendsSentRequestList={friendsSentRequestList} cancelRequestHandler={cancelRequestHandler} />
                           : <div className='friend-list-hidden-text'>Friend List is hidden</div>
                       }
                     </Tab.Pane>
-                    <Tab.Pane eventKey="about">
+                    <Tab.Pane eventKey="about" className="tab-pane-wrap" >
                       <About user={user} />
                     </Tab.Pane>
                   </Tab.Content>
                 </Col>
                 <Col md={3}>
-                  <Nav variant="pills" className="flex-column tab-control">
+                  <Nav variant="pills" className="flex-column tab-control bg-white shadow-sm">
                     <Nav.Item>
-                      <Nav.Link onClick={relocating} eventKey="post">Posts</Nav.Link>
+                      <Nav.Link onClick={feedRerender} eventKey="post">Posts</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                       <Nav.Link onClick={gerFriends} eventKey="friends">Friends</Nav.Link>
@@ -322,7 +338,7 @@ export default function Profile({ socket }) {
         </div>
       </div>
 
-      {openCrop && <CropEasy {...{isCover, photoCoverURL, setPhotoCoverURL, handleSubmit, photoURL, setPhotoURL, setFile, setOpenCrop, show }} />}
+      {openCrop && <CropEasy {...{ isCover, photoCoverURL, setPhotoCoverURL, handleSubmit, photoURL, setPhotoURL, setFile, setOpenCrop, show }} />}
     </>
   );
 }

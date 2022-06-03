@@ -17,9 +17,11 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Spinner, Stack } from 'react-bootstrap';
 
 
-function Messenger({ socket, onlineFriends, stopSpinner }) {
+function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
-  const { user: currentUser, token } = useContext(AuthContext)
+  // const { user: currentUser, token } = useContext(AuthContext)
+  const { token } = useContext(AuthContext)
+  const [currentUser, setCurrentUser] = useState(useContext(AuthContext).user)
 
   const [allFriendsOfCurrentUser, setAllFriendsOfCurrentUser] = useState([])
 
@@ -28,7 +30,8 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
 
   const [notifications, setNotifications] = useState([]);
   const [notificationToggle, setNotificationToggle] = useState(false);
-  
+
+  const [convFriendSearch, setConvFriendSearch] = useState('');
   const [selectedConversation, setSelectedConversation] = useState({});
 
   const config = {
@@ -51,7 +54,7 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
   }
 
   const searchHandler = (e) => {
-    // setSearchValue()
+    setConvFriendSearch(e.target.value)
     fetchAllUsers(e.target.value)
   }
 
@@ -112,6 +115,8 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
     const { data } = await axios.post(`${API_URL}/api/v1/conversation/`, { senderId, receiverId }, config)
     if (data) {
       setNewConvCreated(true)
+      setConvFriendSearch('') //search box empty
+      setAllFriendsOfCurrentUser([]) //friend search result empty
     }
   }
 
@@ -212,8 +217,18 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
     setCurrentChat(c)
     setTargetId(c.members.find(mId => mId !== currentUser._id))
 
-    setSelectedConversation({conversationId: c._id, active: true})
+    setSelectedConversation({ conversationId: c._id, active: true })
   }
+
+  //current user refresh if profile pic has changed
+  useEffect(() => {
+    const refreshUser = async () => {
+      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${currentUser._id}`, config);
+      setCurrentUser(data)
+    }
+
+    refreshUser();
+  }, [])
 
 
   return (
@@ -226,7 +241,7 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
             </div>
             <div className="search-bar shadow-sm overflow-hidden bg-white">
               <Search className='search-icon' />
-              <input onChange={searchHandler} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
+              <input onChange={searchHandler} value={convFriendSearch} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
             </div>
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
               {
@@ -330,7 +345,7 @@ function Messenger({ socket, onlineFriends, stopSpinner }) {
 
 
             <div className={`chat-online-wrapper shadow-sm overflow-hidden bg-white mt-4 ${!isRightSideVisible && 'close'}`}>
-              <ChatOnline stopSpinner={stopSpinner} onlineFriends={onlineFriends} selectConversation={selectConversation} />
+              <ChatOnline stopSpinner={stopSpinner} onlineFriends={onlineFriends} selectConversation={selectConversation} {...{ isFriendsUpdated, updateCurrentUser }} />
             </div>
           </div>
         </div>

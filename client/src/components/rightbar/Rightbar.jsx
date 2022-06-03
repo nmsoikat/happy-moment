@@ -7,7 +7,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Spinner, Stack } from 'react-bootstrap';
 
-export default function Rightbar({ socket, onlineFriends, stopSpinner }) {
+export default function Rightbar({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
 
   const [friends, setFriends] = useState([]);
   const [getFriendsLoaded, setGetFriendsLoaded] = useState(false);
@@ -65,6 +65,17 @@ export default function Rightbar({ socket, onlineFriends, stopSpinner }) {
     setFriends(friendsAndActiveFriends)
     return () => { }
   }, [getFriendsLoaded, socket, onlineFriends])
+
+  //confirm || unfriend //need to re filter for both side users online friends
+  useEffect(() => {
+    const refreshUser = async () => {
+      //user friend list updated //onlineFriend should filter
+      const { data: updateUser } = await axios.get(`${API_URL}/api/v1/users/single?id=${currentUser._id}`, config);
+      updateCurrentUser(updateUser)
+    }
+
+    refreshUser();
+  }, [isFriendsUpdated])
 
   // const handleClick = async () => {
   //   try {

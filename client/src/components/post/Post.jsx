@@ -26,7 +26,9 @@ const Post = forwardRef(({ post, myRef, socket }) => {
 
   const PF = REACT_APP_PUBLIC_FOLDER;
 
-  const { user: currentUser, token } = useContext(AuthContext)
+  // const { user: currentUser, token } = useContext(AuthContext)
+  const { token } = useContext(AuthContext)
+  const [currentUser, setCurrentUser] = useState(useContext(AuthContext).user)
 
   const config = {
     headers: {
@@ -83,7 +85,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
           senderId: currentUser._id,
           receiverId: post.userId,
           postId: post._id,
-          senderName: currentUser.firstName + ' '+ currentUser.lastName,
+          senderName: currentUser.firstName + ' ' + currentUser.lastName,
           type: 'like',
         })
       }
@@ -100,7 +102,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
         senderId: currentUser._id,
         receiverId: post.userId,
         postId: post._id,
-        senderName: currentUser.firstName + ' '+ currentUser.lastName,
+        senderName: currentUser.firstName + ' ' + currentUser.lastName,
         type: 'comment',
       })
 
@@ -180,6 +182,16 @@ const Post = forwardRef(({ post, myRef, socket }) => {
     setIsPostTypeVisible({ visible: false, postId: '' })
     setDeletedPost({ postId, deleted: true })
   }
+
+  //current user refresh if profile pic has changed
+  useEffect(() => {
+    const refreshUser = async () => {
+      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${currentUser._id}`, config);
+      setCurrentUser(data)
+    }
+
+    refreshUser();
+  }, [])
 
   return <div ref={myRef} className={`post shadow-sm bg-white ${(deletedPost.postId === post._id && deletedPost.deleted) && 'd-none'}`}>
     <div className="post-wrapper">

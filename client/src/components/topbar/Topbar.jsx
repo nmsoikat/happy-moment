@@ -8,7 +8,9 @@ import axios from 'axios';
 import { Button } from '@mui/material';
 
 export default function Topbar({ fetchAllUsers, socket }) {
-  const { user, token } = useContext(AuthContext);
+  // const { user, token } = useContext(AuthContext)
+  const { token } = useContext(AuthContext)
+  const [user, setUser] = useState(useContext(AuthContext).user)
   const PF = REACT_APP_PUBLIC_FOLDER;
   const [notifications, setNotifications] = useState([]);
   const [notificationToggle, setNotificationToggle] = useState(false);
@@ -31,7 +33,16 @@ export default function Topbar({ fetchAllUsers, socket }) {
     })
   }, [socket])
 
-  
+  //current user refresh if profile pic has changed
+  useEffect(() => {
+    const refreshUser = async () => {
+      const { data } = await axios.get(`${API_URL}/api/v1/users/single?id=${user._id}`, config);
+      setUser(data)
+    }
+
+    refreshUser();
+  }, [])
+
   return (
     <div className="topbar-wrapper py-3">
       <div className="container">
