@@ -1,0 +1,1 @@
+module.exports.CLIENT_API = "https://gentle-wind.herokuapp.com"

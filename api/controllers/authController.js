@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken');
 const AppError = require('../utils/appError');
 const { promisify } = require('util')
 // const sendEmail = require('../utils/email_old')
-const Email = require('../utils/email')
+const Email = require('../utils/email');
+const { CLIENT_API } = require('../config/Constant');
 
 
 // generate jwt
@@ -170,7 +171,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send it to user's email
-  const resetUrl = `http://localhost:3000/reset-password/${resetToken}`
+  const resetUrl = `${CLIENT_API}/reset-password/${resetToken}`
   // const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
   // const textMessage = `Forgot your password? \n
   //                     Submit a PATCH request with your new-password and password confirm to: \n
