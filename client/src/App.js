@@ -30,7 +30,7 @@ function App() {
   //socket init
   useEffect(() => {
     if (currentUser?._id) {
-      setSocket(io('https://gentle-wind-socket.herokuapp.com'))
+      setSocket(io('ws://localhost:8900'))
     }
 
   }, [])

@@ -1,8 +1,8 @@
 
 const io = require('socket.io')(process.env.PORT || 8900, {
   cors: {
-    // origin: 'http://localhost:3000'
-    origin: 'https://gentle-wind.herokuapp.com'
+    origin: 'http://localhost:3000'
+    // origin: 'https://gentle-wind.herokuapp.com'
   }
 })
 
