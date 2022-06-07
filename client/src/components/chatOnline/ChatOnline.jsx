@@ -15,8 +15,10 @@ function ChatOnline({ onlineFriends, selectConversation, stopSpinner, isFriendsU
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   // get all friends of current users

@@ -1,4 +1,5 @@
 const Conversation = require('../models/Conversation');
+const GroupConversation = require('../models/GroupConversation');
 const User = require('../models/User');
 const AppError = require('../utils/appError');
 
@@ -32,12 +33,11 @@ exports.searchMyFriends = async (req, res) => {
   }
 }
 
-
 //new conversation
 exports.convCreateOne = async (req, res, next) => {
-  const exist = await Conversation.findOne({members: {$all: [req.body.senderId, req.body.receiverId]}})
-  if(exist){
-    return next( new AppError("conversation already created"))
+  const exist = await Conversation.findOne({ members: { $all: [req.body.senderId, req.body.receiverId] } })
+  if (exist) {
+    return next(new AppError("conversation already created"))
   }
 
   const newConversation = new Conversation({
@@ -56,7 +56,7 @@ exports.convCreateOne = async (req, res, next) => {
 //get conversation
 exports.convGetByUId = async (req, res) => {
   try {
-    const conversation = await Conversation.find({members: {$in: [req.params.userId]}})
+    const conversation = await Conversation.find({ members: { $in: [req.params.userId] } })
 
     res.status(200).json(conversation)
   } catch (err) {

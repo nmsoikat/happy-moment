@@ -19,8 +19,10 @@ export default function Profile({ socket, onlineFriends, stopSpinner, isFriendsU
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      }
+        // Authorization: `Bearer ${token}`,
+        'Access-Control-Allow-Origin': '*',
+      },
+      withCredentials: true
     }
 
     const res = searchValue ? await axios.get(`${API_URL}/api/v1/users?searchUser=${searchValue}`, config) : await axios.get(`${API_URL}/api/v1/users`, config)

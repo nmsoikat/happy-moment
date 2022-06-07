@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { convCreateOne, convGetByUId, convGetByTwoUId, searchMyFriends } = require('../controllers/conversationController');
+const { convCreateOne, convGetByUId, convGetByTwoUId, searchMyFriends, createNewChatGroup } = require('../controllers/conversationController');
 const { protect } = require('../controllers/authController');
 
 // get friends //search

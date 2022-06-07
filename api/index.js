@@ -18,6 +18,7 @@ const userRouter = require('./routes/userRouter');
 const postRouter = require('./routes/postRouter');
 const commentRouter = require('./routes/commentRouter');
 const conversationRouter = require('./routes/conversationRouter');
+const groupConversationRouter = require('./routes/groupConversationRouter');
 const messageRouter = require('./routes/messageRouter');
 
 // APP
@@ -44,7 +45,17 @@ app.use('/images', express.static(path.join(__dirname, "/public/images")))
 
 
 // MIDDLEWARE
-app.use(cors())
+let whitelist = ['http://localhost:3000'];
+let corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }, credentials: true
+}
+app.use(cors(corsOptions))
 app.use(express.json()) // body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -101,6 +112,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/conversation', conversationRouter);
+app.use('/api/v1/group-conversation', groupConversationRouter);
 app.use('/api/v1/message', messageRouter);
 
 app.get('/api/v1', (req, res) => {
@@ -119,6 +131,7 @@ if (process.env.NODE_ENV === 'production') {
     res.send('API is running (Development)')
   })
 }
+
 app.get('/', (req, res) => {
   res.send('API is running')
 })

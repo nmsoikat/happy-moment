@@ -6,7 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
 import axios from 'axios';
-import {API_URL} from '../../Constant'
+import { API_URL } from '../../Constant'
 
 const initialValues = {
   password: "",
@@ -23,13 +23,15 @@ const validationSchema = Yup.object().shape({
 
 export default function ResetPassword() {
   const { user, isFetching, error, dispatch, token } = useContext(AuthContext)
-  let { token:resetToken } = useParams();
+  let { token: resetToken } = useParams();
   const navigate = useNavigate()
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   const onSubmit = async (values) => {

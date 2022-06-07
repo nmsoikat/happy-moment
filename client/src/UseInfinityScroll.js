@@ -21,6 +21,7 @@ const UseInfinityScroll = (url='', params, config) => {
     axios.get(url, {
       params,
       headers:config.headers,
+      withCredentials: true,
       cancelToken: new axios.CancelToken(c => cancel = c)
     }).then(res => {
       setDocs(prev => {

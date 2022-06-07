@@ -17,8 +17,10 @@ export default function Rightbar({ socket, onlineFriends, stopSpinner, isFriends
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   // const [followed, setFollowed] = useState(currentUser.followings?.includes(user?._id))

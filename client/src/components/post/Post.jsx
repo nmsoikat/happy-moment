@@ -33,8 +33,10 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   // Reply

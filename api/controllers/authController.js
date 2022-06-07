@@ -32,7 +32,7 @@ const createSendToken = (user, statusCode, res) => {
     cookieOptions.secure = true // it is work only for https;
   }
 
-  res.cookie('jwt', token, cookieOptions);
+  res.status(200).cookie('jwt', token, cookieOptions);
 
 
   // Remove the password from the output
@@ -66,7 +66,10 @@ exports.userRegister = catchAsync(async (req, res, next) => {
   //check user
   const userExist = await User.findOne({ 'email': email })
   if (userExist) {
-    return next(new AppError("User already exist", 400))
+    return res.status(400).json({
+      status: false,
+      message: "User already exist."
+    })
   }
 
   const username = await generateUsername(email);
@@ -87,9 +90,17 @@ exports.userRegister = catchAsync(async (req, res, next) => {
   //send welcome mail
   // const url = `${req.protocol}://${req.get('host')}/profile/${newUser.username}`
   // await new Email(newUser, url).sendWelcome()
-  
+
   // after create an new account auto login
-  createSendToken(newUser, 201, res)
+  // createSendToken(newUser, 201, res)
+
+
+  // Remove the password from the output
+  newUser.password = undefined;
+  res.status(201).json({
+    status: true,
+    data: newUser
+  })
 })
 
 
@@ -171,18 +182,18 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send it to user's email
-  const resetUrl = `${CLIENT_API}/reset-password/${resetToken}`
-  // const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
-  // const textMessage = `Forgot your password? \n
-  //                     Submit a PATCH request with your new-password and password confirm to: \n
-  //                     ${resetUrl} \n
-  //                     If you did not forget your password please ignore this email!`
+  // const resetUrl = `https://localhost:8800/api/v1/auth/reset-password/${resetToken}`
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
+  const textMessage = `Forgot your password? \n
+                      Submit a PATCH request with your new-password and password confirm to: \n
+                      ${resetUrl} \n
+                      If you did not forget your password please ignore this email!`
   try {
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: 'Your password reset token (valid for only 10 minutes)',
-    //   textMessage
-    // })
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (valid for only 10 minutes)',
+      textMessage
+    })
 
     await new Email(user, resetUrl).sendResetPassword();
 
@@ -204,10 +215,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
   const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
-  const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpire: {$gt: Date.now()}});
+  const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpire: { $gt: Date.now() } });
 
   // 2) If token has not expired, and there is user, set the new password.
-  if(!user){
+  if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
   // hash password

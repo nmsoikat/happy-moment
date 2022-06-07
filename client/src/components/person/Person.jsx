@@ -13,8 +13,10 @@ export default function Person({ person }) {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   const sendFriendRequest = async (e) => {

@@ -34,8 +34,10 @@ const Feed = (props) => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
     },
+    withCredentials: true,
     onUploadProgress: (progressEvent) => {
       const { loaded, total } = progressEvent;
       let percent = Math.floor((loaded * 100) / total);

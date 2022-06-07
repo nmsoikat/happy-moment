@@ -44,8 +44,10 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   const handleChange = (e, cover = false) => {

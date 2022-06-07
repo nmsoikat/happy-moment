@@ -3,7 +3,7 @@ import Topbar from '../../components/topbar/Topbar'
 import Conversation from "../../components/conversation/Conversation"
 import Message from "../../components/message/Message"
 import ChatOnline from "../../components/chatOnline/ChatOnline"
-import { useContext, useEffect, useState, useRef } from "react"
+import { useContext, useEffect, useState, useRef, createRef } from "react"
 import { AuthContext } from "../../context/AuthContext"
 import axios from 'axios'
 // import { io } from "socket.io-client"
@@ -14,7 +14,11 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { Spinner, Stack } from 'react-bootstrap';
+import { Button, Modal, Spinner, Stack } from 'react-bootstrap';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import ToggleButton from 'react-bootstrap/ToggleButton'
+import { toast } from 'react-toastify';
+import GroupConversation from "../../components/groupConversation/GroupConversation"
 
 
 function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updateCurrentUser }) {
@@ -33,13 +37,19 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
 
   const [convFriendSearch, setConvFriendSearch] = useState('');
   const [selectedConversation, setSelectedConversation] = useState({});
-
+  const [messageTypeInputBoxRef, setMessageTypeInputBoxRef] = useState();
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
+
+  useEffect(() => {
+    setMessageTypeInputBoxRef(createRef())
+  }, [])
 
   const fetchAllUsers = async (searchValue) => {
     if (!searchValue) { setAllFriendsOfCurrentUser([]); return; }
@@ -138,7 +148,9 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
   useEffect(() => {
     const getMessage = async () => {
       try {
+        console.log(currentChat?._id);
         const { data } = await axios.get(`${API_URL}/api/v1/message/${currentChat?._id}`, config);
+        console.log(data);
         setMessages(data)
       } catch (err) {
         console.log(err);
@@ -169,7 +181,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
        * if we use value attribute then it will be read only field
        */
       setNewMessage(""); //reset text box  
-      e.target.value = "" //direct reset
+      messageTypeInputBoxRef.current.value = ''
     } catch (error) {
       console.log(error);
     }
@@ -231,6 +243,81 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
   }, [])
 
 
+  // -------- Create group -------------
+  const [createGroupModalShow, setCreateGroupModalShow] = useState(false);
+  const [allFriendsOfCurrentUserGroup, setAllFriendsOfCurrentUserGroup] = useState([])
+  const [selectedMembers, setSelectedMembers] = useState([])
+  const [groupName, setGroupName] = useState("")
+  const [myGroups, setMygroups] = useState([]);
+
+  const handleShow = () => setCreateGroupModalShow(true);
+  const handleClose = () => {
+    setSelectedMembers([])
+    setAllFriendsOfCurrentUserGroup([])
+    setCreateGroupModalShow(false)
+  };
+
+  const fetchAllUsersForGroup = async (searchValue) => {
+    if (!searchValue) { setAllFriendsOfCurrentUserGroup([]); return; }
+
+    const res = await axios.get(`${API_URL}/api/v1/conversation/friends?searchUser=${searchValue}`, config)
+
+    setAllFriendsOfCurrentUserGroup(
+      res.data.sort((p1, p2) => {
+        return new Date(p2.createdAt) - new Date(p1.createdAt)
+      })
+    )
+  }
+
+  const searchHandlerForGroup = (e) => {
+    fetchAllUsersForGroup(e.target.value)
+  }
+
+  const groupMemberHandler = (e) => {
+    const username = e.target.name
+    if (e.target.checked) {
+      setSelectedMembers((prev) => [...prev, username])
+    } else {
+      setSelectedMembers((prev) => prev.filter(item => item !== username))
+    }
+  }
+
+  const createGroupHandler = async () => {
+    const newGroup = {
+      groupName,
+      members: selectedMembers
+    }
+
+    try {
+      const { data } = await axios.post(`${API_URL}/api/v1/group-conversation`, newGroup, config)
+
+      if (data.success) {
+        toast.success(data.message)
+        setMygroups((prev) => [...prev, data.data])
+        handleClose()
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+  }
+
+  useEffect(() => {
+    const loadMygroups = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/api/v1/group-conversation`, config)
+        setMygroups(data.data)
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message)
+      }
+    }
+
+    loadMygroups()
+  }, [])
+
   return (
     <>
       <div className="container mt-3 h-100">
@@ -244,6 +331,53 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
               <input onChange={searchHandler} value={convFriendSearch} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
             </div>
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
+              <div className="group-create-button text-right">
+                <span className="text">Create Group</span>
+                <Button variant="outline-secondary" size="sm" onClick={handleShow}>
+                  <GroupAddIcon />
+                </Button>
+
+                <Modal show={createGroupModalShow} onHide={handleClose}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>
+                      <h5 className="create-group-text">Create Group Chat</h5>
+                      <input type="text" onChange={(e) => setGroupName(e.target.value)} name="group-name" id="" className="form-control w-100 group-name-input-box" placeholder="Group Name" required />
+                    </Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <div className="search-bar shadow-sm overflow-hidden bg-white">
+                      <Search className='search-icon' />
+                      <input onChange={searchHandlerForGroup} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
+                    </div>
+                    {
+                      allFriendsOfCurrentUserGroup.length > 0 &&
+                      <div className="searchConvResultWrap group">
+                        {
+                          allFriendsOfCurrentUserGroup.map(friend => (
+                            <label key={friend._id} className='current-friend'>
+                              <img className='post-profile-img' src={(friend.profilePicture && PF + 'person/' + friend.profilePicture) || PF + 'person/noAvatar.png'} alt="" />
+                              <div className="person-left-info">
+                                <span className="post-username">{friend.firstName + ' ' + friend.lastName}</span>
+
+                                <input type="checkbox" name={friend._id} onChange={groupMemberHandler} />
+                              </div>
+                            </label>
+                          ))
+                        }
+                      </div>
+                    }
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="outline-secondary" size="sm" onClick={handleClose}>
+                      Close
+                    </Button>
+                    <Button variant="outline-success" size="sm" onClick={createGroupHandler}>
+                      Create Group
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+
+              </div>
               {
                 allFriendsOfCurrentUser.length > 0 &&
                 <div className="searchConvResultWrap">
@@ -272,7 +406,23 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                     <Stack className="text-center my-3">
                       <Spinner className='mx-auto' animation="border" variant="primary" />
                     </Stack>
-                  )}
+                  )
+              }
+
+              {
+                myGroups.length > 0 ?
+                  myGroups.map((group) =>
+                    <div key={group._id} onClick={() => selectConversation(group)} className={`${(selectedConversation.conversationId === group._id && selectedConversation.active === true) ? 'selected' : ''}`} >
+                      <GroupConversation {...{ group }} />
+                    </div>
+                  )
+                  : (
+                    !stopSpinner &&
+                    <Stack className="text-center my-3">
+                      <Spinner className='mx-auto' animation="border" variant="primary" />
+                    </Stack>
+                  )
+              }
             </div>
           </div>
 
@@ -293,7 +443,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                         )}
                       </div>
                       <div className="chat-box-bottom">
-                        <input className="chat-message-input form-control rounded-pill" placeholder="write something..." onKeyUp={(e) => messageTypeHandler(e)} />
+                        <input ref={messageTypeInputBoxRef} className="chat-message-input form-control rounded-pill" placeholder="write something..." onKeyUp={(e) => messageTypeHandler(e)} />
                         <button className="ml-2 btn btn-sm btn-warning send-message-btn" onClick={newMessageHandler}><span>Send</span> <SendIcon /></button>
                       </div>
                     </>) : (<p className="no-conversation-text">Open a conversation to start chat</p>)

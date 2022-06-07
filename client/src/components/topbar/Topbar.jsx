@@ -18,8 +18,10 @@ export default function Topbar({ fetchAllUsers, socket }) {
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    }
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
   }
 
   const searchHandler = (e) => {
