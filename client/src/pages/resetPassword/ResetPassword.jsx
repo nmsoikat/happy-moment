@@ -7,6 +7,8 @@ import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
 import axios from 'axios';
 import { API_URL } from '../../Constant'
+import { toast } from 'react-toastify';
+
 
 const initialValues = {
   password: "",
@@ -35,8 +37,13 @@ export default function ResetPassword() {
   }
 
   const onSubmit = async (values) => {
-    await axios.patch(`${API_URL}/api/v1/auth/reset-password/${resetToken}`, { password: values.password }, config)
-    navigate('/login')
+    const {data}= await axios.patch(`${API_URL}/api/v1/auth/reset-password/${resetToken}`, { password: values.password }, config)
+    if(data.success){
+      toast.success(data.message)
+      navigate('/login')
+    }else{
+      toast.error(data.message)
+    }
   }
 
 

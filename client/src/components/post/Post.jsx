@@ -83,6 +83,8 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   useEffect(() => {
     if (isLikeClick) {
       if (isLike) {
+        if (post.userId === currentUser._id) return;
+
         socket?.emit("sendNotification", {
           senderId: currentUser._id,
           receiverId: post.userId,
@@ -100,6 +102,8 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   // set notification for comment
   useEffect(() => {
     if (isAnyComment) {
+      if (post.userId === currentUser._id) return;
+
       socket?.emit("sendNotification", {
         senderId: currentUser._id,
         receiverId: post.userId,

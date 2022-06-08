@@ -1,5 +1,6 @@
 const Post = require('../models/Post')
 const User = require('../models/User')
+const Comment = require('../models/Comment')
 const fs = require("fs")
 
 // create a post
@@ -55,21 +56,27 @@ exports.postDeleteById = async (req, res) => {
     if (post.userId.toString() === req.user._id.toString()) {
       await post.deleteOne()
       let url = `api/public/images/post/`
-      if(post.photo){
+      if (post.photo) {
         url = url + post.photo
-      }else if(post.video){
+      } else if (post.video) {
         url = url + post.video
       }
 
-      fs.unlink(url, (err) => {
-        if(err){
-          console.log(err);
-        }else{
-          console.log('file deleted success');
-        }
-      })
+      if (post.photo || post.video) {
+        fs.unlink(url, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('file deleted success');
+          }
+        })
+      }
 
-      res.status(200).json('post has been deleted');
+      await Comment.deleteMany({ postId: req.params.id })
+      res.status(200).json({
+        success: true,
+        message: 'Post has been deleted'
+      });
     } else {
       res.status(403).json('You can delete only our post')
     }
@@ -243,7 +250,7 @@ exports.postGetForTimelineTrending = async (req, res) => {
     // const currentUser = await User.findById(req.params.userId);
     // get 3 post for current user
     // const posts = await Post.find({ likes: { $size: 1 } })
-    const posts = await Post.find({postType: { $ne: 'private' }, "$expr":{$gte:[{$size:"$likes"},2]}})
+    const posts = await Post.find({ postType: { $ne: 'private' }, "$expr": { $gte: [{ $size: "$likes" }, 2] } })
       .populate({
         path: "comments",
         populate: {

@@ -174,7 +174,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   //1) Get user based on posted email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError("There is no user with email address.", 404))
+    return res.status(200).json({
+      success: false,
+      message: "There is no user with this email address!"
+    })
   }
 
   //2) Generate random reset token
@@ -182,23 +185,23 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send it to user's email
-  // const resetUrl = `https://localhost:8800/api/v1/auth/reset-password/${resetToken}`
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`
-  const textMessage = `Forgot your password? \n
-                      Submit a PATCH request with your new-password and password confirm to: \n
-                      ${resetUrl} \n
-                      If you did not forget your password please ignore this email!`
+  // const resetUrl = `https://localhost:3000/reset-password/${resetToken}`
+  const resetUrl = `${CLIENT_API}/reset-password/${resetToken}`
+  // const textMessage = `Forgot your password? \n
+  //                     Submit a PATCH request with your new-password and password confirm to: \n
+  //                     ${resetUrl} \n
+  //                     If you did not forget your password please ignore this email!`
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for only 10 minutes)',
-      textMessage
-    })
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Your password reset token (valid for only 10 minutes)',
+    //   textMessage
+    // })
 
     await new Email(user, resetUrl).sendResetPassword();
 
-    res.status(200).json({
-      status: 'success',
+    return res.status(200).json({
+      success: true,
       message: 'Token sent to email!'
     })
   } catch (err) {
@@ -207,7 +210,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpire = undefined;
     await user.save({ validateBeforeSave: false });
 
-    return next(new AppError('There was an error sending the email. Try again later!', 500));
+    return res.status(200).json({
+      success: false,
+      message: 'There was an error sending the email. Try again later!'
+    })
   }
 })
 
@@ -219,7 +225,10 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 2) If token has not expired, and there is user, set the new password.
   if (!user) {
-    return next(new AppError('Token is invalid or has expired', 400));
+    return res.json({
+      success: false,
+      message: "Token is invalid or has expired"
+    })
   }
   // hash password
   const salt = await bcrypt.genSalt(12);
@@ -232,7 +241,15 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //3) Update changePasswordAt property for the user
 
   //4) Login the user, send JWT
-  createSendToken(user, 201, res)
+  // createSendToken(user, 201, res)
+
+  // Remove the password from the output
+  user.password = undefined;
+
+  res.status(200).json({
+    success: true,
+    data: "Password reset success"
+  })
 })
 
 exports.logout = (req, res) => {

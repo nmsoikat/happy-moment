@@ -14,7 +14,7 @@ module.exports = class Email{
 
   //Create a transporter
   newTransport(){
-    if(process.env.NODE_ENV === 'production'){
+    // if(process.env.NODE_ENV === 'production'){
       // sendgrid
       return nodemailer.createTransport({
         service: 'SendGrid',
@@ -23,17 +23,17 @@ module.exports = class Email{
           pass: process.env.SENDGRID_PASSWORD,
         }
       })
-    }
+    // }
     
     //mailtrap inbox using nodemailer
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    })
+    // return nodemailer.createTransport({
+    //   host: process.env.EMAIL_HOST,
+    //   port: process.env.EMAIL_PORT,
+    //   auth: {
+    //     user: process.env.EMAIL_USERNAME,
+    //     pass: process.env.EMAIL_PASSWORD
+    //   }
+    // })
   }
 
   //actual send
@@ -60,7 +60,7 @@ module.exports = class Email{
 
   //Welcome Mail
   async sendWelcome(){
-    await this.send('welcome', 'Welcome to the our family!');
+    await this.send('welcome', 'Welcome to our family!');
   }
   
   //Forgot Password Mail

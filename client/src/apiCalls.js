@@ -7,8 +7,9 @@ export const loginCall = async (userCredential, dispatch) => {
   try {
     const { data } = await axios.post(`${API_URL}/api/v1/auth/login`, userCredential, {
       withCredentials: true,
-      headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'
-    }
+      headers: {
+        'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'
+      }
     });
     dispatch({ type: "LOGIN_SUCCESS", payload: data })
 
@@ -17,6 +18,6 @@ export const loginCall = async (userCredential, dispatch) => {
     window.location.assign('/')
   } catch (err) {
     dispatch({ type: "LOGIN_FAIL", payload: err })
-    toast.error("Login failed")
+    toast.error("Login failed. Please check Email/Password")
   }
 }

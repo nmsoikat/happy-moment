@@ -6,7 +6,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import TextError from "../../components/textError/TextError";
 import axios from 'axios';
-import {API_URL} from '../../Constant'
+import { API_URL } from '../../Constant'
+import { toast } from 'react-toastify';
+import "./forgotPassword.css"
 
 const initialValues = {
   email: "",
@@ -30,8 +32,13 @@ export default function ForgotPassword() {
   }
 
   const onSubmit = async (values) => {
-    await axios.post(`/auth/forgot-password`, { email: values.email }, config)
-    setIsMailSent(true)
+    const { data } = await axios.post(`${API_URL}/api/v1/auth/forgot-password`, { email: values.email }, config)
+    if (data.success) {
+      toast.success(data.message)
+      setIsMailSent(true)
+    } else {
+      toast.error(data.message)
+    }
   }
 
 
@@ -68,8 +75,8 @@ export default function ForgotPassword() {
                   />
                 </div>
 
-                <button className='login-btn w-100 mt-4' type='submit' disabled={isFetching}>
-                  {isFetching ? <CircularProgress color="inherit" size="20px" /> : !isMailSent ? "Send Reset Link": "Please Check Your Mail"}
+                <button className='login-btn w-100 mt-4 sendmail' type='submit' disabled={isMailSent}>
+                  {isFetching ? <CircularProgress color="inherit" size="20px" /> : !isMailSent ? "Send Reset Link" : "Please Check Your Mail"}
                 </button>
                 <Link to="/login"><span className="password-forgot">Cancel</span></Link>
               </div>
