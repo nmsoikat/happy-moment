@@ -7,6 +7,8 @@ import Profile from './pages/profile/Profile'
 import Trending from './pages/trending/Trending'
 import People from './pages/people/People'
 import Videos from './pages/videos/Videos'
+import VerifyEmail from './pages/verifyEmail/VerifyEmail';
+import SendVerificationEmail from './pages/sendVerificationEmail/SendVerificationEmail';
 
 import { Routes, Route } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react';
@@ -77,6 +79,8 @@ function App() {
         <Route path='/people' element={currentUser ? <People socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <Login />} />
         <Route path='/forgot-password' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ForgotPassword />} />
         <Route path='/reset-password/:token' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ResetPassword />} />
+        <Route path='/send-verification-email' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <SendVerificationEmail />} />
+        <Route path='/verify-email/:token' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <VerifyEmail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

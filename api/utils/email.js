@@ -68,4 +68,9 @@ module.exports = class Email{
     await this.send('passwordReset', 'Your password reset token (valid for only 10 minutes)');
   }
   
+  //Email Verification Mail
+  async sendEmailVerificationMail(){
+    await this.send('verifyEmail', 'Link valid for only 10 minutes');
+  }
+  
 }

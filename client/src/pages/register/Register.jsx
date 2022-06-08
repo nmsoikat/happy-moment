@@ -32,17 +32,32 @@ const validationSchema = Yup.object().shape({
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false)
+  const [isRegister, setIsRegister] = useState(false);
+
   const navigate = useNavigate()
 
   const onSubmit = async (values) => {
     try {
+      //register
       setIsLoading(true)
-      await axios.post(`${API_URL}/api/v1/auth/register`, values)
-      setIsLoading(false)
+      const register = await axios.post(`${API_URL}/api/v1/auth/register`, values)
 
-      toast.success("Registration Success!")
-      
-      navigate('/login')
+      if (register.data.success) {
+        //sent verification email
+        const { data } = await axios.post(`${API_URL}/api/v1/auth/verify-email`, { email: values.email })
+        if (data.success) {
+          toast.success(data.message)
+          setIsRegister(true)
+        } else {
+          toast.error(data.message)
+        }
+
+      } else {
+        toast.error(register.data.message)
+      }
+
+      setIsLoading(false)
+      // navigate('/login')
     } catch (error) {
       toast.error("Registration Failed!")
       console.log(error);
@@ -137,15 +152,28 @@ export default function Register() {
                     component={TextError}
                   />
                 </div>
-
-                <button className='login-btn w-100 mt-4' type='submit'>
-                  {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Sign Up"}
-                </button>
-                <button type='button' className='register-btn mx-auto d-block'>
-                  <Link to="/login" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
-                    {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Log Into Account"}
-                  </Link>
-                </button>
+                {
+                  !isRegister ? (
+                    <>
+                      <button className='login-btn w-100 mt-4' type='submit'>
+                        {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Sign Up"}
+                      </button>
+                      <button type='button' className='register-btn mx-auto d-block'>
+                        <Link to="/login" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
+                          {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Log Into Account"}
+                        </Link>
+                      </button>
+                    </>
+                  ) : (
+                    <p style={{
+                      margin: "10px auto",
+                      color: "#ffa803",
+                      fontSize: "18px",
+                      fontWeight: "500",
+                      textAlign: "center"
+                    }}>Please check your email. We have sent verification link to complete the registration</p>
+                  )
+                }
               </div>
             </Form>
           )}

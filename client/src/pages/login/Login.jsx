@@ -82,7 +82,11 @@ export default function Login() {
                   {isFetching ? <CircularProgress color="inherit" size="20px" /> : "Log In"}
                 </button>
 
-                <Link to="/forgot-password"><span className="password-forgot">Forgot Password?</span></Link>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Link to="/forgot-password"><span className="password-forgot">Forgot Password?</span></Link>
+                  <Link to="/send-verification-email"><span className="password-forgot ml-5">Verify Email</span></Link>
+                </div>
+                
                 <button className='register-btn mx-auto d-block'>
                   <Link to="/register" style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
                     {isFetching ? <CircularProgress color="inherit" size="20px" /> : "Create a New Account"}

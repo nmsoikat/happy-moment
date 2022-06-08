@@ -39,7 +39,7 @@ const createSendToken = (user, statusCode, res) => {
   user.password = undefined;
 
   res.status(statusCode).json({
-    status: 'success',
+    success: true,
     token,
     data: user
   })
@@ -65,9 +65,16 @@ exports.userRegister = catchAsync(async (req, res, next) => {
 
   //check user
   const userExist = await User.findOne({ 'email': email })
+  if (userExist && !userExist.isEmailVerified) {
+    return res.status(200).json({
+      success: false,
+      message: "Please verify your email to complete registration process"
+    })
+  }
+
   if (userExist) {
-    return res.status(400).json({
-      status: false,
+    return res.status(200).json({
+      success: false,
       message: "User already exist."
     })
   }
@@ -98,8 +105,9 @@ exports.userRegister = catchAsync(async (req, res, next) => {
   // Remove the password from the output
   newUser.password = undefined;
   res.status(201).json({
-    status: true,
-    data: newUser
+    success: true,
+    data: newUser,
+    message: "New user registered. Mail not verified yet"
   })
 })
 
@@ -116,6 +124,14 @@ exports.userLogin = catchAsync(async (req, res, next) => {
 
   // 2) match email and password with db
   const user = await User.findOne({ email })
+
+  if (!user.isEmailVerified) {
+    return res.status(200).json({
+      success: false,
+      message: "Please verify your email address"
+    })
+  }
+
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
@@ -251,6 +267,78 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     data: "Password reset success"
   })
 })
+
+
+//SEND VERIFICATION MAIL
+exports.sendEmailVerificationLink = catchAsync(async (req, res, next) => {
+  //1) Get user based on posted email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    res.status(200).json({
+      success: false,
+      message: "User not found with this email. Please create an account"
+    })
+  }
+
+  if (user.isEmailVerified) {
+    res.status(200).json({
+      success: false,
+      message: "Email is already verified"
+    })
+  }
+
+  //2) Generate random reset token
+  const resetToken = user.createEmailVerificationToken();
+  await user.save({ validateBeforeSave: false });
+
+  //3) Send it to user's email
+  const resetUrl = `${CLIENT_API}/verify-email/${resetToken}`
+
+  try {
+    await new Email(user, resetUrl).sendEmailVerificationMail();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification link has sent'
+    })
+  } catch (err) {
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      success: false,
+      message: 'There was an error sending the email. Try again later!'
+    })
+  }
+})
+
+//EMAIL VERIFICATION COMPLETE
+exports.emailVerificationComplete = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+  const user = await User.findOne({ emailVerificationToken: hashedToken, emailVerificationExpires: { $gt: Date.now() } });
+
+  // 2) If token has not expired, and there is user, set the new password.
+  if (!user) {
+    return res.json({
+      success: false,
+      message: "Link is invalid or has expired"
+    })
+  }
+
+  //verified
+  user.isEmailVerified = true
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    data: "Email verification complete"
+  })
+})
+
 
 exports.logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {

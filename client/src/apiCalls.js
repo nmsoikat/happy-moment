@@ -11,11 +11,17 @@ export const loginCall = async (userCredential, dispatch) => {
         'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'
       }
     });
-    dispatch({ type: "LOGIN_SUCCESS", payload: data })
 
-    localStorage.setItem('currentUser', JSON.stringify(data.data))
-    // localStorage.setItem('token', JSON.stringify(data.token))
-    window.location.assign('/')
+    if (data.success) {
+      dispatch({ type: "LOGIN_SUCCESS", payload: data })
+
+      localStorage.setItem('currentUser', JSON.stringify(data.data))
+      // localStorage.setItem('token', JSON.stringify(data.token))
+      window.location.assign('/')
+    } else {
+      dispatch({ type: "LOGIN_FAIL", payload: { message: data.message } })
+      toast.error(data.message)
+    }
   } catch (err) {
     dispatch({ type: "LOGIN_FAIL", payload: err })
     toast.error("Login failed. Please check Email/Password")
