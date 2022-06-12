@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { protect } = require('../controllers/authController');
-const {sendFriendRequest, userUpdateById, userProfileImgUpdateById,usernameUpdateById, userDeleteById, userGetByIdOrUsername, userFollow, userUnfollow, usersGetAll, userGetFriends, confirmFriendRequest, deleteFriendRequest, cancelFriendRequest, userGetFriendsSentReq, userGetFriendsReq, unfriendUser } = require('../controllers/userController');
+const {sendFriendRequest, userUpdateById, userProfileImgUpdateById,usernameUpdateById, userUpdatePasswordById, userDeleteById, userGetByIdOrUsername, userFollow, userUnfollow, usersGetAll, userGetFriends, confirmFriendRequest, deleteFriendRequest, cancelFriendRequest, userGetFriendsSentReq, userGetFriendsReq, unfriendUser } = require('../controllers/userController');
 const { setDestination, uploadFile } = require('../middlewares/fileUploadMiddleware');
 
 
@@ -10,6 +10,9 @@ router.get('/', protect, usersGetAll)
 
 // GET All Users
 router.get('/single', userGetByIdOrUsername)
+
+// UPDATE PASSWORD  
+router.put('/change-password/:id', protect, userUpdatePasswordById)
 
 // UPDATE PROFILE PICTURE
 router.put('/profile-pic/:id', protect, setDestination('/images/person'), uploadFile, userProfileImgUpdateById)

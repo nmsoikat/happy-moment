@@ -311,7 +311,7 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
                       }
                     </Tab.Pane>
                     <Tab.Pane eventKey="about" className="tab-pane-wrap" >
-                      <About user={user} />
+                      <About user={user} isCurrentUser={user.username === currentUser.username} />
                     </Tab.Pane>
                   </Tab.Content>
                 </Col>

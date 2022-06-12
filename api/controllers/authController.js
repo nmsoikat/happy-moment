@@ -24,7 +24,7 @@ const createSendToken = (user, statusCode, res) => {
 
   // set HTTP Only Cookie // expire in 30d
   const cookieOptions = {
-    expire: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    expire: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     httpOnly: true
   }
 
@@ -274,14 +274,14 @@ exports.sendEmailVerificationLink = catchAsync(async (req, res, next) => {
   //1) Get user based on posted email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    res.status(200).json({
+    return res.status(200).json({
       success: false,
       message: "User not found with this email. Please create an account"
     })
   }
 
   if (user.isEmailVerified) {
-    res.status(200).json({
+    return res.status(200).json({
       success: false,
       message: "Email is already verified"
     })
@@ -302,6 +302,7 @@ exports.sendEmailVerificationLink = catchAsync(async (req, res, next) => {
       message: 'Verification link has sent'
     })
   } catch (err) {
+    console.log(err);
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
     await user.save({ validateBeforeSave: false });

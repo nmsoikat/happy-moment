@@ -51,6 +51,45 @@ exports.userGetByIdOrUsername = async (req, res) => {
   }
 }
 
+exports.userUpdatePasswordById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body
+
+    if (req.user.id !== id) {
+      return next(new AppError("You can update only your account!", 400))
+    }
+
+    // 1) check password
+    if (!currentPassword) {
+      return next(new AppError("Please provide password", 400))
+    }
+
+    // 2) match email and password with db
+    const user = await User.findById(id)
+
+    if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+      return res.json({
+        success: false,
+        message: "Incorrect current password"
+      })
+    }
+
+    // hash password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+    await user.updateOne({ password: hashedPassword })
+
+    res.status(200).json({
+      success: true,
+      message: "Password change successfully"
+    })
+  } catch (err) {
+    return res.status(500).json(err)
+  }
+}
+
 // UPDATE PROFILE PICTURE
 exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
   if (!req.file) {
@@ -90,7 +129,7 @@ exports.userProfileImgUpdateById = catchAsync(async (req, res, next) => {
 // UPDATE USER
 exports.userUpdateById = catchAsync(async (req, res, next) => {
   //only logged in user
-  if (req.body.userId !== req.params.id) {
+  if (req.user.id.toString() !== req.params.id) {
     return next(new AppError("You can update only your account!", 400))
   }
 
@@ -104,7 +143,7 @@ exports.userUpdateById = catchAsync(async (req, res, next) => {
   user.password = undefined;
 
   res.status(200).json({
-    status: 'success',
+    success: true,
     data: user
   })
 })

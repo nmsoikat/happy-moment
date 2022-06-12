@@ -61,15 +61,18 @@ const UserSchema = mongoose.Schema({
   },
   desc: {
     type: String,
-    maxLength: 50,
+    maxLength: 100,
+    default: ''
   },
   livesIn: {
     type: String,
-    maxLength: 50
+    maxLength: 100,
+    default: ''
   },
   from: {
     type: String,
-    maxLength: 50
+    maxLength: 100,
+    default: ''
   },
   relationship: {
     type: Number,
@@ -83,7 +86,7 @@ const UserSchema = mongoose.Schema({
   changePasswordAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  
+
   isEmailVerified: {
     type: Boolean,
     default: false
