@@ -86,6 +86,8 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
 
   // new message through socket server
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  // message count
+  const [sendersIds, setSendersIds] = useState([]);
 
 
   // online users
@@ -104,6 +106,8 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
         text,
         conversationId: Date.now()
       })
+
+      setSendersIds((prev) => [...prev, senderId])
     })
 
   }, [socket])
@@ -230,6 +234,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
     setTargetId(c.members.find(mId => mId !== currentUser._id))
 
     setSelectedConversation({ conversationId: c._id, active: true })
+    setSendersIds([])
   }
 
   //current user refresh if profile pic has changed
@@ -398,7 +403,9 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                 conversations.length > 0 ?
                   conversations.map((c, index) =>
                     <div className={`${(selectedConversation.conversationId === c._id && selectedConversation.active === true) ? 'selected' : ''}`} key={index} onClick={() => selectConversation(c)}>
-                      <Conversation onlineFriends={onlineFriends} conversation={c} />
+                      <Conversation messageCount={c.members.map((memberId) => {
+                        return sendersIds.filter(id => id === memberId).length;
+                      })} isSelected={(selectedConversation.conversationId === c._id && selectedConversation.active === true)} onlineFriends={onlineFriends} conversation={c} />
                     </div>
                   )
                   : (

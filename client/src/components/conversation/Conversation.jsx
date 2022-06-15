@@ -4,7 +4,7 @@ import './conversation.css'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from '../../context/AuthContext'
 
-function Conversation({ onlineFriends, conversation }) {
+function Conversation({ messageCount, isSelected, onlineFriends, conversation }) {
   const { user: currentUser, token } = useContext(AuthContext)
   const [user, setUser] = useState({})
   const [userLoaded, setUserLoaded] = useState(false)
@@ -20,7 +20,7 @@ function Conversation({ onlineFriends, conversation }) {
     withCredentials: true
   }
 
-//find conversation user
+  //find conversation user
   useEffect(() => {
     const findId = conversation.members.find(mId => mId !== currentUser._id)
     setConversationUserId(findId)
@@ -52,6 +52,10 @@ function Conversation({ onlineFriends, conversation }) {
         {user?.active && <div className="chat-online-badge"></div>}
       </div>
       <span className="chat-online-name">{(user.firstName && user.firstName) + ' ' + (user.lastName && user.lastName)}</span>
+      {
+        (messageCount[0] === 0 && messageCount[1] === 0) ? '' : (isSelected) ? '' : <div className='chat-message-count'>{messageCount[0] !== 0 ? messageCount[0] : messageCount[1]}</div>
+      }
+      {/* {(!messageCount[0] || !isSelected) && <div className='chat-message-count'>{messageCount[0] ? messageCount[0] : messageCount[1]}</div>} */}
     </div>
   )
 }
