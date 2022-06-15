@@ -4,7 +4,7 @@ import './groupConversation.css'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { AuthContext } from '../../context/AuthContext'
 
-function Conversation({ onlineFriends, group }) {
+function GroupConversation({ onlineFriends, group }) {
   //   const { user: currentUser, token } = useContext(AuthContext)
   //   const [user, setUser] = useState({})
   //   const [userLoaded, setUserLoaded] = useState(false)
@@ -62,4 +62,4 @@ function Conversation({ onlineFriends, group }) {
   )
 }
 
-export default Conversation
+export default GroupConversation

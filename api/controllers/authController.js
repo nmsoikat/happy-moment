@@ -271,6 +271,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 //SEND VERIFICATION MAIL
 exports.sendEmailVerificationLink = catchAsync(async (req, res, next) => {
+
   //1) Get user based on posted email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -338,6 +339,75 @@ exports.emailVerificationComplete = catchAsync(async (req, res, next) => {
     success: true,
     data: "Email verification complete"
   })
+})
+
+exports.sendEmailVerificationLinkForNewMail = catchAsync(async (req, res, next) => {
+  const user = {
+    firstName: req.body.firstName,
+    email: req.body.email
+  }
+
+  const currentUser = await User.findById(req.user.id)
+
+  //1) Generate random reset token
+  const resetToken = currentUser.createEmailVerificationToken();
+  await currentUser.save({ validateBeforeSave: false });
+
+  //2) Send it to user's email
+  const resetUrl = `${CLIENT_API}/verify-email/new/${resetToken}`
+
+  await currentUser.updateOne({ newEmail: req.body.email });
+
+  try {
+    await new Email(user, resetUrl).sendEmailVerificationMail();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification link has sent'
+    })
+  } catch (err) {
+    console.log(err);
+    currentUser.emailVerificationToken = undefined;
+    currentUser.emailVerificationExpires = undefined;
+    await currentUser.save({ validateBeforeSave: false });
+
+    return res.status(200).json({
+      success: false,
+      message: 'There was an error sending the email. Try again later!'
+    })
+  }
+})
+
+
+
+exports.emailVerificationCompleteForNewMail = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+  const user = await User.findOne({ emailVerificationToken: hashedToken, emailVerificationExpires: { $gt: Date.now() } });
+
+  // 2) If token has not expired, and there is user, set the new password.
+  if (!user) {
+    return res.json({
+      success: false,
+      message: "Link is invalid or has expired"
+    })
+  }
+
+  //verified
+  user.email = user.newEmail
+  user.isEmailVerified = true
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  user.newEmail = undefined
+  await user.save();
+
+  console.log(user);
+  
+  res.status(200).json({
+    success: true,
+    data: "Email verification complete"
+  })
+
 })
 
 

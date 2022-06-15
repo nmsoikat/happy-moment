@@ -46,7 +46,7 @@ const changePasswordValidationSchema = Yup.object().shape({
 });
 
 
-function About({ user, isCurrentUser }) {
+function About({ user, isCurrentUser, setFirstName: setProfileFirstName, setLastName: setProfileLastName, setDesc: setProfileDesc, setIsGeneralInfoUpdate }) {
   const [isLoading, setIsLoading] = useState()
   const [generalInfoToggle, setGeneralInfoToggle] = useState(false)
   const [changeEmailToggle, setChangeEmailToggle] = useState(false)
@@ -57,6 +57,8 @@ function About({ user, isCurrentUser }) {
   const [desc, setDesc] = useState(user.desc)
   const [livesIn, setLivesIn] = useState(user.livesIn)
   const [from, setFrom] = useState(user.from)
+
+  const [isMailSent, setIsMailSent] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(useContext(AuthContext).user)
   const config = {
@@ -95,6 +97,17 @@ function About({ user, isCurrentUser }) {
     try {
       const { data } = await axios.patch(`${API_URL}/api/v1/users/${currentUser._id}`, info, config)
       if (data.success) {
+        //profile state update
+        setProfileFirstName(data.data.firstName)
+        setProfileLastName(data.data.lastName)
+        setProfileDesc(data.data.desc)
+        setIsGeneralInfoUpdate(true)
+
+        //about section update
+        setFirstName(data.data.firstName)
+        setLastName(data.data.lastName)
+
+        setGeneralInfoToggle(false)
         toast.success("Information updated successfully")
       }
     } catch (err) {
@@ -102,8 +115,19 @@ function About({ user, isCurrentUser }) {
     }
   }
 
-  const changeEmailSubmit = (values) => {
+  const changeEmailSubmit = async (values) => {
+    const info = {
+      email: values.email,
+      firstName: currentUser.firstName
+    }
 
+    const { data } = await axios.post(`${API_URL}/api/v1/auth/verify-email/new`, info, config)
+    if (data.success) {
+      toast.success(data.message)
+      setIsMailSent(true)
+    } else {
+      toast.error(data.message)
+    }
   }
 
   const changePasswordSubmit = async (values) => {
@@ -130,7 +154,7 @@ function About({ user, isCurrentUser }) {
             <Form>
               <div className="about-info-item">
                 <span className="about-info-key">First Name:</span>
-                {!generalInfoToggle && <span className="about-info-value">{user.firstName}</span>}
+                {!generalInfoToggle && <span className="about-info-value">{firstName}</span>}
                 {
                   generalInfoToggle && (
                     <div className='gi-field-wrap' >
@@ -149,7 +173,7 @@ function About({ user, isCurrentUser }) {
               </div>
               <div className="about-info-item">
                 <span className="about-info-key">Last Name:</span>
-                {!generalInfoToggle && <span className="about-info-value">{user.lastName}</span>}
+                {!generalInfoToggle && <span className="about-info-value">{lastName}</span>}
                 {
                   generalInfoToggle && (
                     <div className='gi-field-wrap' >
@@ -169,7 +193,7 @@ function About({ user, isCurrentUser }) {
               </div>
               <div className="about-info-item">
                 <span className="about-info-key">Bio:</span>
-                {!generalInfoToggle && <span className="about-info-value">{user.desc}</span>}
+                {!generalInfoToggle && <span className="about-info-value">{desc}</span>}
                 {
                   generalInfoToggle &&
                   (<div className='' >
@@ -188,7 +212,7 @@ function About({ user, isCurrentUser }) {
               </div>
               <div className="about-info-item">
                 <span className="about-info-key">Present Address:</span>
-                {!generalInfoToggle && <span className="about-info-value">{user.livesIn}</span>}
+                {!generalInfoToggle && <span className="about-info-value">{livesIn}</span>}
                 {
                   generalInfoToggle && (
                     <div className='' >
@@ -208,7 +232,7 @@ function About({ user, isCurrentUser }) {
               </div>
               <div className="about-info-item">
                 <span className="about-info-key">Permanent Address:</span>
-                {!generalInfoToggle && <span className="about-info-value">{user.from}</span>}
+                {!generalInfoToggle && <span className="about-info-value">{from}</span>}
                 {
                   generalInfoToggle && (
                     <div className='' >
@@ -229,7 +253,7 @@ function About({ user, isCurrentUser }) {
               {
                 generalInfoToggle && (
                   <>
-                    <button className='btn btn-sm btn-outline-secondary' type='reset' onClick={() => setGeneralInfoToggle(false)}>Cancel</button>
+                    <button className={`btn btn-sm btn-outline-secondary`} disabled={isMailSent} type='reset' onClick={() => setGeneralInfoToggle(false)}>Cancel</button>
                     <button className='btn btn-sm btn-success' style={{ marginLeft: "10px" }} type='submit' disabled={isLoading}>
                       {isLoading ? <CircularProgress color="inherit" size="20px" /> : "Save Change"}
                     </button>

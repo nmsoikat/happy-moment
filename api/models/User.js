@@ -93,6 +93,7 @@ const UserSchema = mongoose.Schema({
   },
   emailVerificationToken: String,
   emailVerificationExpires: Date,
+  newEmail:String,
 
 }, { timestamps: true })
 

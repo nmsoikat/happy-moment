@@ -244,79 +244,79 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
 
 
   // -------- Create group -------------
-  const [createGroupModalShow, setCreateGroupModalShow] = useState(false);
-  const [allFriendsOfCurrentUserGroup, setAllFriendsOfCurrentUserGroup] = useState([])
-  const [selectedMembers, setSelectedMembers] = useState([])
-  const [groupName, setGroupName] = useState("")
-  const [myGroups, setMygroups] = useState([]);
+  // const [createGroupModalShow, setCreateGroupModalShow] = useState(false);
+  // const [allFriendsOfCurrentUserGroup, setAllFriendsOfCurrentUserGroup] = useState([])
+  // const [selectedMembers, setSelectedMembers] = useState([])
+  // const [groupName, setGroupName] = useState("")
+  // const [myGroups, setMygroups] = useState([]);
 
-  const handleShow = () => setCreateGroupModalShow(true);
-  const handleClose = () => {
-    setSelectedMembers([])
-    setAllFriendsOfCurrentUserGroup([])
-    setCreateGroupModalShow(false)
-  };
+  // const handleShow = () => setCreateGroupModalShow(true);
+  // const handleClose = () => {
+  //   setSelectedMembers([])
+  //   setAllFriendsOfCurrentUserGroup([])
+  //   setCreateGroupModalShow(false)
+  // };
 
-  const fetchAllUsersForGroup = async (searchValue) => {
-    if (!searchValue) { setAllFriendsOfCurrentUserGroup([]); return; }
+  // const fetchAllUsersForGroup = async (searchValue) => {
+  //   if (!searchValue) { setAllFriendsOfCurrentUserGroup([]); return; }
 
-    const res = await axios.get(`${API_URL}/api/v1/conversation/friends?searchUser=${searchValue}`, config)
+  //   const res = await axios.get(`${API_URL}/api/v1/conversation/friends?searchUser=${searchValue}`, config)
 
-    setAllFriendsOfCurrentUserGroup(
-      res.data.sort((p1, p2) => {
-        return new Date(p2.createdAt) - new Date(p1.createdAt)
-      })
-    )
-  }
+  //   setAllFriendsOfCurrentUserGroup(
+  //     res.data.sort((p1, p2) => {
+  //       return new Date(p2.createdAt) - new Date(p1.createdAt)
+  //     })
+  //   )
+  // }
 
-  const searchHandlerForGroup = (e) => {
-    fetchAllUsersForGroup(e.target.value)
-  }
+  // const searchHandlerForGroup = (e) => {
+  //   fetchAllUsersForGroup(e.target.value)
+  // }
 
-  const groupMemberHandler = (e) => {
-    const username = e.target.name
-    if (e.target.checked) {
-      setSelectedMembers((prev) => [...prev, username])
-    } else {
-      setSelectedMembers((prev) => prev.filter(item => item !== username))
-    }
-  }
+  // const groupMemberHandler = (e) => {
+  //   const username = e.target.name
+  //   if (e.target.checked) {
+  //     setSelectedMembers((prev) => [...prev, username])
+  //   } else {
+  //     setSelectedMembers((prev) => prev.filter(item => item !== username))
+  //   }
+  // }
 
-  const createGroupHandler = async () => {
-    const newGroup = {
-      groupName,
-      members: selectedMembers
-    }
+  // const createGroupHandler = async () => {
+  //   const newGroup = {
+  //     groupName,
+  //     members: selectedMembers
+  //   }
 
-    try {
-      const { data } = await axios.post(`${API_URL}/api/v1/group-conversation`, newGroup, config)
+  //   try {
+  //     const { data } = await axios.post(`${API_URL}/api/v1/group-conversation`, newGroup, config)
 
-      if (data.success) {
-        toast.success(data.message)
-        setMygroups((prev) => [...prev, data.data])
-        handleClose()
-      } else {
-        toast.error(data.message)
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message)
-    }
-  }
+  //     if (data.success) {
+  //       toast.success(data.message)
+  //       setMygroups((prev) => [...prev, data.data])
+  //       handleClose()
+  //     } else {
+  //       toast.error(data.message)
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error(error.message)
+  //   }
+  // }
 
-  useEffect(() => {
-    const loadMygroups = async () => {
-      try {
-        const { data } = await axios.get(`${API_URL}/api/v1/group-conversation`, config)
-        setMygroups(data.data)
-      } catch (error) {
-        console.log(error);
-        toast.error(error.message)
-      }
-    }
+  // useEffect(() => {
+  //   const loadMygroups = async () => {
+  //     try {
+  //       const { data } = await axios.get(`${API_URL}/api/v1/group-conversation`, config)
+  //       setMygroups(data.data)
+  //     } catch (error) {
+  //       console.log(error);
+  //       toast.error(error.message)
+  //     }
+  //   }
 
-    loadMygroups()
-  }, [])
+  //   loadMygroups()
+  // }, [])
 
   return (
     <>
@@ -331,7 +331,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
               <input onChange={searchHandler} value={convFriendSearch} type="text" className="search-input border-0 fw-light ps-1" placeholder="Search smiley people :)" />
             </div>
             <div className="conv-friends-wrapper shadow-sm overflow-hidden bg-white mt-4">
-              <div className="group-create-button text-right">
+              {/* <div className="group-create-button text-right">
                 <span className="text">Create Group</span>
                 <Button variant="outline-secondary" size="sm" onClick={handleShow}>
                   <GroupAddIcon />
@@ -377,7 +377,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                   </Modal.Footer>
                 </Modal>
 
-              </div>
+              </div> */}
               {
                 allFriendsOfCurrentUser.length > 0 &&
                 <div className="searchConvResultWrap">
@@ -409,7 +409,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                   )
               }
 
-              {
+              {/* {
                 myGroups.length > 0 ?
                   myGroups.map((group) =>
                     <div key={group._id} onClick={() => selectConversation(group)} className={`${(selectedConversation.conversationId === group._id && selectedConversation.active === true) ? 'selected' : ''}`} >
@@ -422,7 +422,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
                       <Spinner className='mx-auto' animation="border" variant="primary" />
                     </Stack>
                   )
-              }
+              } */}
             </div>
           </div>
 

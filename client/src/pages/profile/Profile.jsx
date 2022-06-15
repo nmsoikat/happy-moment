@@ -36,6 +36,11 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
   const [photoCoverURL, setPhotoCoverURL] = useState(PF + (currentUser.coverPicture && 'personCover/' + currentUser.coverPicture || 'person/noCover.png'));
   const [openCrop, setOpenCrop] = useState(false);
 
+  const [firstName, setFirstName] = useState(currentUser.firstName);
+  const [lastName, setLastName] = useState(currentUser.lastName);
+  const [desc, setDesc] = useState(currentUser.desc);
+  const [isGeneralInfoUpdate, setIsGeneralInfoUpdate] = useState(false);
+
   const [show, setShow] = useState(false);
   const [isCover, setIsCover] = useState(false);
 
@@ -96,17 +101,38 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
 
   };
 
+  // current user profile by id
+  useEffect(() => {
+    if (!isGeneralInfoUpdate)
+      return () => { }
+
+    const fetchUser = async () => {
+      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${currentUser._id}`);
+      console.log("current user ", data);
+      setFirstName(data.firstName)
+      setLastName(data.lastName)
+      setDesc(data.desc)
+    }
+
+    fetchUser();
+  }, [isGeneralInfoUpdate])
+
   // user profile by username
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
+      console.log("user profile", data);
       setUser(data)
+      setFirstName(data.firstName)
+      setLastName(data.lastName)
+      setDesc(data.desc)
       setPhotoCoverURL(PF + (data.coverPicture && 'personCover/' + data.coverPicture || 'person/noCover.png'))
       setPhotoURL(PF + (data.profilePicture && 'person/' + data.profilePicture || 'person/noAvatar.png'))
     }
 
     fetchUser();
   }, [username])
+
 
   // ------------------------ Friends -----------------------
   const gerFriends = async () => {
@@ -277,8 +303,8 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
                 </div>
               </div>
               <div className="profile-info">
-                <h4 className="profile-info-name">{user ? user.firstName + " " + user.lastName : '...'}</h4>
-                <p className="profile-info-desc">{user ? user.desc : '...'}</p>
+                <h4 className="profile-info-name">{user ? firstName + " " + lastName : '...'}</h4>
+                <p className="profile-info-desc">{user ? desc : '...'}</p>
               </div>
             </div>
 
@@ -311,7 +337,7 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
                       }
                     </Tab.Pane>
                     <Tab.Pane eventKey="about" className="tab-pane-wrap" >
-                      <About user={user} isCurrentUser={user.username === currentUser.username} />
+                      <About {...{ setFirstName, setLastName, setDesc, setIsGeneralInfoUpdate }} user={user} isCurrentUser={user.username === currentUser.username} />
                     </Tab.Pane>
                   </Tab.Content>
                 </Col>

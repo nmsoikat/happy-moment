@@ -10,12 +10,13 @@ import { API_URL } from '../../Constant'
 import { toast } from 'react-toastify';
 import { Spinner, Stack } from 'react-bootstrap';
 
-export default function VerifyEmail() {
+export default function VerifyEmail({ newMail }) {
   const [isMailVerified, setIsmailVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate()
   let { token: resetToken } = useParams();
+  const { user: currentUser } = useContext(AuthContext);
 
   const config = {
     headers: {
@@ -30,13 +31,18 @@ export default function VerifyEmail() {
   useEffect(() => {
     const VerifyEmail = async () => {
       setIsLoading(true);
-
-      const { data } = await axios.patch(`${API_URL}/api/v1/auth/email-verification-complete/${resetToken}`, {}, config)
+      console.log(newMail);
+      const { data } = !newMail ? await axios.patch(`${API_URL}/api/v1/auth/email-verification-complete/${resetToken}`, {}, config) :
+        await axios.patch(`${API_URL}/api/v1/auth/email-verification-complete/new/${resetToken}`, {}, config)
       if (data.success) {
         toast.success(data.message)
         setIsmailVerified(true)
         setTimeout(() => {
-          navigate('/login')
+          if (!newMail) {
+            navigate('/login')
+          } else {
+            navigate(`/profile/${currentUser.username}`)
+          }
         }, 3000)
       } else {
         toast.error(data.message)
@@ -46,7 +52,7 @@ export default function VerifyEmail() {
     }
 
     VerifyEmail()
-  }, [])
+  }, [newMail])
 
   return <>
     <div className="login">

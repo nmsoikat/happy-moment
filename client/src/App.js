@@ -80,7 +80,8 @@ function App() {
         <Route path='/forgot-password' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ForgotPassword />} />
         <Route path='/reset-password/:token' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <ResetPassword />} />
         <Route path='/send-verification-email' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <SendVerificationEmail />} />
-        <Route path='/verify-email/:token' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <VerifyEmail />} />
+        <Route path='/verify-email/:token' element={currentUser ? <Home socket={socket} isFriendsUpdated={isFriendsUpdated} updateCurrentUser={setCurrentUser} onlineFriends={onlineFriends} stopSpinner={stopSpinner} /> : <VerifyEmail newMail={false} />} />
+        <Route path='/verify-email/new/:token' element={<VerifyEmail newMail={true} />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

@@ -1,31 +1,29 @@
 const nodemailer = require('nodemailer')
 const pug = require('pug')
-const {htmlToText} = require('html-to-text')
+const { htmlToText } = require('html-to-text')
 const fs = require('fs')
 
-module.exports = class Email{
+module.exports = class Email {
   //define email options
-  constructor(user, url){
+  constructor(user, url) {
     this.to = user.email;
     this.firstName = user.firstName;
     this.url = url;
-    this.from = `Nur Mohammad ${process.env.EMAIL_FORM}`
+    this.from = `GentleWind ${process.env.EMAIL_FORM}`
   }
 
   //Create a transporter
-  newTransport(){
-    // if(process.env.NODE_ENV === 'production'){
-      // sendgrid
-      return nodemailer.createTransport({
-        service: 'SendGrid',
-        auth:{
-          user: process.env.SENDGRID_USERNAME,
-          pass: process.env.SENDGRID_PASSWORD,
-        }
-      })
-    // }
-    
-    //mailtrap inbox using nodemailer
+  newTransport() {
+    // sendgrid
+    return nodemailer.createTransport({
+      service: 'SendGrid',
+      auth: {
+        user: process.env.SENDGRID_USERNAME,
+        pass: process.env.SENDGRID_PASSWORD,
+      }
+    })
+
+    //mailtrap
     // return nodemailer.createTransport({
     //   host: process.env.EMAIL_HOST,
     //   port: process.env.EMAIL_PORT,
@@ -33,11 +31,13 @@ module.exports = class Email{
     //     user: process.env.EMAIL_USERNAME,
     //     pass: process.env.EMAIL_PASSWORD
     //   }
+
     // })
+
   }
 
   //actual send
-  async send(template, subject){
+  async send(template, subject) {
     //1) Render html
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       firstName: this.firstName,
@@ -59,18 +59,18 @@ module.exports = class Email{
   }
 
   //Welcome Mail
-  async sendWelcome(){
+  async sendWelcome() {
     await this.send('welcome', 'Welcome to our family!');
   }
-  
+
   //Forgot Password Mail
-  async sendResetPassword(){
+  async sendResetPassword() {
     await this.send('passwordReset', 'Your password reset token (valid for only 10 minutes)');
   }
-  
+
   //Email Verification Mail
-  async sendEmailVerificationMail(){
+  async sendEmailVerificationMail() {
     await this.send('verifyEmail', 'Link valid for only 10 minutes');
   }
-  
+
 }

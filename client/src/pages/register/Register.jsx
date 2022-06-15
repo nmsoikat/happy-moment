@@ -36,11 +36,20 @@ export default function Register() {
 
   const navigate = useNavigate()
 
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
+  }
+
   const onSubmit = async (values) => {
     try {
       //register
       setIsLoading(true)
-      const register = await axios.post(`${API_URL}/api/v1/auth/register`, values)
+      const register = await axios.post(`${API_URL}/api/v1/auth/register`, values, config)
 
       if (register.data.success) {
         //sent verification email
