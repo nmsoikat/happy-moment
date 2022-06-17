@@ -31,7 +31,8 @@ const { Server } = require('socket.io')
 const io = new Server(server, {
   cors: {
     // origin: 'http://localhost:3000'
-    origin: 'https://gentle-wind.herokuapp.com'
+    // origin: 'https://gentle-wind.herokuapp.com'
+    origin: '*'
   }
 });
 
