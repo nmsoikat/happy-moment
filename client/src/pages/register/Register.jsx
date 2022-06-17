@@ -78,7 +78,7 @@ export default function Register() {
     <div className="login">
       <div className="login-wrapper">
         <div className="login-left">
-          <h3 className="login-logo">Gentle Wind</h3>
+          <h3 className="login-logo">Gentlewind</h3>
           <div className="span login-desc">
             Be happy for this moment <span>&#128578;</span>
           </div>

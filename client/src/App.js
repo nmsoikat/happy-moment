@@ -30,13 +30,18 @@ function App() {
   const [stopSpinner, setStopSpinner] = useState(false);
 
   //socket init
+  // useEffect(() => {
+  //   if (currentUser?._id) {
+  //     setSocket(io('ws://localhost:8900'))
+  //   }
+
+  // }, [])
+
   useEffect(() => {
     if (currentUser?._id) {
-      setSocket(io('ws://localhost:8900'))
+      setSocket(io('https://gentle-wind.herokuapp.com'))
     }
-
   }, [])
-
   //user added to socket
   useEffect(() => {
     socket?.on("connect", () => {
