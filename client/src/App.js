@@ -39,7 +39,7 @@ function App() {
 
   useEffect(() => {
     if (currentUser?._id) {
-      setSocket(io('https://gentle-wind.herokuapp.com'))
+      setSocket(io('https://gentle-wind-socket.herokuapp.com'))
     }
   }, [])
   //user added to socket

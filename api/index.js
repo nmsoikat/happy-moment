@@ -24,17 +24,17 @@ const messageRouter = require('./routes/messageRouter');
 // APP
 const app = express();
 
-const http = require('http')
-const server = http.createServer(app)
+// const http = require('http')
+// const server = http.createServer(app)
 
-const { Server } = require('socket.io')
-const io = new Server(server, {
-  cors: {
-    // origin: 'http://localhost:3000'
-    // origin: 'https://gentle-wind.herokuapp.com'
-    origin: '*'
-  }
-});
+// const { Server } = require('socket.io')
+// const io = new Server(server, {
+//   cors: {
+//     // origin: 'http://localhost:3000'
+//     // origin: 'https://gentle-wind.herokuapp.com'
+//     origin: '*'
+//   }
+// });
 
 app.set('views', './views')
 app.set('view engine', 'pug')
@@ -58,7 +58,8 @@ app.use('/images', express.static(path.join(__dirname, "/public/images")))
 
 // MIDDLEWARE
 // let whitelist = ['http://localhost:3000'];
-let whitelist = ['https://gentle-wind.herokuapp.com'];
+// let whitelist = ['https://gentle-wind.herokuapp.com'];
+let whitelist = ['https://gentlewind.netlify.app'];
 let corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1) {
@@ -157,75 +158,79 @@ app.use(AppErrorHandler);
 // ----------------------------------------------------------
 
 // active users
-let onlineUsers = []
+// let onlineUsers = []
 
-// user added online
-const addUser = (userId, socketId) => {
-  !onlineUsers.some(user => user.userId === userId) && onlineUsers.push({ userId, socketId })
-}
+// // user added online
+// const addUser = (userId, socketId) => {
+//   !onlineUsers.some(user => user.userId === userId) && onlineUsers.push({ userId, socketId })
+// }
 
-// remove from online
-const removeUser = (socketId) => {
-  onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
-}
+// // remove from online
+// const removeUser = (socketId) => {
+//   onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
+// }
 
-// get user
-const getUser = (userId) => {
-  return onlineUsers.find(user => user.userId === userId)
-}
+// // get user
+// const getUser = (userId) => {
+//   return onlineUsers.find(user => user.userId === userId)
+// }
 
-// every connection
-io.on("connection", (socket) => {
-  // CONNECTED
-  // console.log("A user connected");
+// // every connection
+// io.on("connection", (socket) => {
+//   // CONNECTED
+//   // console.log("A user connected");
 
-  socket.on('addUser', (userId) => {
-    addUser(userId, socket.id) // set userId and socketId
+//   socket.on('addUser', (userId) => {
+//     addUser(userId, socket.id) // set userId and socketId
 
-    // console.log(onlineUsers);
-    // console.log(`User added: ${socket.id}`);
+//     // console.log(onlineUsers);
+//     // console.log(`User added: ${socket.id}`);
 
-    //send to client
-    io.emit("getUsers", onlineUsers) // online users
-  })
-
-
-
-  // SEND AND GET MESSAGE
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => { // receive from client
-    const whoReceive = getUser(receiverId)
-
-    //send to client //specific
-    io.to(whoReceive?.socketId).emit("getMessage", { senderId, text })
-  })
-
-  socket.on("sendNotification", ({ senderId, receiverId, postId, senderName, type }) => {
-    const receiver = getUser(receiverId)
+//     //send to client
+//     io.emit("getUsers", onlineUsers) // online users
+//   })
 
 
-    if (receiver) {
-      io.to(receiver.socketId).emit("getNotification", {
-        senderId,
-        postId,
-        senderName,
-        type
-      })
-    }
 
-  })
+//   // SEND AND GET MESSAGE
+//   socket.on("sendMessage", ({ senderId, receiverId, text }) => { // receive from client
+//     const whoReceive = getUser(receiverId)
 
-  // DISCONNECTED
-  socket.on("disconnect", () => {
-    // console.log("A user disconnected");
-    removeUser(socket.id) // remove active user
+//     //send to client //specific
+//     io.to(whoReceive?.socketId).emit("getMessage", { senderId, text })
+//   })
 
-    //send to client
-    io.emit('getUsers', onlineUsers) // online users
-    console.log(`User disconnected: ${socket.id}`);
-  })
-})
+//   socket.on("sendNotification", ({ senderId, receiverId, postId, senderName, type }) => {
+//     const receiver = getUser(receiverId)
+
+
+//     if (receiver) {
+//       io.to(receiver.socketId).emit("getNotification", {
+//         senderId,
+//         postId,
+//         senderName,
+//         type
+//       })
+//     }
+
+//   })
+
+//   // DISCONNECTED
+//   socket.on("disconnect", () => {
+//     // console.log("A user disconnected");
+//     removeUser(socket.id) // remove active user
+
+//     //send to client
+//     io.emit('getUsers', onlineUsers) // online users
+//     console.log(`User disconnected: ${socket.id}`);
+//   })
+// })
+
+// --------------------- End Socket ----------------------
+
+
 // LISTEN
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log('Backend Server is Running On:' + PORT);
 })
