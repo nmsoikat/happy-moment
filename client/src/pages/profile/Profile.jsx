@@ -107,7 +107,7 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
       return () => { }
 
     const fetchUser = async () => {
-      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${currentUser._id}`);
+      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${currentUser._id}`, config);
       console.log("current user ", data);
       setFirstName(data.firstName)
       setLastName(data.lastName)
@@ -120,7 +120,7 @@ export default function Profile({ socket, setIsFriendsUpdated }) {
   // user profile by username
   useEffect(() => {
     const fetchUser = async () => {
-      const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
+      const { data } = await axios(`${API_URL}/api/v1/users/single?username=${username}`, config);
       console.log("user profile", data);
       setUser(data)
       setFirstName(data.firstName)

@@ -8,6 +8,8 @@ import { AuthContext } from '../../context/AuthContext';
 import UseInfinityScroll from '../../UseInfinityScroll';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 import { useState, useEffect, useContext, useRef, useCallback } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
+import MoreIcon from '@mui/icons-material/More';
 
 const Feed = (props) => {
   const username = props.username;
@@ -30,6 +32,8 @@ const Feed = (props) => {
   const [query, setQuery] = useState('')
   const [newPosts, setNewPosts] = useState([])
   const [fileUploading, setFileUploading] = useState(0)
+  const [postDesc, setPostDesc] = useState('')
+  const [isRichEditor, setIsRichEditor] = useState(false);
 
   const config = {
     headers: {
@@ -88,13 +92,17 @@ const Feed = (props) => {
   const submitHandler = async (e) => {
     e.preventDefault()
 
-    if (!file && !desc.current.value) {
+    // if (!file && !desc.current.value) {
+    //   return alert("Please add description or image.")
+    // }
+    if (!file && !postDesc) {
       return alert("Please add description or image.")
     }
 
     const newPost = {
       userId: user._id,
-      desc: desc.current.value,
+      // desc: desc.current.value,
+      desc: postDesc,
       postType,
     }
 
@@ -130,7 +138,8 @@ const Feed = (props) => {
       }, 500)
       setNewPosts(prev => [postShared.data, ...prev])
 
-      desc.current.value = "";
+      // desc.current.value = "";
+      setPostDesc('')
       if (file) {
         cancelBlobView()
       }
@@ -161,6 +170,16 @@ const Feed = (props) => {
     refreshUser();
   }, [])
 
+  const editorChangeHandler = (e) => {
+    setIsRichEditor(!isRichEditor)
+    setPostDesc('')
+  }
+
+  const editPostContent = (e) => {
+    setIsRichEditor(!isRichEditor)
+    setPostDesc('')
+  }
+
   return <>
     <div className='feed'>
       <div className="feed-wrapper">
@@ -169,9 +188,44 @@ const Feed = (props) => {
             <div className="share-wrapper">
               <div className="share-top">
                 <img src={user.profilePicture ? PF + 'person/' + user.profilePicture : PF + "/person/noAvatar.png"} alt="" className="share-profile-img" />
-                <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} />
+                <div>
+                  <span style={{ fontWeight: 'bold', color: '#333' }}>{user.firstName + ' ' + user.lastName}</span>
+                  <br />
+                  <div onClick={editorChangeHandler} style={{ display: 'inline-block', fontWeight: 'bold', color: '#555', cursor: 'pointer', transform: 'rotate(180deg)' }}><MoreIcon /></div>
+                </div>
+                {/* <input placeholder={"What's on your mind " + user.firstName + "?"} className="share-input" ref={desc} /> */}
               </div>
-              <hr className="share-hr" />
+              {
+                isRichEditor ? (
+                  <Editor
+                    textareaName='postTextArea'
+                    init={{
+                      height: 200,
+                      menubar: false,
+                      plugins: [
+                        'textcolor advlist autolink lists link image charmap print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount'
+                      ],
+                      toolbar: 'undo redo | formatselect | ' +
+                        'bold italic forecolor backcolor | alignleft aligncenter ' +
+                        'alignright alignjustify | bullist numlist outdent indent | ' +
+                        'removeformat | help',
+                      content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                    }}
+                    onEditorChange={(postContent) => setPostDesc(postContent)}
+                  />
+                ) : (
+                  <>
+                    <textarea
+                      placeholder={"What's on your mind " + user.firstName + "?"}
+                      className="share-input"
+                      onEditorChange={(e) => setPostDesc(e.target.value)} ></textarea>
+                    <hr className="share-hr" />
+                  </>
+                )
+              }
+
               {
                 file && (
                   <div className="share-img-container">
@@ -192,7 +246,7 @@ const Feed = (props) => {
 
               {fileUploading > 0 && <ProgressBar now={fileUploading} label={`${fileUploading}%`} />}
 
-              <form className="share-bottom" encType="multipart/form-data" onSubmit={submitHandler}>
+              <form className="share-bottom mt-2" encType="multipart/form-data" onSubmit={submitHandler}>
                 <div className="share-options">
                   <label id="file" className="share-option">
                     <PermMedia htmlColor='tomato' className='share-option-icon' />
@@ -214,12 +268,12 @@ const Feed = (props) => {
         ) : ''}
         {
           newPosts.map((p, index) => (
-            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
+            <Post key={p._id} post={p} editPostContent={editPostContent} myRef={lastDocElementRef} socket={socket} />
           ))
         }
         {
           docs.map((p) => (
-            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
+            <Post key={p._id} post={p} editPostContent={editPostContent} myRef={lastDocElementRef} socket={socket} />
           ))
         }
       </div>

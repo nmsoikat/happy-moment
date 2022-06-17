@@ -19,11 +19,17 @@ exports.postCreateOne = async (req, res) => {
 exports.postUpdateById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post.userId.toString() === req.body.userId) {
-      await post.updateOne({ $set: req.body });
-      res.status(200).json("The post has been updated");
+    if (post.userId.toString() === req.user._id.toString()) {
+      await post.updateOne({ desc: req.body.postDesc });
+      res.status(200).json({
+        success: true,
+        message: 'The post has been updated'
+      });
     } else {
-      res.status(403).json('You can update only our post')
+      res.status(200).json({
+        success: true,
+        message: 'You can update only our post'
+      });
     }
   } catch (err) {
     res.status(500).json(err)

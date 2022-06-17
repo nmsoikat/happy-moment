@@ -14,6 +14,7 @@
 .share-top {
 	display: flex;
 	align-items: center;
+	margin-bottom: 10px;
 }
 
 .share-profile-img {
@@ -26,7 +27,7 @@
 
 .share-input {
 	border: none;
-	width: 80%;
+	width: 100%;
 }
 
 .share-input:focus {

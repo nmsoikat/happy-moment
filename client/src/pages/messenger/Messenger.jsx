@@ -222,7 +222,7 @@ function Messenger({ socket, onlineFriends, stopSpinner, isFriendsUpdated, updat
     if (!targetId) return;
 
     const findTargetUser = async () => {
-      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${targetId}`);
+      const { data } = await axios(`${API_URL}/api/v1/users/single?id=${targetId}`, config);
       setTargetUser(data)
     }
     findTargetUser();

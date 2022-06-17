@@ -1,13 +1,18 @@
 import './post.css'
 import { MoreVert } from '@mui/icons-material';
-import { useContext, useEffect, useState, forwardRef } from 'react';
+import { useContext, useEffect, useState, forwardRef, useRef } from 'react';
 import axios from 'axios';
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext';
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
+import { Editor } from '@tinymce/tinymce-react';
+import { toast } from 'react-toastify';
 
 const Post = forwardRef(({ post, myRef, socket }) => {
+  const [postDesc, setPostDesc] = useState(post?.desc) // a copy of post
+  const [postDescDemo, setPostDescDemo] = useState(post?.desc)
+  const [isEditPost, setIsEditPost] = useState(false)
   const [like, setLike] = useState(post.likes.length)
   const [isLike, setIsLike] = useState(false)
   const [isLikeClick, setIsLikeClick] = useState(false)
@@ -25,6 +30,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   const [isPostTypeVisible, setIsPostTypeVisible] = useState({ visible: false, postId: '' })
 
   const PF = REACT_APP_PUBLIC_FOLDER;
+  const editorRef = useRef(null);
 
   // const { user: currentUser, token } = useContext(AuthContext)
   const { token } = useContext(AuthContext)
@@ -199,6 +205,37 @@ const Post = forwardRef(({ post, myRef, socket }) => {
     refreshUser();
   }, [])
 
+  //enable edit
+  const postEditEnable = () => {
+    setIsEditPost(true)
+    editorRef.current.setContent(postDesc)
+  }
+
+  //separate state
+  const editorOnChangeHandler = (desc) => {
+    setPostDescDemo(desc)
+  }
+
+  //main post no change
+  const postEditCancel = () => {
+    setIsEditPost(false)
+    setPostDesc(post.desc)
+  }
+
+  //update
+  const updatePostDesc = async (postId) => {
+    setPostDesc(postDescDemo) //updated post
+
+    const { data } = await axios.put(`${API_URL}/api/v1/posts/${postId}`, { postDesc:postDescDemo }, config)
+    if (data.success) {
+      setIsEditPost(false)
+      toast.success(data.message)
+    } else {
+      toast.error(data.message)
+    }
+
+  }
+
   return <div ref={myRef} className={`post shadow-sm bg-white ${(deletedPost.postId === post._id && deletedPost.deleted) && 'd-none'}`}>
     <div className="post-wrapper">
       <div className="post-top">
@@ -218,6 +255,7 @@ const Post = forwardRef(({ post, myRef, socket }) => {
                 (isPostTypeVisible.visible && isPostTypeVisible.postId === post._id) &&
                 (
                   <div className='dropdown shadow'>
+                    {!isEditPost && <label className={`d-block`} onClick={() => postEditEnable({ postId: post._id })}>Edit</label>}
                     <label className={`d-block ${postType.postType === 'public' && 'selected'}`} onClick={() => updatePostType({ postType: 'public', postId: post._id })}>Public</label>
                     <label className={`d-block ${postType.postType === 'private' && 'selected'}`} onClick={() => updatePostType({ postType: 'private', postId: post._id })}>Private</label>
                     <label className={`d-block text-danger`} onClick={() => deleteUserPostById(post._id)}>Delete</label>
@@ -231,7 +269,38 @@ const Post = forwardRef(({ post, myRef, socket }) => {
       </div>
 
       <div className="post-center">
-        <p className="post-text">{post?.desc}</p>
+        {/* <p className="post-text">{post?.desc}</p> */}
+        {
+          isEditPost ? (
+            <>
+              <Editor
+                // onInit={(evt, editor) => editorRef.current = editor}
+                initialValue={postDesc}
+                textareaName='postTextArea'
+                init={{
+                  height: 200,
+                  menubar: false,
+                  plugins: [
+                    'textcolor advlist autolink lists link image charmap print preview anchor',
+                    'searchreplace visualblocks code fullscreen',
+                    'insertdatetime media table paste code help wordcount'
+                  ],
+                  toolbar: 'undo redo | formatselect | ' +
+                    'bold italic forecolor backcolor | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent | ' +
+                    'removeformat | help',
+                  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                }}
+                onEditorChange={(postContent) => editorOnChangeHandler(postContent)}
+              />
+              <button className="btn btn-sm btn-outline-secondary" onClick={postEditCancel}>Cancel</button>
+              <button className="btn btn-sm btn-warning ml-2" onClick={() => updatePostDesc(post._id)}>Update</button>
+            </>
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: postDesc }} />
+          )
+        }
+
         {post?.photo && <img className='post-img' src={PF + 'post/' + post?.photo} alt="" />}
         {post?.video && (
           <video src={PF + 'post/' + post?.video} controls>

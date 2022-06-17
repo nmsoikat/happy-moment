@@ -8,15 +8,24 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { REACT_APP_PUBLIC_FOLDER, API_URL } from '../../Constant'
 
-export default function Profile({socket}) {
+export default function Profile({ socket }) {
   const PF = REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams()
 
   const [user, setUser] = useState({})
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      // Authorization: `Bearer ${token}`,
+      'Access-Control-Allow-Origin': '*',
+    },
+    withCredentials: true
+  }
+
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await axios(`${API_URL}/api/v1/users/single?username=${username}`);
+      const res = await axios(`${API_URL}/api/v1/users/single?username=${username}`, config);
       setUser(res.data)
     }
 
@@ -25,14 +34,14 @@ export default function Profile({socket}) {
 
   return (
     <>
-      <Topbar  socket={socket} />
+      <Topbar socket={socket} />
       <div className="container">
         <div className="row">
           <div className="col-md-3">
             <Sidebar />
           </div>
           <div className="col-md-9">
-            <Feed trendingPage={true}/>
+            <Feed trendingPage={true} />
           </div>
         </div>
       </div>
