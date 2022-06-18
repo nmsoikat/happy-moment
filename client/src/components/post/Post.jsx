@@ -208,7 +208,8 @@ const Post = forwardRef(({ post, myRef, socket }) => {
   //enable edit
   const postEditEnable = () => {
     setIsEditPost(true)
-    editorRef.current.setContent(postDesc)
+    // editorRef.current.setContent(postDesc)
+    setPostDescDemo(postDesc)
   }
 
   //separate state

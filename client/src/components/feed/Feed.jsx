@@ -140,6 +140,7 @@ const Feed = (props) => {
 
       // desc.current.value = "";
       setPostDesc('')
+      setIsRichEditor(false)
       if (file) {
         cancelBlobView()
       }
@@ -171,11 +172,6 @@ const Feed = (props) => {
   }, [])
 
   const editorChangeHandler = (e) => {
-    setIsRichEditor(!isRichEditor)
-    setPostDesc('')
-  }
-
-  const editPostContent = (e) => {
     setIsRichEditor(!isRichEditor)
     setPostDesc('')
   }
@@ -220,7 +216,8 @@ const Feed = (props) => {
                     <textarea
                       placeholder={"What's on your mind " + user.firstName + "?"}
                       className="share-input"
-                      onEditorChange={(e) => setPostDesc(e.target.value)} ></textarea>
+                      value={postDesc}
+                      onChange={(e) => setPostDesc(e.target.value)} ></textarea>
                     <hr className="share-hr" />
                   </>
                 )
@@ -268,12 +265,12 @@ const Feed = (props) => {
         ) : ''}
         {
           newPosts.map((p, index) => (
-            <Post key={p._id} post={p} editPostContent={editPostContent} myRef={lastDocElementRef} socket={socket} />
+            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
           ))
         }
         {
           docs.map((p) => (
-            <Post key={p._id} post={p} editPostContent={editPostContent} myRef={lastDocElementRef} socket={socket} />
+            <Post key={p._id} post={p} myRef={lastDocElementRef} socket={socket} />
           ))
         }
       </div>
